@@ -1,0 +1,41 @@
+### THIS GIT IGNORE IS DESIGNED FOR:
+### NPM, NODE, COMPOSER
+
+### IGNORE OSX & LOGS
+logs
+*.log
+*.gz
+*.zip
+*.map
+.htaccess
+.DS_Store
+sitemap.xml
+sitemap.xml.gz
+
+### IGNORE SECURITY CONFIGURATIONS
+conf.php
+db.php
+
+### IGNORE MIKE'S LOCAL VM
+conf
+
+### IGNORE DEPLOYMENT CLIENTS
+pushy
+pushy_*
+
+### IGNORE ALL NPM CORES
+node_modules
+bower_components
+npm-debug.log
+.sass-cache/
+
+### IGNORE COMPOSER CORES
+vendor
+
+### IGNORE OTHER SPECIFIC CORES
+webapp/platforms
+webapp/plugins
+
+
+### WEB IGNORES
+VERSION

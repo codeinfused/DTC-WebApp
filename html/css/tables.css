@@ -1,0 +1,121 @@
+.page-table-edit-wrap{
+  position: relative;
+  padding-bottom: 30px;
+}
+
+.page-table-edit-wrap h1{
+  padding: 30px 20px 16px 20px;
+  margin:0 auto 0px;
+  background: #2e539c;
+  color: rgba(255,255,255,0.25);
+  font-size: 2.1rem;
+  font-weight: 100;
+}
+
+.my-profile{
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  z-index: 10;
+  display: block;
+  width: 70px;
+  height: 70px;
+  margin: 0;
+  -webkit-border-radius: 70px;
+  border-radius: 70px;
+  border: 4px solid #fff;
+  overflow: hidden;
+}
+.my-profile img{
+  position: relative;
+  height: 70px;
+  width: 70px;
+}
+
+.table-game-details{
+  margin: 0 0 20px;
+  background: #333;
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 600;
+  padding: 15px 60px 15px 22px;
+}
+
+.table-form-item{
+  position: relative;
+  margin: 8px 16px;
+  padding: 10px 16px;
+  background: #f3f3f3;
+  color: #333;
+  border-radius: 2px;
+}
+.table-form-item * {
+  font-size: 1.3rem;
+}
+
+.table-form-playerseats span{
+  color: #909090;
+  font-weight: 100;
+  font-style: italic;
+}
+
+.table-form-item div[data-react-toolbox="input"]{
+  padding-bottom: 1rem;
+  outline: none;
+}
+div[data-react-toolbox="dropdown"]{
+  outline: none;
+  z-index: 310;
+}
+
+div[data-react-toolbox="overlay"]{
+  height: 90vh;
+  top: -10px;
+  z-index: 500;
+}
+div[data-react-toolbox="dialog"] h3#months{
+  margin: 0.4rem 0 0;
+  font-size: 2.6rem;
+}
+div[data-react-toolbox="dialog"][class*="hoursDisplay"] header, div[data-react-toolbox="dialog"][class*="minutesDisplay"] header{
+  width: auto;
+  font-size: 4.2rem;
+}
+
+div[data-react-toolbox="dropdown"] ul{
+  margin: 0; padding: 8px 0; outline: none;
+}
+div[data-react-toolbox="dropdown"] li{
+  padding: 0.8rem 1rem;
+  font-size: 1.2rem;
+}
+
+div[data-react-toolbox="slider"] div[class*="theme__snap"]:after{
+  display: block;
+  width: 4px;
+  height: 4px;
+  content: "";
+  background-color: #3f51b5;
+  border-radius: 50%;
+  position: relative;
+  top: -1px;
+}
+
+label[data-react-toolbox="switch"]{
+  margin: 0.7rem 0;
+}
+
+.table-form-item .submit{
+  border: none;
+  outline: none;
+  padding: 12px 14px;
+  text-align: center;
+  display: block;
+  /*background: #3a9bcc;*/
+  background: #a23fc5;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1.5rem;
+  width: 100%;
+  border-radius: 7px;
+}

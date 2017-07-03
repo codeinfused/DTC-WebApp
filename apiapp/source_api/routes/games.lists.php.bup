@@ -1,0 +1,100 @@
+<?php
+use api\auth\Auth;
+use api\games\Games;
+
+/*
+$app->get('/games', function($req, $resp, $args) use ($app)
+{
+  echo json_encode(array('error'=>'Invalid api route'));
+});
+*/
+
+$app->get('/import_bgg_process_next', function($req, $resp, $args) use ($app)
+{
+  Games::bgg_clone__process_next($this);
+});
+
+$app->get('/import_bgg_sitemap/[{pagenum}]', function($req, $resp, $args) use ($app)
+{
+  return ;
+  Games::bgg_clone__convert_sitemap_page($this, "https://boardgamegeek.com/sitemap_geekitems_boardgame_page_".$args['pagenum']);
+});
+
+$app->get('/games/[{id}]', function($req, $resp, $args) use ($app)
+{
+  $bggapi = $this->get('bgg_api');
+
+  $this->curl->get(array(
+    "url" => $bggapi['game'],
+    "showHeaders" => false,
+    "autofollow" => true,
+    "data" => array(
+      'type' => 'boardgame',
+      'id' => $args['id']
+    )
+  ));
+
+  $bggxml = simplexml_load_string($this->curl->html);
+
+  if(empty($bggxml->item)){
+    return $resp->withJson(array(
+      'error'=>'Game was not found.'
+    ));
+  }
+
+  $game = $node = json_decode(json_encode($bggxml->item));
+  $game_json = Games::game_xml_to_json($game);
+
+	return $resp->withJson($game_json);
+});
+
+
+$app->post('/games/search/', function($req, $resp, $args) use ($app)
+{
+  $bggapi = $this->get('bgg_api');
+  $body = $req->getParsedBody();
+  $term = $body['term'];
+
+  $games_list_ids = Games::search_games_by_term($this, $term, false);
+  if(empty($games_list_ids)){ return $resp->withJson(array('error'=>'No games found for search '.$term.'.')); }
+
+  $games_list = Games::get_games_by_ids($this, $games_list_ids);
+  return $resp->withJson(array('games'=>$games_list));
+});
+
+
+$app->get('/collections/[{username}]', function($req, $resp, $args) use($app)
+{
+  $bggapi = $this->get('bgg_api');
+
+  $collection_repeats = 0;
+  while($collection_repeats < 4)
+  {
+    $collection_repeats++;
+    $listobj = Games::curl_get_user_collection($this, $args['username']);
+
+    // if error or empty list returned
+    if(is_string($listobj)){
+      return $listobj;
+    }
+
+    if( isset($listobj->message) && strpos($listobj->message->{0}, 'try again later')!==false ){
+      sleep(1);
+    }else{
+      $collection_repeats = 100;
+    }
+  }
+
+  // get actual game data from collection's IDs
+  // -------
+  $games_list_ids = array();
+  if(!is_array($listobj->item)){ $listobj->item = array($listobj->item); }
+
+  foreach($listobj->item as $listgame){ $games_list_ids[] = $listgame->{'@attributes'}->objectid; }
+  $games_list = Games::get_games_by_ids($this, $games_list_ids);
+
+  //return json_encode(array('games'=>$games_list), JSON_UNESCAPED_SLASHES);
+  return $resp->withJson(array('games'=>$games_list));
+});
+
+?>
