@@ -257,6 +257,7 @@ abstract class Auth
     }
 
     $jwt = self::generateToken($pdo, $user, $body);
+    $jwt['user'] = User::getUserInfo($pdo, $user['id']);
     return $jwt;
   }
 

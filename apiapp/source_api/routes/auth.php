@@ -17,6 +17,7 @@ $app->post('/authenticate', function($request, $response, $args)
     return $response->withStatus((int)$authReq->get_code())->withJson($authReq->json());
   }
 
+  //$authReq->data->user = $authUser = User::getUserInfo($this->db, $authReq->data->uid);
   return $response->withJson($authReq);
 });
 
