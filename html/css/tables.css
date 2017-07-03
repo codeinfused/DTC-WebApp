@@ -85,10 +85,17 @@ div[data-react-toolbox="dialog"][class*="hoursDisplay"] header, div[data-react-t
 div[data-react-toolbox="dropdown"] ul{
   margin: 0; padding: 8px 0; outline: none;
 }
+
+
 div[data-react-toolbox="dropdown"] li{
+  padding: 0.6rem 1rem;
+  font-size: 1.15rem;
+}
+.game-search div[data-react-toolbox="dropdown"] li{
   padding: 0.4rem 1rem;
   font-size: 1.05rem;
 }
+
 
 div[data-react-toolbox="slider"] div[class*="theme__snap"]:after{
   display: block;
