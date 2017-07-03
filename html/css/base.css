@@ -20,7 +20,7 @@ body{
   }
 }
 
-button, button:focus, button:visited{ outline: none; }
+button, button:focus, button:visited{ outline: none !important; cursor: pointer; }
 
 
 

@@ -18,7 +18,8 @@ class SplashIntro extends React.Component
   {
     super(props);
     this.state = {
-      askDialogActive: false
+      askDialogActive: false,
+      appLoading: false
     };
 
     this.handleGuestOpen = this.handleGuestOpen.bind(this);
@@ -85,7 +86,7 @@ class SplashIntro extends React.Component
   {
     var comp = this;
     var req = CONFIG.api.authenticate;
-    comp.setState({loaded: false});
+    comp.setState({loaded: false, appLoading:true});
 
     comp.getRequest = axios.post(req, {
       grant_type: 'facebook',
@@ -169,9 +170,9 @@ class SplashIntro extends React.Component
           <div id="app-logo"><img src="images/dtc-logo-transp-full.png" /></div>
 
           <div className="app-splash-actions-wrap">
-            <LoadingInline active={!comp.props.appLoaded} />
+            <LoadingInline active={comp.state.appLoading} />
 
-            <div className="app-splash-actions" style={{opacity: (comp.props.appLoaded===true ? '1' : '0')}}>
+            <div className="app-splash-actions" style={{opacity: (comp.state.appLoading===true ? '0' : '1')}}>
               <div className="app-splash-action">
                 <FacebookLogin
                   appId="202475036823066"
@@ -179,6 +180,7 @@ class SplashIntro extends React.Component
                   autoLoad={false}
                   fields="first_name,last_name,email,picture"
                   callback={this.facebookResponse}
+                  onClick={()=>{comp.setState({appLoading:true});}}
                   icon={false}
                   redirectUri={window.location.href}
                   cssClass="btn-login btn-login-facebook"
@@ -193,6 +195,7 @@ class SplashIntro extends React.Component
                   uxMode="popup"
                   onSuccess={this.googleResponse}
                   onFailure={this.googleDenied}
+                  onRequest={()=>{comp.setState({appLoading:true});}}
                   className="btn-login btn-login-google"
                 />
               </div>

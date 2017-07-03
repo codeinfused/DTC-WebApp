@@ -57,8 +57,8 @@ abstract class GamesDB
     $dbCheck = $pdo->prepare(
       "SELECT *,
         (SELECT count(id) FROM game_wtp gw WHERE gw.bgg_id=db.bgg_id) as wtp,
-        (SELECT count(id) FROM game_tables gt WHERE gt.bgg_id=db.bgg_id AND table_type='now' AND start_datetime > NOW() - INTERVAL 20 MINUTE) as lfp,
-        (SELECT count(id) FROM game_tables gt2 WHERE gt2.bgg_id=db.bgg_id AND table_type='future' AND start_datetime > NOW()) as scheduled
+        (SELECT count(id) FROM game_tables gt WHERE gt.bgg_id=db.bgg_id AND table_type='now' AND status='ready' AND start_datetime > NOW() - INTERVAL 20 MINUTE) as lfp,
+        (SELECT count(id) FROM game_tables gt2 WHERE gt2.bgg_id=db.bgg_id AND table_type='future' AND status='ready' AND start_datetime > NOW()) as scheduled
         FROM bgg_game_db db
         WHERE bgg_id = :bid LIMIT 1"
     );
@@ -88,8 +88,8 @@ abstract class GamesDB
       "SELECT
         SQL_CALC_FOUND_ROWS *,
         (SELECT count(id) FROM game_wtp gw WHERE gw.bgg_id=db.bgg_id) as wtp,
-        (SELECT count(id) FROM game_tables gt WHERE gt.bgg_id=db.bgg_id AND table_type='now' AND start_datetime > NOW() - INTERVAL 20 MINUTE) as lfp,
-        (SELECT count(id) FROM game_tables gt2 WHERE gt2.bgg_id=db.bgg_id AND table_type='future' AND start_datetime > NOW()) as scheduled
+        (SELECT count(id) FROM game_tables gt WHERE gt.bgg_id=db.bgg_id AND table_type='now' AND status='ready' AND start_datetime > NOW() - INTERVAL 20 MINUTE) as lfp,
+        (SELECT count(id) FROM game_tables gt2 WHERE gt2.bgg_id=db.bgg_id AND table_type='future' AND status='ready' AND start_datetime > NOW()) as scheduled
         FROM bgg_game_db db
         WHERE title LIKE :term AND title != 'EXPANSION' $tag_sql $sortby_sql
         LIMIT ".($opts['page']*$opts['limit']).",{$opts['limit']}"
@@ -127,8 +127,8 @@ abstract class GamesDB
       "SELECT
         SQL_CALC_FOUND_ROWS db.*,
         (SELECT count(id) FROM game_wtp gw WHERE gw.bgg_id=db.bgg_id) as wtp,
-        (SELECT count(id) FROM game_tables gt WHERE gt.bgg_id=db.bgg_id AND table_type='now' AND start_datetime > NOW() - INTERVAL 45 MINUTE) as lfp,
-        (SELECT count(id) FROM game_tables gt2 WHERE gt2.bgg_id=db.bgg_id AND table_type='future' AND start_datetime > NOW()) as scheduled
+        (SELECT count(id) FROM game_tables gt WHERE gt.bgg_id=db.bgg_id AND table_type='now' AND status='ready' AND start_datetime > NOW() - INTERVAL 45 MINUTE) as lfp,
+        (SELECT count(id) FROM game_tables gt2 WHERE gt2.bgg_id=db.bgg_id AND table_type='future' AND status='ready' AND start_datetime > NOW()) as scheduled
         FROM bgg_game_db db
         INNER JOIN library_dtc2017 lib ON lib.bgg_id = db.bgg_id
         WHERE db.title != 'EXPANSION' AND db.title IS NOT NULL $tag_sql $term_sql $sortby_sql

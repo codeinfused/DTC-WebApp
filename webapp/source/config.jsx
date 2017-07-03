@@ -19,7 +19,13 @@ const CONFIG = {
     verify: baseAPI+"verifyauth",
     wtp: baseAPI+"user/me/wtp",
     notify: baseAPI+"user/me/notify",
-    tableEdit: baseAPI+"tables/edit"
+
+    tableEdit: baseAPI+"tables/edit",
+    myTables: baseAPI+"tables/mine",
+    cancelTable: baseAPI+"tables/cancel",
+    refreshTable: baseAPI+"tables/refresh",
+    joinTable: baseAPI+"tables/join",
+    leaveTable: baseAPI+"tables/leave"
   },
 
   checkAuth: function(context, loadVar)
@@ -30,12 +36,12 @@ const CONFIG = {
       comp.state.authenticated = false;
       setTimeout(function(){
         //context.setState({[loadVar]: true});
-        context.setState({appLoaded: true});
         if(window.location.search.match(/^\?code=/)){
           // response to facebook oauth
         }else{
           browserHistory.push('/');
         }
+        context.setState({appLoaded: true});
       }, 50);
       return;
     }

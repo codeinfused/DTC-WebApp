@@ -113,6 +113,7 @@
   padding:50px 20px;
   margin:0 auto;
   text-align: center;
+  z-index:300;
 }
 
 .loader-layout-inner{

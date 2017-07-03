@@ -19,6 +19,7 @@ import SearchGames from './pages/SearchGames.jsx';
 import About from './pages/About.jsx';
 import TableEdit from './pages/TableEdit.jsx';
 import TableList from './pages/TableList.jsx';
+import MyTables from './pages/MyTables.jsx';
 
 class AppLayout extends React.Component
 {
@@ -30,6 +31,7 @@ class AppLayout extends React.Component
     this.state = {
       askDialogActive: false,
       appLoaded: false,
+      appLoading: false,
       sideMenuOpen: false,
       ignoreLandscape: false
     };
@@ -40,7 +42,7 @@ class AppLayout extends React.Component
       {label:'Con Library',       path:'/library', icon:'import_contacts', callback: comp.DBLoadLibrary},
       {label:'My Plans',          path:'/myplans', icon:'date_range'},
       {label:'My Tables',         path:'/mytables', icon:'playlist_add_check'},
-      {label:'My Settings',       path:'/me', icon:'settings_applications'},
+      // {label:'My Settings',       path:'/me', icon:'settings_applications'},
       {label:'About',             path:'/about', icon:'info'}
     ];
   }
@@ -99,6 +101,7 @@ class AppLayout extends React.Component
     return (
       <div id="app">
 
+
         <MediaQuery minDeviceWidth={500}>
           {comp.state.ignoreLandscape ? '' : (
             <div id="landscape-warning">
@@ -107,6 +110,7 @@ class AppLayout extends React.Component
           )}
         </MediaQuery>
 
+        {!comp.state.appLoaded ? <LoadingInline active={true} /> : (
         <div id="app-wrap">
           <AppMenu width={280} pageWrapId={"app-main-body"} outerContainerId={"app-wrap"} isOpen={comp.state.sideMenuOpen} onStateChange={comp.isMenuOpen.bind(comp)} customBurgerIcon={false} customCrossIcon={<FontIcon value='close' />}>
             <h2 className="app-menu-head"><img src="/images/dtc-logo-transp-full.png" /></h2>
@@ -121,7 +125,7 @@ class AppLayout extends React.Component
               transitionEnterTimeout={500}
               transitionLeaveTimeout={500}
             >
-              {React.cloneElement(this.props.children, {key: pathpage, appLoaded: comp.state.appLoaded})}
+              {React.cloneElement(this.props.children, {key: pathpage, appLoading: comp.state.appLoading})}
             </CSSTransitionGroup>
           </div>
 
@@ -131,6 +135,7 @@ class AppLayout extends React.Component
             </div>
           )}
         </div>
+        )}
 
       </div>
     );
@@ -148,6 +153,7 @@ ReactDOM.render(
       <Route path="tables" component={TableList} />
       <Route path="tables/create/:bgg_id" component={TableEdit} />
       <Route path="tables/edit/:table_id" component={TableEdit} />
+      <Route path="mytables" component={MyTables} />
     </Route>
   </Router>,
   document.getElementById('app-wrapper')

@@ -1,0 +1,29 @@
+{
+  "name": "Dice Tower Con App",
+  "description": "Mobile webapp for finding and starting table games.",
+  "require": {
+    "php": ">=7.0.0",
+    "slim/slim": "^3.1",
+    "slim/php-view": "^2.0",
+    "monolog/monolog": "^1.17",
+    "cartalyst/sentinel": "2.0.*",
+    "ircmaxell/password-compat": "^1.0",
+    "illuminate/database": "^5.3",
+    "illuminate/events": "^5.3",
+    "symfony/http-foundation": "^3.2",
+    "twig/twig": "^1.30",
+    "firebase/php-jwt": "^4.0"
+  },
+  "require-dev": {
+    "symfony/var-dumper": "~2.6"
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "start": "php -S 0.0.0.0:8001 -t public public/index.php",
+    "test": "phpunit"
+  }
+}

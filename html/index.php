@@ -49,7 +49,17 @@
 </head>
 <body>
 
-  <div id="app-wrapper"></div>
+  <div id="app-wrapper">
+    <div className="loader-layout-inline" style="display: block;">
+      <div className="loader-layout-inner">
+        <div className="loader-spinner2">
+          <svg className="loader-spinner2-circular" viewBox="25 25 50 50">
+            <circle className="loader-spinner2-path" cx="50" cy="50" r="20" fill="none" strokeWidth="2" strokeMiterlimit="10"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
   <div id="toasts-wrapper"></div>
 
   <script defer src="/vendors/axios.js"></script>
