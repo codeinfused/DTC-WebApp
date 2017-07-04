@@ -42,7 +42,7 @@ $container['logger'] = function($c)
 $container['db'] = function($c)
 {
   $settings = $c->get('settings')['db'];
-  $pdo = new PDO("mysql:host=" . $settings['host'] . ";dbname=" . $settings['dbname'], $settings['user'], $settings['pass']);
+  $pdo = new PDO("mysql:host=" . $settings['host'] . ";charset=utf8;dbname=" . $settings['dbname'], $settings['user'], $settings['pass']);
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
   $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
