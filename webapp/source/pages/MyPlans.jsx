@@ -36,8 +36,6 @@ class MyPlans extends React.Component
     this.renderTableList = this.renderTableList.bind(this);
     this.renderNoTables = this.renderNoTables.bind(this);
     this.getTableList = this.getTableList.bind(this);
-    this.handleToggleCancel = this.handleToggleCancel.bind(this);
-    this.deleteTable = this.deleteTable.bind(this);
   }
 
   componentDidMount()
@@ -66,34 +64,6 @@ class MyPlans extends React.Component
       ToastsAPI.toast('error', null, 'Failed to set.', {timeOut:6000});
     });
   }
-
-  deleteTable()
-  {
-    var comp = this;
-    axios.post(CONFIG.api.cancelTable, {
-      table_id: comp.state.currentTableId,
-      t: (new Date()).getTime()
-    }, {
-      headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
-    }).then(function(json){
-      ToastsAPI.toast('success', 'Table cancelled.', null, {timeout:6000});
-      comp.setState({cancelDialogActive: false});
-      comp.getTableList();
-    }).catch(function(json){
-      ToastsAPI.toast('error', null, json.response.data.message, {timeOut:6000});
-    });
-  }
-
-  handleConfirmCancel(table)
-  {
-    this.setState({
-      currentTableId: table.table_id,
-      cancelDialogActive: true
-    })
-  }
-
-  handleToggleCancel(){ this.setState({cancelDialogActive: false}); }
-
 
   handleSelectDay(day)
   {
@@ -143,7 +113,7 @@ class MyPlans extends React.Component
   {
     var comp = this;
     return comp.conDays.map(function(day, i){
-      var isSel = day.date === comp.state.currentDay ? ' active' : '';
+      var isSel = day.date == comp.state.currentDay ? ' active' : '';
       return (
         <div className={"calendar-day" + isSel} key={"calendar-day-"+day.date} onClick={comp.handleSelectDay.bind(comp, day.date)}>
           <span className="calendar-day-date">{day.date}</span>
@@ -209,19 +179,6 @@ class MyPlans extends React.Component
           active={!comp.state.loaded}
         />
 
-        <Dialog
-          title="Cancel This Table?"
-          type="small"
-          onEscKeyDown={this.handleToggleCancel}
-          onOverlayClick={this.handleToggleCancel}
-          active={this.state.cancelDialogActive}
-          actions={[
-            {label: "Nevermind", onClick: this.handleToggleCancel, raised: true},
-            {label: "Cancel It", onClick: this.deleteTable, primary: true, raised: true}
-          ]}
-        >
-          <p>You cannot undo this action if you cancel this table. If players have signed up, they will see a status change.</p>
-        </Dialog>
       </div>
     );
   }
