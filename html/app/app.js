@@ -98973,6 +98973,22 @@
 	    key: 'viewPlayers',
 	    value: function viewPlayers(table) {}
 	  }, {
+	    key: 'handleLeaveGame',
+	    value: function handleLeaveGame(table) {
+	      var comp = this;
+	      _axios2.default.post(_config2.default.api.leaveTable, {
+	        table_id: table.table_id,
+	        t: new Date().getTime()
+	      }, {
+	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
+	      }).then(function (json) {
+	        _ToastsAPI2.default.toast('success', 'Left game table', null, { timeout: 6000 });
+	        comp.getTableList();
+	      }).catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, json.response.data.message, { timeOut: 6000 });
+	      });
+	    }
+	  }, {
 	    key: 'renderCalendar',
 	    value: function renderCalendar() {
 	      var comp = this;
@@ -98998,18 +99014,15 @@
 	    key: 'renderTableList',
 	    value: function renderTableList() {
 	      var comp = this;
-	
+	      var selectedObj = comp.conDays.filter(function (item) {
+	        return item.date == comp.state.currentDay;
+	      });
 	      return _react2.default.createElement(
 	        'ul',
 	        { className: 'plans-timeline' },
-	        _react2.default.createElement(
-	          _reactTransitionGroup.CSSTransitionGroup,
-	          {
-	            transitionName: 'router',
-	            transitionEnterTimeout: 500,
-	            transitionLeaveTimeout: 500
-	          },
-	          comp.state.tables.map(function (table, i) {
+	        comp.state.tables.map(function (table, i) {
+	          var isSelected = (0, _moment2.default)(selectedObj[0].full, 'YYYY-MM-DD').isSame((0, _moment2.default)(table.start_datetime, 'YYYY-MM-DD HH:mm:ss'), 'day');
+	          if (isSelected) {
 	            return _react2.default.createElement(
 	              'li',
 	              { key: "table-item-" + table.table_id, className: table.status },
@@ -99048,40 +99061,19 @@
 	                    'Host: ',
 	                    table.host_name
 	                  )
+	                ),
+	                _react2.default.createElement(
+	                  'button',
+	                  { onClick: comp.handleLeaveGame.bind(comp, table) },
+	                  'Leave game'
 	                )
 	              )
 	            );
-	          })
-	        )
-	      )
-	
-	      //         <div className="table-item" key={"table-item-"+table.table_id}>
-	      //           <div className="table-item-header">
-	      //             <span className="table-item-title">{table.title}</span>
-	      //             <span className={"table-item-when " + table.status}>
-	      //               {table.status === 'cancelled' ? 'Cancelled' : moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').fromNow()}
-	      //             </span>
-	      //           </div>
-	      //           <div className="table-item-details">
-	      //             <span className="table-item-tag">{table.seats} seats</span>
-	      //             <span className="table-item-tag">{table.table_location}</span>
-	      //           </div>
-	      //           {table.status === 'cancelled' ? '' : (
-	      //             <div className="table-item-actions">
-	      //               <button className='delete' onClick={comp.handleConfirmCancel.bind(comp, table)}><FontIcon value='close' /></button>
-	      //               {table.table_type==='now' ? (
-	      //                 <button onClick={comp.refreshTable.bind(comp, table)}>Refresh this listing</button>
-	      //               ) : (
-	      //                 <button onClick={comp.viewPlayers.bind(comp, table)}>View your players</button>
-	      //               )}
-	      //             </div>
-	      //           )}
-	      //         </div>
-	      //       );
-	      //     })}
-	      //   </CSSTransitionGroup>
-	      // </div>
-	      ;
+	          } else {
+	            return '';
+	          }
+	        })
+	      );
 	    }
 	  }, {
 	    key: 'renderNoTables',

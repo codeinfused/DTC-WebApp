@@ -116,9 +116,26 @@ class MyPlans extends React.Component
     });
   }
 
+
   viewPlayers(table)
   {
 
+  }
+
+  handleLeaveGame(table)
+  {
+    var comp = this;
+    axios.post(CONFIG.api.leaveTable, {
+      table_id: table.table_id,
+      t: (new Date()).getTime()
+    }, {
+      headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
+    }).then(function(json){
+      ToastsAPI.toast('success', 'Left game table', null, {timeout:6000});
+      comp.getTableList();
+    }).catch(function(json){
+      ToastsAPI.toast('error', null, json.response.data.message, {timeOut:6000});
+    });
   }
 
 
@@ -140,16 +157,13 @@ class MyPlans extends React.Component
   renderTableList()
   {
     var comp = this;
-
+    var selectedObj = comp.conDays.filter(function(item){ return item.date==comp.state.currentDay; });
     return (
       <ul className="plans-timeline">
-        <CSSTransitionGroup
-          transitionName="router"
-          transitionEnterTimeout={500}
-          transitionLeaveTimeout={500}
-        >
-          {comp.state.tables.map(function(table, i)
-          {
+        {comp.state.tables.map(function(table, i)
+        {
+          var isSelected = moment(selectedObj[0].full, 'YYYY-MM-DD').isSame(moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss'), 'day');
+          if(isSelected){
             return (
               <li key={"table-item-"+table.table_id} className={table.status}>
                 <i className={table.status==='cancelled' ? "fa fa-calendar-times-o cancelled" : "fa fa-calendar-check-o"}></i> {/*  */}
@@ -161,42 +175,15 @@ class MyPlans extends React.Component
                     <span className="plan-tag">Room: {table.table_location}</span>
                     <span className={"plan-tag" + (table.player_id === CONFIG.state.user.id ? " hosting" : "")}>Host: {table.host_name}</span>
                   </div>
+                  <button onClick={comp.handleLeaveGame.bind(comp, table)}>Leave game</button>
                 </div>
               </li>
             );
-          })}
-        </CSSTransitionGroup>
+          }else{
+            return '';
+          }
+        })}
       </ul>
-
-
-
-
-      //         <div className="table-item" key={"table-item-"+table.table_id}>
-      //           <div className="table-item-header">
-      //             <span className="table-item-title">{table.title}</span>
-      //             <span className={"table-item-when " + table.status}>
-      //               {table.status === 'cancelled' ? 'Cancelled' : moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').fromNow()}
-      //             </span>
-      //           </div>
-      //           <div className="table-item-details">
-      //             <span className="table-item-tag">{table.seats} seats</span>
-      //             <span className="table-item-tag">{table.table_location}</span>
-      //           </div>
-      //           {table.status === 'cancelled' ? '' : (
-      //             <div className="table-item-actions">
-      //               <button className='delete' onClick={comp.handleConfirmCancel.bind(comp, table)}><FontIcon value='close' /></button>
-      //               {table.table_type==='now' ? (
-      //                 <button onClick={comp.refreshTable.bind(comp, table)}>Refresh this listing</button>
-      //               ) : (
-      //                 <button onClick={comp.viewPlayers.bind(comp, table)}>View your players</button>
-      //               )}
-      //             </div>
-      //           )}
-      //         </div>
-      //       );
-      //     })}
-      //   </CSSTransitionGroup>
-      // </div>
     );
   }
 

@@ -1,3 +1,7 @@
+#page-my-plans{
+  padding-bottom: 30px;
+}
+
 .calendar-days{
   display: flex;
   flex-direction: row;
@@ -54,8 +58,8 @@ ul.plans-timeline:before{
 }
 ul.plans-timeline li{
   position: relative;
-  margin-right: 10px;
-  margin-bottom: 15px;
+  margin-right: 2px;
+  margin-bottom: 38px;
 }
 ul.plans-timeline li > .fa{
   width: 34px;
@@ -82,7 +86,7 @@ ul.plans-timeline .plans-item{
   color: #444;
   margin-left: 60px;
   margin-right: 15px;
-  padding: 0;
+  padding: 0 0 5px;
   position: relative;
 }
 ul.plans-timeline .cancelled .plans-item{ opacity: 0.6; background: #e6b8b8; }
@@ -121,4 +125,23 @@ p.plans-time {
   font-weight: 100;
   font-size: 1.8rem;
   color: #666;
+}
+
+.plans-item button{
+  position: absolute;
+  bottom: -20px;
+  left: 14px;
+  border: none;
+  outline: none;
+  height: 32px;
+  line-height: 32px;
+  padding: 0px 12px;
+  display: inline-block;
+  /*background: #3a9bcc;*/
+  background: #d25555;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1.15rem;
+  border-radius: 6px;
+  margin-right: 8px;
 }
