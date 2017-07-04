@@ -1,6 +1,12 @@
 {
-  "short_name": "Dice Tower Con",
   "name": "Dice Tower Convention App",
+  "short_name": "Dice Tower Con",
+  "lang": "en-US",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#7d5fa6",
   "icons": [
     {
       "src": "apple-touch-icon-192.png",
@@ -12,9 +18,5 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ],
-  "start_url": "/",
-  "background_color": "#7d5fa6",
-  "display": "standalone",
-  "orientation": "portrait"
+  ]
 }

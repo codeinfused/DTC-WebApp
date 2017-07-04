@@ -11,7 +11,7 @@
   <title>Dice Tower Convention App</title>
   <meta name="description" content="">
 
-  <meta name="viewport" content="width=device-width, height=device-height, user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+  <meta name="viewport" content="width=device-width, height=device-height, user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no" />
 
   <!-- IOS Meta -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -21,9 +21,11 @@
 
   <!-- Android Meta -->
   <link rel="manifest" href="/android-manifest.json">
+  <meta name="application-name" content="Dice Tower Con">
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="theme-color" content="#601c88" />
   <meta name="msapplication-navbutton-color" content="#601c88" />
+  <meta name="msapplication-starturl" content="/">
 
   <!-- Icon Meta -->
   <link rel="icon" type="image/png" href="/apple-touch-icon.png" />
