@@ -20,6 +20,7 @@ import About from './pages/About.jsx';
 import TableEdit from './pages/TableEdit.jsx';
 import TableList from './pages/TableList.jsx';
 import MyTables from './pages/MyTables.jsx';
+import MyPlans from './pages/MyPlans.jsx';
 
 class AppLayout extends React.Component
 {
@@ -154,6 +155,7 @@ ReactDOM.render(
       <Route path="tables/create/:bgg_id" component={TableEdit} />
       <Route path="tables/edit/:table_id" component={TableEdit} />
       <Route path="mytables" component={MyTables} />
+      <Route path="myplans" component={MyPlans} />
     </Route>
   </Router>,
   document.getElementById('app-wrapper')

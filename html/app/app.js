@@ -125,6 +125,10 @@
 	
 	var _MyTables2 = _interopRequireDefault(_MyTables);
 	
+	var _MyPlans = __webpack_require__(847);
+	
+	var _MyPlans2 = _interopRequireDefault(_MyPlans);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -293,7 +297,8 @@
 	    _react2.default.createElement(_reactRouter.Route, { path: 'tables', component: _TableList2.default }),
 	    _react2.default.createElement(_reactRouter.Route, { path: 'tables/create/:bgg_id', component: _TableEdit2.default }),
 	    _react2.default.createElement(_reactRouter.Route, { path: 'tables/edit/:table_id', component: _TableEdit2.default }),
-	    _react2.default.createElement(_reactRouter.Route, { path: 'mytables', component: _MyTables2.default })
+	    _react2.default.createElement(_reactRouter.Route, { path: 'mytables', component: _MyTables2.default }),
+	    _react2.default.createElement(_reactRouter.Route, { path: 'myplans', component: _MyPlans2.default })
 	  )
 	), document.getElementById('app-wrapper'));
 
@@ -56909,6 +56914,7 @@
 	
 	    tableEdit: baseAPI + "tables/edit",
 	    myTables: baseAPI + "tables/mine",
+	    myPlans: baseAPI + "me/plans",
 	    cancelTable: baseAPI + "tables/cancel",
 	    refreshTable: baseAPI + "tables/refresh",
 	    joinTable: baseAPI + "tables/join",
@@ -98552,6 +98558,333 @@
 	}(_react2.default.Component);
 	
 	exports.default = MyTables;
+
+/***/ }),
+/* 847 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _config = __webpack_require__(552);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	var _axios = __webpack_require__(525);
+	
+	var _axios2 = _interopRequireDefault(_axios);
+	
+	var _react = __webpack_require__(2);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _reactRouter = __webpack_require__(185);
+	
+	var _reactToolbox = __webpack_require__(243);
+	
+	var _button = __webpack_require__(244);
+	
+	var _reactTransitionGroup = __webpack_require__(551);
+	
+	var _lodash = __webpack_require__(554);
+	
+	var _moment = __webpack_require__(728);
+	
+	var _moment2 = _interopRequireDefault(_moment);
+	
+	var _Loaders = __webpack_require__(715);
+	
+	var _ToastsAPI = __webpack_require__(556);
+	
+	var _ToastsAPI2 = _interopRequireDefault(_ToastsAPI);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var MyPlans = function (_React$Component) {
+	  _inherits(MyPlans, _React$Component);
+	
+	  function MyPlans(props) {
+	    _classCallCheck(this, MyPlans);
+	
+	    var _this = _possibleConstructorReturn(this, (MyPlans.__proto__ || Object.getPrototypeOf(MyPlans)).call(this, props));
+	
+	    var comp = _this;
+	
+	    _this.state = {
+	      loaded: false,
+	      currentDay: (0, _moment2.default)().date(),
+	      tables: []
+	    };
+	
+	    _this.conDays = [{ full: '2017-07-04', date: '4', name: 'Tue' }, { full: '2017-07-05', date: '5', name: 'Wed' }, { full: '2017-07-06', date: '6', name: 'Thu' }, { full: '2017-07-07', date: '7', name: 'Fri' }, { full: '2017-07-08', date: '8', name: 'Sat' }, { full: '2017-07-09', date: '9', name: 'Sun' }];
+	
+	    _this.renderTableList = _this.renderTableList.bind(_this);
+	    _this.renderNoTables = _this.renderNoTables.bind(_this);
+	    _this.getTableList = _this.getTableList.bind(_this);
+	    _this.handleToggleCancel = _this.handleToggleCancel.bind(_this);
+	    _this.deleteTable = _this.deleteTable.bind(_this);
+	    return _this;
+	  }
+	
+	  _createClass(MyPlans, [{
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      this.getTableList();
+	    }
+	  }, {
+	    key: 'componentWillReceiveProps',
+	    value: function componentWillReceiveProps(nextProps) {}
+	  }, {
+	    key: 'getTableList',
+	    value: function getTableList() {
+	      var comp = this;
+	      _axios2.default.post(_config2.default.api.myPlans, {
+	        t: new Date().getTime()
+	      }, {
+	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
+	      }).then(function (json) {
+	        comp.setState({
+	          loaded: true,
+	          tables: json.data.tables
+	        });
+	      }).catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, 'Failed to set.', { timeOut: 6000 });
+	      });
+	    }
+	  }, {
+	    key: 'deleteTable',
+	    value: function deleteTable() {
+	      var comp = this;
+	      _axios2.default.post(_config2.default.api.cancelTable, {
+	        table_id: comp.state.currentTableId,
+	        t: new Date().getTime()
+	      }, {
+	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
+	      }).then(function (json) {
+	        _ToastsAPI2.default.toast('success', 'Table cancelled.', null, { timeout: 6000 });
+	        comp.setState({ cancelDialogActive: false });
+	        comp.getTableList();
+	      }).catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, json.response.data.message, { timeOut: 6000 });
+	      });
+	    }
+	  }, {
+	    key: 'handleConfirmCancel',
+	    value: function handleConfirmCancel(table) {
+	      this.setState({
+	        currentTableId: table.table_id,
+	        cancelDialogActive: true
+	      });
+	    }
+	  }, {
+	    key: 'handleToggleCancel',
+	    value: function handleToggleCancel() {
+	      this.setState({ cancelDialogActive: false });
+	    }
+	  }, {
+	    key: 'handleSelectDay',
+	    value: function handleSelectDay(day) {
+	      this.setState({ currentDay: day });
+	    }
+	  }, {
+	    key: 'refreshTable',
+	    value: function refreshTable(table) {
+	      var comp = this;
+	      _axios2.default.post(_config2.default.api.refreshTable, {
+	        table_id: table.table_id,
+	        t: new Date().getTime()
+	      }, {
+	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
+	      }).then(function (json) {
+	        _ToastsAPI2.default.toast('success', 'Table updated.', null, { timeout: 6000 });
+	        comp.getTableList();
+	      }).catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, json.response.data.message, { timeOut: 6000 });
+	      });
+	    }
+	  }, {
+	    key: 'viewPlayers',
+	    value: function viewPlayers(table) {}
+	  }, {
+	    key: 'renderCalendar',
+	    value: function renderCalendar() {
+	      var comp = this;
+	      return comp.conDays.map(function (day, i) {
+	        var isSel = day.date === comp.state.currentDay ? ' active' : '';
+	        return _react2.default.createElement(
+	          'div',
+	          { className: "calendar-day" + isSel, key: "calendar-day-" + day.date, onClick: comp.handleSelectDay.bind(comp, day.date) },
+	          _react2.default.createElement(
+	            'span',
+	            { className: 'calendar-day-date' },
+	            day.date
+	          ),
+	          _react2.default.createElement(
+	            'span',
+	            { className: 'calendar-day-name' },
+	            day.name
+	          )
+	        );
+	      });
+	    }
+	  }, {
+	    key: 'renderTableList',
+	    value: function renderTableList() {
+	      var comp = this;
+	
+	      return _react2.default.createElement(
+	        'ul',
+	        { className: 'plans-timeline' },
+	        _react2.default.createElement(
+	          _reactTransitionGroup.CSSTransitionGroup,
+	          {
+	            transitionName: 'router',
+	            transitionEnterTimeout: 500,
+	            transitionLeaveTimeout: 500
+	          },
+	          comp.state.tables.map(function (table, i) {
+	            console.log(_config2.default.state.user);
+	            return _react2.default.createElement(
+	              'li',
+	              { key: "table-item-" + table.table_id },
+	              _react2.default.createElement('i', { className: table.status === 'cancelled' ? "fa fa-calendar-times-o cancelled" : "fa fa-calendar-check-o" }),
+	              ' ',
+	              _react2.default.createElement(
+	                'div',
+	                { className: 'plans-item' },
+	                _react2.default.createElement(
+	                  'div',
+	                  { className: 'plans-item-head' },
+	                  table.title
+	                ),
+	                _react2.default.createElement(
+	                  'div',
+	                  { className: 'plans-item-body' },
+	                  _react2.default.createElement(
+	                    'p',
+	                    { className: 'plans-time' },
+	                    (0, _moment2.default)(table.start_datetime).fromNow()
+	                  ),
+	                  _react2.default.createElement(
+	                    'span',
+	                    { className: 'plan-tag' },
+	                    'Room: ',
+	                    table.table_location
+	                  ),
+	                  _react2.default.createElement(
+	                    'span',
+	                    { className: "plan-tag" + (table.player_id === _config2.default.state.user.id ? " hosting" : "") },
+	                    'Host: ',
+	                    table.host_name
+	                  )
+	                )
+	              )
+	            );
+	          })
+	        )
+	      )
+	
+	      //         <div className="table-item" key={"table-item-"+table.table_id}>
+	      //           <div className="table-item-header">
+	      //             <span className="table-item-title">{table.title}</span>
+	      //             <span className={"table-item-when " + table.status}>
+	      //               {table.status === 'cancelled' ? 'Cancelled' : moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').fromNow()}
+	      //             </span>
+	      //           </div>
+	      //           <div className="table-item-details">
+	      //             <span className="table-item-tag">{table.seats} seats</span>
+	      //             <span className="table-item-tag">{table.table_location}</span>
+	      //           </div>
+	      //           {table.status === 'cancelled' ? '' : (
+	      //             <div className="table-item-actions">
+	      //               <button className='delete' onClick={comp.handleConfirmCancel.bind(comp, table)}><FontIcon value='close' /></button>
+	      //               {table.table_type==='now' ? (
+	      //                 <button onClick={comp.refreshTable.bind(comp, table)}>Refresh this listing</button>
+	      //               ) : (
+	      //                 <button onClick={comp.viewPlayers.bind(comp, table)}>View your players</button>
+	      //               )}
+	      //             </div>
+	      //           )}
+	      //         </div>
+	      //       );
+	      //     })}
+	      //   </CSSTransitionGroup>
+	      // </div>
+	      ;
+	    }
+	  }, {
+	    key: 'renderNoTables',
+	    value: function renderNoTables() {
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'game-search-list-empty' },
+	        _react2.default.createElement(
+	          'h3',
+	          null,
+	          'No current tables.'
+	        ),
+	        _react2.default.createElement(
+	          'p',
+	          null,
+	          'Either you haven\'t made any tables yet, or your other games have already happened.'
+	        )
+	      );
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var comp = this;
+	      return _react2.default.createElement(
+	        'div',
+	        { id: 'page-my-plans', className: 'transition-item page-my-plans page-wrap' },
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'calendar-days' },
+	          comp.renderCalendar()
+	        ),
+	        _react2.default.createElement(
+	          'div',
+	          { className: "table-list-wrap" + (comp.state.loaded ? " loading" : "") },
+	          comp.state.tables && comp.state.tables.length > 0 ? comp.renderTableList() : comp.renderNoTables()
+	        ),
+	        _react2.default.createElement(_Loaders.LoadingInline, {
+	          active: !comp.state.loaded
+	        }),
+	        _react2.default.createElement(
+	          _reactToolbox.Dialog,
+	          {
+	            title: 'Cancel This Table?',
+	            type: 'small',
+	            onEscKeyDown: this.handleToggleCancel,
+	            onOverlayClick: this.handleToggleCancel,
+	            active: this.state.cancelDialogActive,
+	            actions: [{ label: "Nevermind", onClick: this.handleToggleCancel, raised: true }, { label: "Cancel It", onClick: this.deleteTable, primary: true, raised: true }]
+	          },
+	          _react2.default.createElement(
+	            'p',
+	            null,
+	            'You cannot undo this action if you cancel this table. If players have signed up, they will see a status change.'
+	          )
+	        )
+	      );
+	    }
+	  }]);
+	
+	  return MyPlans;
+	}(_react2.default.Component);
+	
+	exports.default = MyPlans;
 
 /***/ })
 /******/ ]);

@@ -22,6 +22,7 @@ const CONFIG = {
 
     tableEdit: baseAPI+"tables/edit",
     myTables: baseAPI+"tables/mine",
+    myPlans: baseAPI+"me/plans",
     cancelTable: baseAPI+"tables/cancel",
     refreshTable: baseAPI+"tables/refresh",
     joinTable: baseAPI+"tables/join",

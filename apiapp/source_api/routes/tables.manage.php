@@ -4,6 +4,24 @@ use api\games\GamesDB;
 use api\tables\Tables;
 
 
+$app->post('/me/plans', function($req, $resp, $args) use ($app)
+{
+  $body = $req->getParsedBody();
+
+  $token = Auth::checkAuthorization($this->db, $req);
+  if( is_error($token) ){
+    return $resp->withStatus((int)$token->get_code())->withJson($token->json());
+  }
+
+  $table = Tables::my_plans($this->db, $token->data->uid);
+  if( is_error($table) ){
+    return $resp->withStatus((int)$table->get_code())->withJson($table->json());
+  }
+
+  return $resp->withJson($table);
+});
+
+
 $app->post('/tables/mine', function($req, $resp, $args) use ($app)
 {
   $body = $req->getParsedBody();

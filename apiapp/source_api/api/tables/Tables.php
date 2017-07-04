@@ -20,6 +20,25 @@ abstract class Tables
     return array('tables'=>$tables);
   }
 
+  static function my_plans($pdo, $uid)
+  {
+    $dbCheck = $pdo->prepare(
+      "SELECT db.title, tb.id as table_id, tb.player_id, CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as host_name, tb.table_type, tb.seats, tb.table_location, tb.start_datetime, tb.lft, tb.allow_signups, tb.status
+      FROM game_tables tb
+      LEFT JOIN game_signups gs ON gs.table_id = tb.id
+      JOIN bgg_game_db db ON tb.bgg_id = db.bgg_id
+      LEFT JOIN users u ON u.id = tb.player_id
+      WHERE (tb.player_id=:uid OR gs.player_id=:uid)
+      AND tb.table_type='future'
+      AND tb.start_datetime > NOW() - INTERVAL 20 MINUTE
+      ORDER BY tb.start_datetime ASC"
+    );
+    $dbCheck->execute(array(':uid' => $uid));
+    $tables = $dbCheck->fetchAll();
+    return array('tables'=>$tables);
+  }
+
+
 
   /* EDIT CONTROLS
     ---------------------------------------------------------- */

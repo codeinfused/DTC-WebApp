@@ -1,0 +1,122 @@
+.calendar-days{
+  display: flex;
+  flex-direction: row;
+  width: 100vw;
+}
+.calendar-day{
+  background: #fff;
+  padding: 16px 8px;
+  text-align: center;
+  border-right: 1px solid #f0f0f0;
+  flex-grow: 1;
+}
+.calendar-day:last-child{
+  border-right: none;
+}
+.calendar-day.active{
+  background: #3a9bcc;
+}
+.calendar-day.active .calendar-day-name{
+  color: #fff;
+}
+
+.calendar-day-date{
+  display: block;
+  font-weight: 100;
+  font-size: 2.8rem;
+  margin-bottom: 3px;
+  color: #e8e8e8;
+}
+.calendar-day-name{
+  display: block;
+  font-weight: 900;
+  font-size: 1.25rem;
+  text-transform: uppercase;
+  color: #555;
+}
+
+ul.plans-timeline{
+  position: relative;
+  margin: 20px 0 30px 0;
+  padding: 0;
+  list-style: none;
+}
+ul.plans-timeline:before{
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: #5a5a5a;
+  left: 31px;
+  margin: 0;
+  border-radius: 2px;
+}
+ul.plans-timeline li{
+  position: relative;
+  margin-right: 10px;
+  margin-bottom: 15px;
+}
+ul.plans-timeline li > .fa{
+  width: 34px;
+  height: 34px;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 34px;
+  position: absolute;
+  color: #fff;
+  background: #3a9bcc;
+  border-radius: 50%;
+  text-align: center;
+  left: 16px;
+  top: 2px;
+}
+ul.plans-timeline li > .fa.cancelled{
+  background: #c74646;
+}
+ul.plans-timeline .plans-item{
+  box-shadow: 0 1px 1px rgba(0,0,0,0.3);
+  border-radius: 3px;
+  margin-top: 0;
+  background: #f6f6f6;
+  color: #444;
+  margin-left: 60px;
+  margin-right: 15px;
+  padding: 0;
+  position: relative;
+}
+.plans-item .plans-item-head{
+  padding: 12px 14px;
+  width: calc(100% - 28px);
+  background: #6f6f6f;
+  font-size: 1.25rem;
+  color: #fff;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+}
+.plans-item .plans-item-body{
+  padding: 10px 14px 12px;
+}
+.plans-item-body .plan-tag{
+  display: inline-block;
+  margin: 0 3px 0 0;
+  border-radius: 4px;
+  background: #bb9889;
+  color: #fff;
+  padding: 6px 8px;
+  line-height: 1;
+  font-size: 1.08rem;
+}
+.plans-item-body .plan-tag.hosting{
+  background: #49af5d;
+}
+
+p.plans-time {
+  margin: 0 0 8px;
+  font-weight: 100;
+  font-size: 1.8rem;
+  color: #666;
+}
