@@ -22,6 +22,27 @@ $app->post('/me/plans', function($req, $resp, $args) use ($app)
 });
 
 
+$app->post('/tables/list', function($req, $resp, $args) use ($app)
+{
+  $body = $req->getParsedBody();
+
+  $token = Auth::checkAuthorization($this->db, $req);
+  if( is_error($token) ){
+    return $resp->withStatus((int)$token->get_code())->withJson($token->json());
+  }
+  if(empty($body['bgg_id']) || empty($body['table_type'])){
+    return $resp->withStatus(401)->withJson(array('message'=>'Missing search data.'));
+  }
+
+  $table = Tables::list_tables($this->db, $body['bgg_id'], $body['table_type'], $token->data->uid);
+  if( is_error($table) ){
+    return $resp->withStatus((int)$table->get_code())->withJson($table->json());
+  }
+
+  return $resp->withJson($table);
+});
+
+
 $app->post('/tables/mine', function($req, $resp, $args) use ($app)
 {
   $body = $req->getParsedBody();

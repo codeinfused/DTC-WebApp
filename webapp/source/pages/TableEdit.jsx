@@ -161,7 +161,7 @@ class TableEdit extends React.Component
   handleCloseDialog()
   {
     this.setState({dialogActive: false});
-    browserHistory.push('/home');
+    browserHistory.goBack();
   }
 
   render()

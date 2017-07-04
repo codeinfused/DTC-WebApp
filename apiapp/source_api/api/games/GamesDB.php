@@ -42,7 +42,7 @@ abstract class GamesDB
       case 'bggrate': $sortby_sql = 'ORDER BY bggrate DESC'; break;
       case 'wtp': $sortby_sql = 'HAVING wtp > 0 ORDER BY wtp DESC, bggrate DESC'; break;
       case 'lfp': $sortby_sql = 'HAVING lfp > 0 ORDER BY lfp DESC, bggrate DESC'; break;
-      case 'scheduled': $sortby_sql = 'AND start_datetime > NOW() HAVING scheduled > 0 ORDER BY start_datetime ASC, bggrate DESC'; break;
+      case 'scheduled': $sortby_sql = 'HAVING scheduled > 0 ORDER BY bggrate DESC'; break;
       case 'year': $sortby_sql = 'AND bggrate > 5 AND year < '.(date("Y")+1).' ORDER BY year DESC, bggrate DESC'; break;
       case 'maxplayers': $sortby_sql =  'AND bggrate > 5 AND maxplayers > 6 ORDER BY bggrate DESC, maxplayers DESC'; break;
       default: $sortby_sql = 'ORDER BY bggrate DESC'; break;

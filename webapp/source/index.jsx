@@ -132,7 +132,8 @@ class AppLayout extends React.Component
 
           {pathpage==='root' ? '' : (
             <div id="app-navbar">
-              <button className="btn-global-menu app-navbar-btn" onClick={comp.toggleSideMenu.bind(comp)}><FontIcon value='menu' /> <span></span></button>
+              <button className="btn-global-menu app-navbar-btn" onClick={()=>{browserHistory.goBack();}}><FontIcon value='keyboard_arrow_left' /></button>
+              <button className="btn-global-menu app-navbar-btn" onClick={comp.toggleSideMenu.bind(comp)}><FontIcon value='menu' /></button>
             </div>
           )}
         </div>
@@ -151,7 +152,7 @@ ReactDOM.render(
       <Route path="games" component={SearchGames} source="bgg" />
       <Route path="library" component={SearchGames} source="library" />
       <Route path="about" component={About} />
-      <Route path="tables" component={TableList} />
+      <Route path="list/:type/:bgg_id" component={TableList} />
       <Route path="tables/create/:bgg_id" component={TableEdit} />
       <Route path="tables/edit/:table_id" component={TableEdit} />
       <Route path="mytables" component={MyTables} />

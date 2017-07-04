@@ -150,14 +150,14 @@ class MyPlans extends React.Component
         >
           {comp.state.tables.map(function(table, i)
           {
-            console.log(CONFIG.state.user);
             return (
-              <li key={"table-item-"+table.table_id}>
+              <li key={"table-item-"+table.table_id} className={table.status}>
                 <i className={table.status==='cancelled' ? "fa fa-calendar-times-o cancelled" : "fa fa-calendar-check-o"}></i> {/*  */}
                 <div className="plans-item">
                   <div className="plans-item-head">{table.title}</div>
                   <div className="plans-item-body">
-                    <p className="plans-time">{moment(table.start_datetime).fromNow()}</p>
+                    <p className="plans-time">{table.status==='cancelled' ? 'Cancelled' : moment(table.start_datetime).fromNow()}</p>
+                    <span className="plan-tag">{moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, MMM Do YYYY, h:mm a')}</span>
                     <span className="plan-tag">Room: {table.table_location}</span>
                     <span className={"plan-tag" + (table.player_id === CONFIG.state.user.id ? " hosting" : "")}>Host: {table.host_name}</span>
                   </div>

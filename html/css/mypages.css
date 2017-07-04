@@ -85,6 +85,8 @@ ul.plans-timeline .plans-item{
   padding: 0;
   position: relative;
 }
+ul.plans-timeline .cancelled .plans-item{ opacity: 0.6; background: #e6b8b8; }
+
 .plans-item .plans-item-head{
   padding: 12px 14px;
   width: calc(100% - 28px);
@@ -102,7 +104,7 @@ ul.plans-timeline .plans-item{
 }
 .plans-item-body .plan-tag{
   display: inline-block;
-  margin: 0 3px 0 0;
+  margin: 0 4px 4px 0;
   border-radius: 4px;
   background: #bb9889;
   color: #fff;

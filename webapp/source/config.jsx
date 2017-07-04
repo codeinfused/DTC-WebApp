@@ -20,6 +20,7 @@ const CONFIG = {
     wtp: baseAPI+"user/me/wtp",
     notify: baseAPI+"user/me/notify",
 
+    tableList: baseAPI+"tables/list",
     tableEdit: baseAPI+"tables/edit",
     myTables: baseAPI+"tables/mine",
     myPlans: baseAPI+"me/plans",

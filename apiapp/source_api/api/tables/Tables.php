@@ -13,7 +13,12 @@ abstract class Tables
   static function my_tables($pdo, $uid)
   {
     $dbCheck = $pdo->prepare(
-      "SELECT db.title, tb.id as table_id, tb.table_type, tb.seats, tb.table_location, tb.start_datetime, tb.lft, tb.allow_signups, tb.status FROM game_tables tb JOIN bgg_game_db db ON tb.bgg_id = db.bgg_id WHERE tb.player_id=:uid AND tb.start_datetime > NOW() - INTERVAL 20 MINUTE ORDER BY tb.start_datetime ASC"
+      "SELECT db.title, tb.id as table_id, tb.table_type, tb.seats, tb.table_location, tb.start_datetime, tb.lft, tb.allow_signups, tb.status, COUNT(gs.id) AS signups
+      FROM game_tables tb JOIN bgg_game_db db ON tb.bgg_id = db.bgg_id
+      LEFT JOIN game_signups gs ON gs.table_id = tb.id
+      WHERE tb.player_id=:uid AND tb.start_datetime > NOW() - INTERVAL 20 MINUTE
+      GROUP BY tb.id
+      ORDER BY tb.start_datetime ASC"
     );
     $dbCheck->execute(array(':uid' => $uid));
     $tables = $dbCheck->fetchAll();
@@ -38,6 +43,25 @@ abstract class Tables
     return array('tables'=>$tables);
   }
 
+  static function list_tables($pdo, $bgg_id, $table_type, $uid)
+  {
+    $dbCheck = $pdo->prepare(
+      "SELECT db.title, tb.id as table_id, tb.player_id, CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as host_name, tb.table_type, tb.seats, tb.table_location, tb.start_datetime, tb.lft, COUNT(gs.id) AS signups, tb.allow_signups, tb.status, (SELECT count(id) FROM game_signups WHERE table_id=tb.id AND player_id=:uid) as joined
+      FROM game_tables tb
+      LEFT JOIN game_signups gs ON gs.table_id = tb.id
+      JOIN bgg_game_db db ON tb.bgg_id = db.bgg_id
+      LEFT JOIN users u ON u.id = tb.player_id
+      WHERE tb.bgg_id=:bgg_id
+      AND tb.table_type=:table_type
+      AND tb.start_datetime > NOW() - INTERVAL 20 MINUTE
+      AND tb.status='ready'
+      GROUP BY tb.id
+      ORDER BY tb.start_datetime ASC"
+    );
+    $dbCheck->execute(array(':bgg_id' => $bgg_id, ':table_type' => $table_type, ':uid'=>$uid));
+    $tables = $dbCheck->fetchAll();
+    return array('tables'=>$tables);
+  }
 
 
   /* EDIT CONTROLS
@@ -96,13 +120,24 @@ abstract class Tables
 
   static function cancel_table($pdo, $uid, $data)
   {
-    $dbCheck = $pdo->prepare(
-      "UPDATE game_tables SET status='cancelled' WHERE id=:table_id AND player_id=:uid LIMIT 1"
-    );
+    $dbCheck = $pdo->prepare("UPDATE game_tables SET status='cancelled' WHERE id=:table_id AND player_id=:uid LIMIT 1");
     $dbCheck->execute(array(
       ':table_id' => $data['table_id'],
       ':uid' => $uid
     ));
+
+    $dbCheck = $pdo->prepare("SELECT COUNT(*) FROM game_signups WHERE table_id=:table_id");
+    $dbCheck->execute(array(':table_id' => $data['table_id']));
+    $signups = $dbCheck->fetchColumn();
+
+    if($signups === false || $signups < 1){
+      $dbCheck = $pdo->prepare("DELETE FROM game_tables WHERE id=:table_id AND player_id=:uid LIMIT 1");
+      $dbCheck->execute(array(
+        ':table_id' => $data['table_id'],
+        ':uid' => $uid
+      ));
+    }
+
     return array('success'=>true);
   }
 
@@ -115,7 +150,7 @@ abstract class Tables
 
     if($table_id !== false){
       $dbCheck = $pdo->prepare(
-        "INSERT INTO game_signups SET table_id=:table_id AND player_id=:uid"
+        "INSERT INTO game_signups SET table_id=:table_id, player_id=:uid"
       );
       $dbCheck->execute(array(
         ':table_id' => $data['table_id'],
@@ -128,7 +163,7 @@ abstract class Tables
   static function leave_table($pdo, $uid, $data)
   {
     $dbCheck = $pdo->prepare(
-      "DELETE FROM game_signups WHERE table_id=:table_id AND player_id=:uid"
+      "DELETE FROM game_signups WHERE table_id=:table_id AND player_id=:uid LIMIT 1"
     );
     $dbCheck->execute(array(
       ':table_id' => $data['table_id'],

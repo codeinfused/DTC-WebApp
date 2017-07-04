@@ -269,10 +269,15 @@
 	            { id: 'app-navbar' },
 	            _react2.default.createElement(
 	              'button',
+	              { className: 'btn-global-menu app-navbar-btn', onClick: function onClick() {
+	                  _reactRouter.browserHistory.goBack();
+	                } },
+	              _react2.default.createElement(_reactToolbox.FontIcon, { value: 'keyboard_arrow_left' })
+	            ),
+	            _react2.default.createElement(
+	              'button',
 	              { className: 'btn-global-menu app-navbar-btn', onClick: comp.toggleSideMenu.bind(comp) },
-	              _react2.default.createElement(_reactToolbox.FontIcon, { value: 'menu' }),
-	              ' ',
-	              _react2.default.createElement('span', null)
+	              _react2.default.createElement(_reactToolbox.FontIcon, { value: 'menu' })
 	            )
 	          )
 	        )
@@ -294,7 +299,7 @@
 	    _react2.default.createElement(_reactRouter.Route, { path: 'games', component: _SearchGames2.default, source: 'bgg' }),
 	    _react2.default.createElement(_reactRouter.Route, { path: 'library', component: _SearchGames2.default, source: 'library' }),
 	    _react2.default.createElement(_reactRouter.Route, { path: 'about', component: _About2.default }),
-	    _react2.default.createElement(_reactRouter.Route, { path: 'tables', component: _TableList2.default }),
+	    _react2.default.createElement(_reactRouter.Route, { path: 'list/:type/:bgg_id', component: _TableList2.default }),
 	    _react2.default.createElement(_reactRouter.Route, { path: 'tables/create/:bgg_id', component: _TableEdit2.default }),
 	    _react2.default.createElement(_reactRouter.Route, { path: 'tables/edit/:table_id', component: _TableEdit2.default }),
 	    _react2.default.createElement(_reactRouter.Route, { path: 'mytables', component: _MyTables2.default }),
@@ -56912,6 +56917,7 @@
 	    wtp: baseAPI + "user/me/wtp",
 	    notify: baseAPI + "user/me/notify",
 	
+	    tableList: baseAPI + "tables/list",
 	    tableEdit: baseAPI + "tables/edit",
 	    myTables: baseAPI + "tables/mine",
 	    myPlans: baseAPI + "me/plans",
@@ -80833,6 +80839,14 @@
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
 	      var comp = this;
+	      this.setState({
+	        searchText: _config2.default.state.last_searchText || '',
+	        tag: _config2.default.state.last_tag,
+	        sortBy: _config2.default.state.last_sortBy ? _config2.default.state.last_sortBy : 'bggrate',
+	        currentGamePage: _config2.default.state.last_currentGamePage || 0
+	      }, function () {
+	        comp.searchGames();
+	      });
 	      //CONFIG.transitionIn(this, function(){});
 	
 	      //this.notificationEngine();
@@ -81046,6 +81060,7 @@
 	  }, {
 	    key: 'handleSearchChange',
 	    value: function handleSearchChange(event) {
+	      _config2.default.state.last_searchText = event.target.value;
 	      this.setState({ searchText: event.target.value });
 	    }
 	  }, {
@@ -81067,6 +81082,8 @@
 	    key: 'handleChangeSort',
 	    value: function handleChangeSort(val) {
 	      var comp = this;
+	      _config2.default.state.last_sortBy = val;
+	      _config2.default.state.last_currentGamePage = 0;
 	      comp.setState({ sortBy: val, loader: true, currentGamePage: 0 }, function () {
 	        comp.searchGames();
 	      });
@@ -81075,6 +81092,8 @@
 	    key: 'handleChangeTag',
 	    value: function handleChangeTag(val) {
 	      var comp = this;
+	      _config2.default.state.last_tag = val;
+	      _config2.default.state.last_currentGamePage = 0;
 	      comp.setState({ tag: val, loader: true, currentGamePage: 0 }, function () {
 	        comp.searchGames();
 	      });
@@ -81088,9 +81107,15 @@
 	      //});
 	    }
 	  }, {
+	    key: 'handleFindTables',
+	    value: function handleFindTables(bgg_id, type) {
+	      _reactRouter.browserHistory.push('/list/' + type + '/' + bgg_id);
+	    }
+	  }, {
 	    key: 'gameListBack',
 	    value: function gameListBack() {
 	      var comp = this;
+	      _config2.default.state.last_currentGamePage = this.state.currentGamePage - 1;
 	      comp.setState({ loader: true, currentGamePage: this.state.currentGamePage - 1 }, function () {
 	        comp.searchGames();
 	      });
@@ -81099,6 +81124,7 @@
 	    key: 'gameListNext',
 	    value: function gameListNext() {
 	      var comp = this;
+	      _config2.default.state.last_currentGamePage = this.state.currentGamePage + 1;
 	      comp.setState({ loader: true, currentGamePage: this.state.currentGamePage + 1 }, function () {
 	        comp.searchGames();
 	      });
@@ -81233,7 +81259,7 @@
 	                    _react2.default.createElement(
 	                      'div',
 	                      { className: 'game-item-action-btn action-searchtables-btn' },
-	                      _react2.default.createElement(_button.IconButton, { icon: 'search' })
+	                      _react2.default.createElement(_button.IconButton, { icon: 'search', onClick: comp.handleFindTables.bind(comp, game.bgg_id, 'now') })
 	                    ),
 	                    _react2.default.createElement(
 	                      'div',
@@ -81256,7 +81282,7 @@
 	                    _react2.default.createElement(
 	                      'div',
 	                      { className: 'game-item-action-btn action-searchschedule-btn' },
-	                      _react2.default.createElement(_button.IconButton, { icon: 'search' })
+	                      _react2.default.createElement(_button.IconButton, { icon: 'search', onClick: comp.handleFindTables.bind(comp, game.bgg_id, 'future') })
 	                    ),
 	                    _react2.default.createElement(
 	                      'div',
@@ -82267,7 +82293,7 @@
 	    key: 'handleCloseDialog',
 	    value: function handleCloseDialog() {
 	      this.setState({ dialogActive: false });
-	      _reactRouter.browserHistory.push('/home');
+	      _reactRouter.browserHistory.goBack();
 	    }
 	  }, {
 	    key: 'render',
@@ -98230,6 +98256,10 @@
 	
 	var _htmlEntities = __webpack_require__(722);
 	
+	var _moment = __webpack_require__(728);
+	
+	var _moment2 = _interopRequireDefault(_moment);
+	
 	var _Loaders = __webpack_require__(715);
 	
 	var _ToastsAPI = __webpack_require__(556);
@@ -98244,8 +98274,6 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var entities = { xml: new _htmlEntities.XmlEntities(), html: new _htmlEntities.AllHtmlEntities() };
-	
 	var TableList = function (_React$Component) {
 	  _inherits(TableList, _React$Component);
 	
@@ -98256,26 +98284,237 @@
 	
 	    var comp = _this;
 	
-	    console.log(props);
+	    _this.state = {
+	      loaded: false,
+	      cancelDialogActive: false,
+	      bgg_id: _this.props.params.bgg_id,
+	      table_type: _this.props.params.type,
+	      tables: []
+	    };
 	
-	    _this.state = {};
+	    _this.renderTableList = _this.renderTableList.bind(_this);
+	    _this.renderNoTables = _this.renderNoTables.bind(_this);
+	    _this.getTableList = _this.getTableList.bind(_this);
+	    _this.handleToggleCancel = _this.handleToggleCancel.bind(_this);
+	    _this.deleteTable = _this.deleteTable.bind(_this);
 	    return _this;
 	  }
 	
 	  _createClass(TableList, [{
 	    key: 'componentDidMount',
-	    value: function componentDidMount() {}
+	    value: function componentDidMount() {
+	      this.getTableList();
+	    }
 	  }, {
 	    key: 'componentWillReceiveProps',
 	    value: function componentWillReceiveProps(nextProps) {}
 	  }, {
-	    key: 'getGameData',
-	    value: function getGameData(bgg_id) {}
+	    key: 'getTableList',
+	    value: function getTableList() {
+	      var comp = this;
+	      _axios2.default.post(_config2.default.api.tableList, {
+	        bgg_id: comp.state.bgg_id,
+	        table_type: comp.state.table_type,
+	        t: new Date().getTime()
+	      }, {
+	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
+	      }).then(function (json) {
+	        comp.setState({
+	          loaded: true,
+	          tables: json.data.tables
+	        });
+	      }).catch(function (json) {
+	        comp.setState({ loaded: true });
+	        _ToastsAPI2.default.toast('error', null, 'Failed to get.', { timeOut: 6000 });
+	      });
+	    }
+	  }, {
+	    key: 'deleteTable',
+	    value: function deleteTable() {
+	      var comp = this;
+	      _axios2.default.post(_config2.default.api.cancelTable, {
+	        table_id: comp.state.currentTableId,
+	        t: new Date().getTime()
+	      }, {
+	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
+	      }).then(function (json) {
+	        _ToastsAPI2.default.toast('success', 'Table cancelled.', null, { timeout: 6000 });
+	        comp.setState({ cancelDialogActive: false });
+	        comp.getTableList();
+	      }).catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, json.response.data.message, { timeOut: 6000 });
+	      });
+	    }
+	  }, {
+	    key: 'handleConfirmCancel',
+	    value: function handleConfirmCancel(table) {
+	      this.setState({
+	        currentTableId: table.table_id,
+	        cancelDialogActive: true
+	      });
+	    }
+	  }, {
+	    key: 'handleToggleCancel',
+	    value: function handleToggleCancel() {
+	      this.setState({ cancelDialogActive: false });
+	    }
+	  }, {
+	    key: 'handleJoinGame',
+	    value: function handleJoinGame(table) {
+	      var comp = this;
+	      _axios2.default.post(_config2.default.api.joinTable, {
+	        table_id: table.table_id,
+	        t: new Date().getTime()
+	      }, {
+	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
+	      }).then(function (json) {
+	        _ToastsAPI2.default.toast('success', 'Joined game!', null, { timeout: 6000 });
+	        comp.getTableList();
+	      }).catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, json.response.data.message, { timeOut: 6000 });
+	      });
+	    }
+	  }, {
+	    key: 'handleLeaveGame',
+	    value: function handleLeaveGame(table) {
+	      var comp = this;
+	      _axios2.default.post(_config2.default.api.leaveTable, {
+	        table_id: table.table_id,
+	        t: new Date().getTime()
+	      }, {
+	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
+	      }).then(function (json) {
+	        _ToastsAPI2.default.toast('success', 'Left game table', null, { timeout: 6000 });
+	        comp.getTableList();
+	      }).catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, json.response.data.message, { timeOut: 6000 });
+	      });
+	    }
+	  }, {
+	    key: 'renderTableList',
+	    value: function renderTableList() {
+	      var comp = this;
+	
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'table-list' },
+	        _react2.default.createElement(
+	          'h2',
+	          null,
+	          'Closest Tables'
+	        ),
+	        comp.state.tables.map(function (table, i) {
+	          return _react2.default.createElement(
+	            'div',
+	            { className: 'table-item', key: "table-item-" + table.table_id },
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'table-item-header' },
+	              _react2.default.createElement(
+	                'span',
+	                { className: 'table-item-title' },
+	                table.title
+	              ),
+	              _react2.default.createElement(
+	                'span',
+	                { className: "table-item-when " + table.status },
+	                table.status === 'cancelled' ? 'Cancelled' : (0, _moment2.default)(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').fromNow()
+	              )
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'table-item-details' },
+	              table.table_type === 'now' ? _react2.default.createElement(
+	                'span',
+	                { className: 'table-item-tag' },
+	                'Host: ',
+	                table.host_name
+	              ) : _react2.default.createElement(
+	                'span',
+	                { className: 'table-item-tag' },
+	                table.signups,
+	                ' of ',
+	                table.seats,
+	                ' seats taken'
+	              ),
+	              _react2.default.createElement(
+	                'span',
+	                { className: 'table-item-tag' },
+	                table.table_location
+	              ),
+	              table.table_type === 'future' ? _react2.default.createElement(
+	                'span',
+	                { className: 'table-item-tag' },
+	                (0, _moment2.default)(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, MMM Do YYYY, h:mm a')
+	              ) : ''
+	            ),
+	            table.status === 'cancelled' ? '' : _react2.default.createElement(
+	              'div',
+	              { className: 'table-item-actions' },
+	              table.table_type === 'now' ? _react2.default.createElement('div', null) : table.joined > 0 ? _react2.default.createElement(
+	                'button',
+	                { className: 'leave', onClick: comp.handleLeaveGame.bind(comp, table) },
+	                'Leave this scheduled game'
+	              ) : _react2.default.createElement(
+	                'button',
+	                { onClick: comp.handleJoinGame.bind(comp, table) },
+	                'Join This Game!'
+	              )
+	            )
+	          );
+	        })
+	      );
+	    }
+	  }, {
+	    key: 'renderNoTables',
+	    value: function renderNoTables() {
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'game-search-list-empty' },
+	        _react2.default.createElement(
+	          'h3',
+	          null,
+	          'No tables found.'
+	        ),
+	        _react2.default.createElement(
+	          'p',
+	          null,
+	          'Probably these games ended, or there was a bad search.'
+	        )
+	      );
+	    }
 	  }, {
 	    key: 'render',
 	    value: function render() {
 	      var comp = this;
-	      return _react2.default.createElement('div', { id: 'page-table-edit', className: 'transition-item page-table-edit page-wrap' });
+	      return _react2.default.createElement(
+	        'div',
+	        { id: 'page-list-tables', className: 'transition-item page-list-tables page-wrap' },
+	        _react2.default.createElement(
+	          'div',
+	          { className: "table-list-wrap" + (comp.state.loaded ? " loading" : "") },
+	          comp.state.tables && comp.state.tables.length > 0 ? comp.renderTableList() : comp.renderNoTables()
+	        ),
+	        _react2.default.createElement(_Loaders.LoadingInline, {
+	          active: !comp.state.loaded
+	        }),
+	        _react2.default.createElement(
+	          _reactToolbox.Dialog,
+	          {
+	            title: 'Cancel This Table?',
+	            type: 'small',
+	            onEscKeyDown: this.handleToggleCancel,
+	            onOverlayClick: this.handleToggleCancel,
+	            active: this.state.cancelDialogActive,
+	            actions: [{ label: "Nevermind", onClick: this.handleToggleCancel, raised: true }, { label: "Cancel It", onClick: this.deleteTable, primary: true, raised: true }]
+	          },
+	          _react2.default.createElement(
+	            'p',
+	            null,
+	            'You cannot undo this action if you cancel this table. If players have signed up, they will see a status change.'
+	          )
+	        )
+	      );
 	    }
 	  }]);
 	
@@ -98476,17 +98715,24 @@
 	              _react2.default.createElement(
 	                'div',
 	                { className: 'table-item-details' },
-	                _react2.default.createElement(
+	                table.table_type === 'future' ? _react2.default.createElement(
 	                  'span',
 	                  { className: 'table-item-tag' },
+	                  table.signups,
+	                  ' of ',
 	                  table.seats,
-	                  ' seats'
-	                ),
+	                  ' seats taken'
+	                ) : '',
 	                _react2.default.createElement(
 	                  'span',
 	                  { className: 'table-item-tag' },
 	                  table.table_location
-	                )
+	                ),
+	                table.table_type === 'future' ? _react2.default.createElement(
+	                  'span',
+	                  { className: 'table-item-tag' },
+	                  (0, _moment2.default)(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, MMM Do YYYY, h:mm a')
+	                ) : ''
 	              ),
 	              table.status === 'cancelled' ? '' : _react2.default.createElement(
 	                'div',
@@ -98764,10 +99010,9 @@
 	            transitionLeaveTimeout: 500
 	          },
 	          comp.state.tables.map(function (table, i) {
-	            console.log(_config2.default.state.user);
 	            return _react2.default.createElement(
 	              'li',
-	              { key: "table-item-" + table.table_id },
+	              { key: "table-item-" + table.table_id, className: table.status },
 	              _react2.default.createElement('i', { className: table.status === 'cancelled' ? "fa fa-calendar-times-o cancelled" : "fa fa-calendar-check-o" }),
 	              ' ',
 	              _react2.default.createElement(
@@ -98784,7 +99029,12 @@
 	                  _react2.default.createElement(
 	                    'p',
 	                    { className: 'plans-time' },
-	                    (0, _moment2.default)(table.start_datetime).fromNow()
+	                    table.status === 'cancelled' ? 'Cancelled' : (0, _moment2.default)(table.start_datetime).fromNow()
+	                  ),
+	                  _react2.default.createElement(
+	                    'span',
+	                    { className: 'plan-tag' },
+	                    (0, _moment2.default)(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, MMM Do YYYY, h:mm a')
 	                  ),
 	                  _react2.default.createElement(
 	                    'span',

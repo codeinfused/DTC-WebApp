@@ -101,6 +101,14 @@ class SearchGames extends React.Component
   componentDidMount()
   {
     var comp = this;
+    this.setState({
+      searchText: (CONFIG.state.last_searchText || ''),
+      tag: CONFIG.state.last_tag,
+      sortBy: (CONFIG.state.last_sortBy ? CONFIG.state.last_sortBy : 'bggrate'),
+      currentGamePage: (CONFIG.state.last_currentGamePage || 0)
+    }, function(){
+      comp.searchGames();
+    });
     //CONFIG.transitionIn(this, function(){});
 
     //this.notificationEngine();
@@ -306,6 +314,7 @@ class SearchGames extends React.Component
 
   handleSearchChange(event)
   {
+    CONFIG.state.last_searchText = event.target.value;
     this.setState({searchText: event.target.value});
   }
 
@@ -327,12 +336,16 @@ class SearchGames extends React.Component
   handleChangeSort(val)
   {
     var comp = this;
+    CONFIG.state.last_sortBy = val;
+    CONFIG.state.last_currentGamePage = 0;
     comp.setState({sortBy: val, loader: true, currentGamePage: 0}, ()=>{comp.searchGames();});
   }
 
   handleChangeTag(val)
   {
     var comp = this;
+    CONFIG.state.last_tag = val;
+    CONFIG.state.last_currentGamePage = 0;
     comp.setState({tag: val, loader: true, currentGamePage: 0}, ()=>{comp.searchGames();});
   }
 
@@ -344,14 +357,21 @@ class SearchGames extends React.Component
     //});
   }
 
+  handleFindTables(bgg_id, type)
+  {
+    browserHistory.push('/list/'+type+'/'+bgg_id);
+  }
+
   gameListBack()
   {
     var comp = this;
+    CONFIG.state.last_currentGamePage = this.state.currentGamePage-1;
     comp.setState({loader: true, currentGamePage: this.state.currentGamePage-1}, ()=>{comp.searchGames();});
   }
   gameListNext()
   {
     var comp = this;
+    CONFIG.state.last_currentGamePage = this.state.currentGamePage+1;
     comp.setState({loader: true, currentGamePage: this.state.currentGamePage+1}, ()=>{comp.searchGames();});
   }
 
@@ -405,14 +425,14 @@ class SearchGames extends React.Component
                   <div className="game-item-action">
                     <div className="game-item-action-line">
                       <div className="game-item-action-title">Tables looking for players</div>
-                      <div className="game-item-action-btn action-searchtables-btn"><IconButton icon='search' /></div>
+                      <div className="game-item-action-btn action-searchtables-btn"><IconButton icon='search' onClick={comp.handleFindTables.bind(comp, game.bgg_id, 'now')} /></div>
                       <div className="game-item-action-count">{+game.lfp}</div>
                     </div>
                   </div>
                   <div className="game-item-action">
                     <div className="game-item-action-line">
                       <div className="game-item-action-title">Scheduled game tables</div>
-                      <div className="game-item-action-btn action-searchschedule-btn"><IconButton icon='search' /></div>
+                      <div className="game-item-action-btn action-searchschedule-btn"><IconButton icon='search' onClick={comp.handleFindTables.bind(comp, game.bgg_id, 'future')} /></div>
                       <div className="game-item-action-count">{+game.scheduled}</div>
                     </div>
                   </div>
