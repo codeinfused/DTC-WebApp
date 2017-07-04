@@ -24,6 +24,19 @@ body{
 button, button:focus, button:visited{ outline: none !important; cursor: pointer; }
 
 
+#page-home h1{
+  color: #adadad;
+  font-weight: 100;
+  text-align: center;
+  font-size: 2rem;
+  padding: 0 30px;
+}
+#page-home p{
+  padding: 0 30px;
+  color: #ddd;
+  font-size: 1.2rem;
+  text-align: center;
+}
 
 #page-about{
   padding: 0px 20px 36px;

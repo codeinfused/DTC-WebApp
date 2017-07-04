@@ -30,6 +30,8 @@ class Home extends React.Component
       <div id="page-home" className="transition-item page-home page-wrap">
         <div className={"home-header" + (comp.state.loader ? " loading" : "")}>
           <div id="app-logo"><img src="images/dtc-logo-transp-full.png" /></div>
+          <h1>Dashboard Coming Soon</h1>
+          <p>Snapshots of player data and games being played, to be determined as the con goes on!</p>
         </div>
 
         <LoadingInline

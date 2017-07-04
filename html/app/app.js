@@ -80555,6 +80555,16 @@
 	            'div',
 	            { id: 'app-logo' },
 	            _react2.default.createElement('img', { src: 'images/dtc-logo-transp-full.png' })
+	          ),
+	          _react2.default.createElement(
+	            'h1',
+	            null,
+	            'Dashboard Coming Soon'
+	          ),
+	          _react2.default.createElement(
+	            'p',
+	            null,
+	            'Snapshots of player data and games being played, to be determined as the con goes on!'
 	          )
 	        ),
 	        _react2.default.createElement(_Loaders.LoadingInline, {
