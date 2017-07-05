@@ -21,6 +21,7 @@ import TableEdit from './pages/TableEdit.jsx';
 import TableList from './pages/TableList.jsx';
 import MyTables from './pages/MyTables.jsx';
 import MyPlans from './pages/MyPlans.jsx';
+import MySettings from './pages/MySettings.jsx';
 
 class AppLayout extends React.Component
 {
@@ -43,7 +44,7 @@ class AppLayout extends React.Component
       {label:'Con Library',       path:'/library', icon:'import_contacts', callback: comp.DBLoadLibrary},
       {label:'My Plans',          path:'/myplans', icon:'date_range'},
       {label:'My Tables',         path:'/mytables', icon:'playlist_add_check'},
-      // {label:'My Settings',       path:'/me', icon:'settings_applications'},
+      {label:'My Settings',       path:'/me', icon:'settings_applications'},
       {label:'About',             path:'/about', icon:'info'}
     ];
   }
@@ -157,6 +158,7 @@ ReactDOM.render(
       <Route path="tables/edit/:table_id" component={TableEdit} />
       <Route path="mytables" component={MyTables} />
       <Route path="myplans" component={MyPlans} />
+      <Route path="me" component={MySettings} />
     </Route>
   </Router>,
   document.getElementById('app-wrapper')

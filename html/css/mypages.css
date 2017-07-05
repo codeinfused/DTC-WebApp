@@ -145,3 +145,43 @@ p.plans-time {
   border-radius: 6px;
   margin-right: 8px;
 }
+
+
+/* MY SETTINGS */
+
+.my-settings-wrap{
+  padding: 34px 22px;
+}
+#page-my-settings h2{
+  color: #fff;
+  font-size: 2.4rem;
+  font-weight: 100;
+  margin: 0 0 20px;
+}
+
+.my-settings-item{
+  background: #f6f6f6;
+  color: #444;
+  margin: 14px auto;
+  padding: 16px 18px;
+  border-radius: 4px;
+}
+
+.my-settings-item h3{
+  margin: 0 0 10px;
+  font-size: 1.7rem;
+}
+.my-settings-item .my-current-account{
+  display: block;
+  font-size: 1.3rem;
+  font-style: italic;
+  margin-bottom: 24px;
+}
+.my-current-account span{
+  font-weight: 600;
+  color: #af4492;
+}
+
+.my-settings-item .account-option{
+  margin: 16px auto;
+}

@@ -261,4 +261,45 @@ abstract class Auth
     return $jwt;
   }
 
+
+  static function add_auth($pdo, $request, $body)
+  {
+    $grant = $body['grant_type'];
+    $token = $body['token'];
+    $user_obj = $body['user']; // email, first_name, last_name
+
+    $req = $pdo->prepare("SELECT id, firstname, lastname, email, role, grant_type, fb_token, google_token, thumb FROM users WHERE email = :email");
+    $req->execute(array(":email"=>$user_obj['email']));
+    $user = $req->fetch();
+    $req->closeCursor();
+
+    $reqsql = "UPDATE users SET firstname = :fname, lastname = :lname, email = :email, grant_type = :grant, thumb = :thumb";
+    if($grant==='facebook'){
+      $reqsql .= ", fb_token = :token";
+    }else if($grant==='google'){
+      $reqsql .= ", google_token = :token";
+    }
+    $reqsql .= " WHERE id = :id";
+
+    $exec_array = array(
+      ':fname'=>$user_obj['first_name'],
+      ':lname'=>$user_obj['last_name'],
+      ':email'=>$user_obj['email'],
+      ':grant'=>$grant,
+      ':thumb'=>$user_obj['thumb'],
+      ':id'=>$user['id']
+    );
+    $exec_array[':token'] = $token;
+
+    $req = $pdo->prepare($reqsql);
+    $req->execute($exec_array);
+
+    $req = $pdo->prepare("SELECT id, firstname, lastname, email, role, grant_type, fb_token, google_token FROM users WHERE id = :id");
+    $req->execute(array(":id"=>$user['id']));
+    $user = $req->fetch();
+    $req->closeCursor();
+
+    return array('user'=>$user);
+  }
+
 } // end Auth class

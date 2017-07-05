@@ -22,6 +22,26 @@ $app->post('/authenticate', function($request, $response, $args)
 });
 
 
+$app->post('/addauth', function($request, $response, $args)
+{
+  $body = $request->getParsedBody();
+  $grant_types = array('facebook', 'google', 'guest');
+
+  if( empty($body['grant_type']) || !in_array($body['grant_type'], $grant_types) ){
+    $err = new \ApiError('406');
+    return $response->withStatus(406)->withJson($err->json());
+  }
+
+  $authReq = Auth::add_auth($this->db, $request, $body);
+  if(is_error($authReq)){
+    return $response->withStatus((int)$authReq->get_code())->withJson($authReq->json());
+  }
+
+  //$authReq->data->user = $authUser = User::getUserInfo($this->db, $authReq->data->uid);
+  return $response->withJson($authReq);
+});
+
+
 $app->post('/verifyauth', function($request, $response, $args)
 {
   $body = $request->getParsedBody();

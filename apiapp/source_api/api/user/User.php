@@ -4,9 +4,18 @@ namespace api\user;
 abstract class User
 {
 
+  static function setNotifications($pdo, $uid, $state)
+  {
+    $allow = $state==true ? 1 : 0;
+    $req = $pdo->prepare("UPDATE users SET allow_notifications=:allow WHERE id=:uid");
+    $req->execute(array(':uid'=>$uid, ':allow'=>$allow));
+    $req->closeCursor();
+    return true;
+  }
+
   static function getUserInfo($pdo, $uid)
   {
-    $req = $pdo->prepare("SELECT id, firstname, lastname, email, role, grant_type, fb_token, google_token, thumb FROM users WHERE id = :uid");
+    $req = $pdo->prepare("SELECT id, firstname, lastname, email, role, grant_type, fb_token, google_token, thumb, allow_notifications FROM users WHERE id = :uid");
     $req->execute(array(":uid"=>$uid));
     $user = $req->fetch();
     $req->closeCursor();

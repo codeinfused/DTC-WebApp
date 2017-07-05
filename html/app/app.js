@@ -129,6 +129,10 @@
 	
 	var _MyPlans2 = _interopRequireDefault(_MyPlans);
 	
+	var _MySettings = __webpack_require__(848);
+	
+	var _MySettings2 = _interopRequireDefault(_MySettings);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -155,9 +159,7 @@
 	      ignoreLandscape: false
 	    };
 	
-	    _this.navButtons = [{ label: 'Home', path: '/home', icon: 'store' }, { label: 'Search Games', path: '/games', icon: 'library_books', callback: comp.DBLoadBGG }, { label: 'Con Library', path: '/library', icon: 'import_contacts', callback: comp.DBLoadLibrary }, { label: 'My Plans', path: '/myplans', icon: 'date_range' }, { label: 'My Tables', path: '/mytables', icon: 'playlist_add_check' },
-	    // {label:'My Settings',       path:'/me', icon:'settings_applications'},
-	    { label: 'About', path: '/about', icon: 'info' }];
+	    _this.navButtons = [{ label: 'Home', path: '/home', icon: 'store' }, { label: 'Search Games', path: '/games', icon: 'library_books', callback: comp.DBLoadBGG }, { label: 'Con Library', path: '/library', icon: 'import_contacts', callback: comp.DBLoadLibrary }, { label: 'My Plans', path: '/myplans', icon: 'date_range' }, { label: 'My Tables', path: '/mytables', icon: 'playlist_add_check' }, { label: 'My Settings', path: '/me', icon: 'settings_applications' }, { label: 'About', path: '/about', icon: 'info' }];
 	    return _this;
 	  }
 	
@@ -303,7 +305,8 @@
 	    _react2.default.createElement(_reactRouter.Route, { path: 'tables/create/:bgg_id', component: _TableEdit2.default }),
 	    _react2.default.createElement(_reactRouter.Route, { path: 'tables/edit/:table_id', component: _TableEdit2.default }),
 	    _react2.default.createElement(_reactRouter.Route, { path: 'mytables', component: _MyTables2.default }),
-	    _react2.default.createElement(_reactRouter.Route, { path: 'myplans', component: _MyPlans2.default })
+	    _react2.default.createElement(_reactRouter.Route, { path: 'myplans', component: _MyPlans2.default }),
+	    _react2.default.createElement(_reactRouter.Route, { path: 'me', component: _MySettings2.default })
 	  )
 	), document.getElementById('app-wrapper'));
 
@@ -56913,6 +56916,8 @@
 	  api: {
 	    url: baseAPI,
 	    authenticate: baseAPI + "authenticate",
+	    addAuth: baseAPI + "addauth",
+	    changeNotify: baseAPI + "user/setnotify",
 	    verify: baseAPI + "verifyauth",
 	    wtp: baseAPI + "user/me/wtp",
 	    notify: baseAPI + "user/me/notify",
@@ -56953,11 +56958,15 @@
 	      comp.state.auth = auth;
 	      context.setState({ appLoaded: true });
 	
+	      if (!!comp.state.user.allow_notifications) {
+	        comp.checkNotificationPermission(false);
+	      }
+	
 	      if (location.pathname === '/') {
 	        _reactRouter.browserHistory.push('/home');
 	      }
 	    }).catch(function (json) {
-	      _ToastsAPI2.default.toast('error', null, json.response.data.message, { timeOut: 8000 });
+	      _ToastsAPI2.default.toast('error', null, json.response.data.message, { timeOut: 6000 });
 	      comp.state.authenticated = false;
 	      context.setState({ appLoaded: true });
 	      _reactRouter.browserHistory.push('/');
@@ -56965,6 +56974,70 @@
 	  },
 	
 	  checkApiResponse: function checkApiResponse(json) {},
+	
+	  handleChangeNotifications: function handleChangeNotifications(val) {
+	    var comp = this;
+	    var req = comp.api.changeNotify;
+	
+	    var getRequest = (0, _axios2.default)({
+	      method: 'post',
+	      url: req,
+	      responseType: 'json',
+	      data: {
+	        allow_notifications: val,
+	        t: new Date().getTime()
+	      },
+	      headers: { 'Authorization': 'Bearer ' + CONFIG.state.auth }
+	    }).then(function (json) {
+	      comp.state.user.allow_notifications = val;
+	      if (!!val) {
+	        comp.checkNotificationPermission(true);
+	      }
+	    }).catch(function (json) {
+	      _ToastsAPI2.default.toast('error', null, json.response.data.message, { timeOut: 8000 }); // json.response.data.message
+	    });
+	  },
+	  checkNotificationPermission: function checkNotificationPermission(enabling) {
+	    var comp = this;
+	    //if (!"Notification" in window) {
+	    //ToastsAPI.toast('error', null, 'Your browser cannot send phone notifications.', {timeout:6000});
+	    if ('serviceWorker' in navigator && 'Notification' in window) {
+	      if (Notification.permission === 'granted') {
+	        navigator.serviceWorker.register('/sw.js').then(function (swReg) {
+	          //console.log('Service Worker is registered', swReg);
+	          comp.notifier = swReg;
+	          if (enabling === true) {
+	            comp.sendNotification('DTC Notifications', "Notifications are enabled.");
+	          }
+	        }).catch(function (error) {
+	          //console.error('Service Worker Error', error);
+	        });
+	      } else {
+	        // notification not granted yet
+	        navigator.serviceWorker.register('sw.js');
+	        Notification.requestPermission(function (result) {
+	          if (result === 'granted') {
+	            navigator.serviceWorker.ready.then(function (registration) {
+	              comp.notifier = registration;
+	              comp.sendNotification('DTC Notifications', "Notifications are enabled.");
+	            });
+	          }
+	        });
+	      }
+	    } else {
+	      //console.warn('Push messaging is not supported');
+	    }
+	  },
+	  sendNotification: function sendNotification(title, message) {
+	    if ('serviceWorker' in navigator && 'Notification' in window && Notification.permission === "granted") {
+	      comp.notifier.showNotification(title, {
+	        body: message,
+	        icon: "/apple-touch-icon-192.png"
+	      });
+	      window.navigator.vibrate(400);
+	    }
+	  },
+	
 	
 	  phraseCapitalize: function phraseCapitalize(str) {
 	    return str.toLowerCase().split(' ').map(function (word) {
@@ -56999,7 +57072,8 @@
 	    user: {},
 	    searchAction: '',
 	    searchDB: 'bgg',
-	    currentCreateGame: {}
+	    currentCreateGame: {},
+	    notifier: {}
 	  }
 	
 	};
@@ -99089,6 +99163,264 @@
 	}(_react2.default.Component);
 	
 	exports.default = MyPlans;
+
+/***/ }),
+/* 848 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _config = __webpack_require__(552);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	var _axios = __webpack_require__(525);
+	
+	var _axios2 = _interopRequireDefault(_axios);
+	
+	var _react = __webpack_require__(2);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _reactRouter = __webpack_require__(185);
+	
+	var _reactToolbox = __webpack_require__(243);
+	
+	var _button = __webpack_require__(244);
+	
+	var _lodash = __webpack_require__(554);
+	
+	var _moment = __webpack_require__(728);
+	
+	var _moment2 = _interopRequireDefault(_moment);
+	
+	var _reactFacebookLogin = __webpack_require__(717);
+	
+	var _reactFacebookLogin2 = _interopRequireDefault(_reactFacebookLogin);
+	
+	var _reactGoogleLogin = __webpack_require__(718);
+	
+	var _reactGoogleLogin2 = _interopRequireDefault(_reactGoogleLogin);
+	
+	var _Loaders = __webpack_require__(715);
+	
+	var _ToastsAPI = __webpack_require__(556);
+	
+	var _ToastsAPI2 = _interopRequireDefault(_ToastsAPI);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var MySettings = function (_React$Component) {
+	  _inherits(MySettings, _React$Component);
+	
+	  function MySettings(props) {
+	    _classCallCheck(this, MySettings);
+	
+	    var _this = _possibleConstructorReturn(this, (MySettings.__proto__ || Object.getPrototypeOf(MySettings)).call(this, props));
+	
+	    var comp = _this;
+	
+	    _this.state = {
+	      loaded: true,
+	      allow_notifications: !!_config2.default.state.user.allow_notifications
+	    };
+	
+	    _this.facebookResponse = _this.facebookResponse.bind(_this);
+	    _this.googleResponse = _this.googleResponse.bind(_this);
+	    _this.googleDenied = _this.googleDenied.bind(_this);
+	    _this.setAuthData = _this.setAuthData.bind(_this);
+	    return _this;
+	  }
+	
+	  _createClass(MySettings, [{
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {}
+	  }, {
+	    key: 'componentWillReceiveProps',
+	    value: function componentWillReceiveProps(nextProps) {}
+	  }, {
+	    key: 'setAuthData',
+	    value: function setAuthData(json) {
+	      if (json && json.user) {
+	        _config2.default.state.user = json.user;
+	        this.setState({ loaded: true });
+	        this.forceUpdate();
+	      }
+	    }
+	  }, {
+	    key: 'facebookResponse',
+	    value: function facebookResponse(response) {
+	      var comp = this;
+	      var req = _config2.default.api.addAuth;
+	      comp.setState({ loaded: false, appLoading: true });
+	
+	      comp.getRequest = _axios2.default.post(req, {
+	        grant_type: 'facebook',
+	        token: response.accessToken,
+	        user: {
+	          email: response.email,
+	          first_name: response.first_name,
+	          last_name: response.last_name,
+	          thumb: response.picture.data.url
+	        },
+	        t: new Date().getTime()
+	      }).then(function (json) {
+	        if (json.data && json.data.user) {
+	          comp.setAuthData(json.data);
+	        } else {
+	          _ToastsAPI2.default.toast('error', null, 'Could not connect to app, please refresh.', { timeOut: 8000 });
+	          comp.setState({ loaded: true });
+	        }
+	      }).catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, json.response.data.message, { timeOut: 8000 });
+	        comp.setState({ loaded: true });
+	      });
+	    }
+	  }, {
+	    key: 'googleResponse',
+	    value: function googleResponse(response) {
+	      var comp = this;
+	      var req = _config2.default.api.addAuth;
+	      comp.setState({ loaded: false });
+	
+	      comp.getRequest = (0, _axios2.default)({
+	        method: 'post',
+	        url: req,
+	        responseType: 'json',
+	        data: {
+	          grant_type: 'google',
+	          token: response.tokenId,
+	          user: {
+	            email: response.profileObj.email,
+	            first_name: response.profileObj.givenName,
+	            last_name: response.profileObj.familyName,
+	            thumb: response.profileObj.imageUrl
+	          },
+	          t: new Date().getTime()
+	        }
+	      }).then(function (json) {
+	        if (json.data && json.data.user) {
+	          comp.setAuthData(json.data);
+	        } else {
+	          _ToastsAPI2.default.toast('error', null, 'Could not connect to app, please refresh.', { timeOut: 8000 });
+	          comp.setState({ loaded: true });
+	        }
+	      }).catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, json, { timeOut: 8000 }); // json.response.data.message
+	        comp.setState({ loaded: true });
+	      });
+	    }
+	  }, {
+	    key: 'googleDenied',
+	    value: function googleDenied(response) {
+	      if (response.error != 'popup_closed_by_user') {
+	        _ToastsAPI2.default.toast('error', null, 'Error signing in. Please try again.', { timeOut: 8000 });
+	      }
+	    }
+	  }, {
+	    key: 'handleChangeNotifications',
+	    value: function handleChangeNotifications(val) {
+	      var comp = this;
+	      _config2.default.handleChangeNotifications(val);
+	      comp.setState({ allow_notifications: val });
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var comp = this;
+	      return _react2.default.createElement(
+	        'div',
+	        { id: 'page-my-settings', className: 'transition-item page-my-settings page-wrap' },
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'my-settings-wrap' },
+	          _react2.default.createElement(
+	            'h2',
+	            null,
+	            'My Settings'
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'my-settings-item' },
+	            _react2.default.createElement(_reactToolbox.Switch, { label: 'Allow Phone Notifications', checked: comp.state.allow_notifications, onChange: comp.handleChangeNotifications.bind(comp) })
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'my-settings-item' },
+	            _react2.default.createElement(
+	              'h3',
+	              null,
+	              'Account Login'
+	            ),
+	            _react2.default.createElement(
+	              'span',
+	              { className: 'my-current-account' },
+	              'Currently: ',
+	              _react2.default.createElement(
+	                'span',
+	                null,
+	                _config2.default.state.user.grant_type
+	              )
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'account-option' },
+	              _react2.default.createElement(_reactFacebookLogin2.default, {
+	                appId: '202475036823066',
+	                textButton: 'Sign in with Facebook',
+	                autoLoad: false,
+	                fields: 'first_name,last_name,email,picture',
+	                callback: this.facebookResponse,
+	                onClick: function onClick() {
+	                  comp.setState({ appLoading: true });
+	                },
+	                icon: false,
+	                redirectUri: window.location.href,
+	                cssClass: 'btn-login btn-login-facebook'
+	              })
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'account-option' },
+	              _react2.default.createElement(_reactGoogleLogin2.default, {
+	                clientId: '1018275567135-e9q9n0aoc1l7bn8doq8q394t1so9gn5b.apps.googleusercontent.com',
+	                buttonText: 'Sign in with Google',
+	                scope: 'profile email',
+	                autoLoad: false,
+	                uxMode: 'popup',
+	                onSuccess: this.googleResponse,
+	                onFailure: this.googleDenied,
+	                onRequest: function onRequest() {
+	                  comp.setState({ appLoading: true });
+	                },
+	                className: 'btn-login btn-login-google'
+	              })
+	            )
+	          )
+	        ),
+	        _react2.default.createElement(_Loaders.LoadingInline, {
+	          active: !comp.state.loaded
+	        })
+	      );
+	    }
+	  }]);
+	
+	  return MySettings;
+	}(_react2.default.Component);
+	
+	exports.default = MySettings;
 
 /***/ })
 /******/ ]);

@@ -16,6 +16,8 @@ const CONFIG = {
   api: {
     url: baseAPI,
     authenticate: baseAPI+"authenticate",
+    addAuth: baseAPI+"addauth",
+    changeNotify: baseAPI+"user/setnotify",
     verify: baseAPI+"verifyauth",
     wtp: baseAPI+"user/me/wtp",
     notify: baseAPI+"user/me/notify",
@@ -58,12 +60,16 @@ const CONFIG = {
       comp.state.auth = auth;
       context.setState({appLoaded: true});
 
+      if(!!comp.state.user.allow_notifications){
+        comp.checkNotificationPermission(false);
+      }
+
       if(location.pathname === '/'){
         browserHistory.push('/home');
       }
 
     }).catch(function(json){
-      ToastsAPI.toast('error', null, json.response.data.message, {timeOut:8000});
+      ToastsAPI.toast('error', null, json.response.data.message, {timeOut:6000});
       comp.state.authenticated = false;
       context.setState({appLoaded: true});
       browserHistory.push('/');
@@ -73,6 +79,76 @@ const CONFIG = {
   checkApiResponse: function(json)
   {
 
+  },
+
+
+  handleChangeNotifications(val)
+  {
+    var comp = this;
+    var req = comp.api.changeNotify;
+
+    var getRequest = axios({
+      method: 'post',
+      url: req,
+      responseType: 'json',
+      data: {
+        allow_notifications: val,
+        t: (new Date()).getTime()
+      },
+      headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
+    }).then(function(json)
+    {
+      comp.state.user.allow_notifications = val;
+      if(!!val){ comp.checkNotificationPermission(true); }
+    }).catch(function(json){
+      ToastsAPI.toast('error', null, json.response.data.message, {timeOut:8000}); // json.response.data.message
+    });
+  },
+
+
+  checkNotificationPermission(enabling)
+  {
+    var comp = this;
+    //if (!"Notification" in window) {
+    //ToastsAPI.toast('error', null, 'Your browser cannot send phone notifications.', {timeout:6000});
+    if ('serviceWorker' in navigator && 'Notification' in window) {
+      if (Notification.permission === 'granted'){
+        navigator.serviceWorker.register('/sw.js').then(function(swReg) {
+          //console.log('Service Worker is registered', swReg);
+          comp.notifier = swReg;
+          if(enabling===true){
+            comp.sendNotification('DTC Notifications', "Notifications are enabled.");
+          }
+        }).catch(function(error) {
+          //console.error('Service Worker Error', error);
+        });
+      }else{
+        // notification not granted yet
+        navigator.serviceWorker.register('sw.js');
+        Notification.requestPermission(function(result) {
+          if (result === 'granted') {
+            navigator.serviceWorker.ready.then(function(registration) {
+              comp.notifier = registration;
+              comp.sendNotification('DTC Notifications', "Notifications are enabled.");
+            });
+          }
+        });
+      }
+    } else {
+      //console.warn('Push messaging is not supported');
+    }
+  },
+
+
+  sendNotification(title, message)
+  {
+    if ('serviceWorker' in navigator && 'Notification' in window && Notification.permission === "granted") {
+      comp.notifier.showNotification(title, {
+        body: message,
+        icon: "/apple-touch-icon-192.png"
+      });
+      window.navigator.vibrate(400);
+    }
   },
 
   phraseCapitalize: function(str)
@@ -114,7 +190,8 @@ const CONFIG = {
     user: {},
     searchAction: '',
     searchDB: 'bgg',
-    currentCreateGame: {}
+    currentCreateGame: {},
+    notifier: {}
   }
 
 };
