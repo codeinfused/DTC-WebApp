@@ -21,6 +21,7 @@ const CONFIG = {
     verify: baseAPI+"verifyauth",
     wtp: baseAPI+"user/me/wtp",
     notify: baseAPI+"user/me/notify",
+    getAlerts: baseAPI+"user/getalerts",
 
     tableList: baseAPI+"tables/list",
     tableEdit: baseAPI+"tables/edit",
@@ -68,6 +69,8 @@ const CONFIG = {
         browserHistory.push('/home');
       }
 
+      comp.state.index.getNewAlerts();
+
     }).catch(function(json){
       ToastsAPI.toast('error', null, json.response.data.message, {timeOut:6000});
       comp.state.authenticated = false;
@@ -99,7 +102,7 @@ const CONFIG = {
     }).then(function(json)
     {
       comp.state.user.allow_notifications = val;
-      if(!!val){ comp.checkNotificationPermission(true); }
+      if(val){ comp.checkNotificationPermission(true); }
     }).catch(function(json){
       ToastsAPI.toast('error', null, json.response.data.message, {timeOut:8000}); // json.response.data.message
     });
@@ -124,7 +127,7 @@ const CONFIG = {
         });
       }else{
         // notification not granted yet
-        navigator.serviceWorker.register('sw.js');
+        navigator.serviceWorker.register('/sw.js');
         Notification.requestPermission(function(result) {
           if (result === 'granted') {
             navigator.serviceWorker.ready.then(function(registration) {
@@ -146,9 +149,9 @@ const CONFIG = {
     if ('serviceWorker' in navigator && 'Notification' in window && Notification.permission === "granted") {
       comp.notifier.showNotification(title, {
         body: message,
-        icon: "/apple-touch-icon-192.png"
+        icon: "/apple-touch-icon-192.png",
+        vibrate: 400
       });
-      window.navigator.vibrate(400);
     }
   },
 
@@ -185,6 +188,7 @@ const CONFIG = {
   // },
 
   state: {
+    index: {},
     transitionTime: 300,
     authenticated: false,
     auth: '',

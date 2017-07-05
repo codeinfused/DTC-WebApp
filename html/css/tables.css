@@ -226,3 +226,16 @@ span.table-item-when.cancelled {
   font-style: italic;
   background: #773333
 }
+
+select.sublocation_alpha{
+  border: 1px solid #aaa;
+  background: #fff;
+  padding: 5px 7px;
+  margin-right: 8px;
+}
+select.sublocation_num{
+  border: 1px solid #aaa;
+  background: #fff;
+  padding: 5px 7px;
+  margin-right: 8px;
+}

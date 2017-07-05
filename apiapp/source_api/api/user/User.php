@@ -4,6 +4,35 @@ namespace api\user;
 abstract class User
 {
 
+  static function getNotifications($pdo, $uid)
+  {
+    $req = $pdo->prepare("SELECT nt.id, nt.title, db.title as game_title, nt.message, nt.reference_id, nt.created_date, gt.start_datetime, gt.table_type, nt.link, CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as host_name
+      FROM notifications nt
+      LEFT JOIN game_tables gt ON gt.id = nt.reference_id
+      LEFT JOIN bgg_game_db db ON db.bgg_id = gt.bgg_id
+      LEFT JOIN users u ON u.id = gt.player_id
+      WHERE user_id=:uid AND dismissed=0 AND created_date > NOW() - INTERVAL 24 HOUR LIMIT 99");
+    $req->execute(array(":uid"=>$uid));
+    $wtps = $req->fetchAll();
+    $req->closeCursor();
+
+    return array('alerts' => $wtps);
+  }
+
+  static function dismissNotification($pdo, $uid, $alert_id)
+  {
+    if($alert_id==='all'){
+      $req = $pdo->prepare("DELETE FROM notifications WHERE user_id=:uid");
+      $req->execute(array(':uid'=>$uid, ':alert_id'=>$alert_id));
+    }else{
+      $req = $pdo->prepare("DELETE FROM notifications WHERE user_id=:uid AND id=:alert_id");
+      $req->execute(array(':uid'=>$uid, ':alert_id'=>$alert_id));
+    }
+    $req->closeCursor();
+    return true;
+  }
+
+
   static function setNotifications($pdo, $uid, $state)
   {
     $allow = $state==true ? 1 : 0;

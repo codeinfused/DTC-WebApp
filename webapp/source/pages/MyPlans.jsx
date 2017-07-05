@@ -142,7 +142,7 @@ class MyPlans extends React.Component
                   <div className="plans-item-body">
                     <p className="plans-time">{table.status==='cancelled' ? 'Cancelled' : moment(table.start_datetime).fromNow()}</p>
                     <span className="plan-tag">{moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, MMM Do YYYY, h:mm a')}</span>
-                    <span className="plan-tag">Room: {table.table_location}</span>
+                    <span className="plan-tag">{table.table_location +' '+ (table.table_sublocation_alpha||'') + '-' + (table.table_sublocation_num||'')}</span>
                     <span className={"plan-tag" + (table.player_id === CONFIG.state.user.id ? " hosting" : "")}>Host: {table.host_name}</span>
                   </div>
                   <button onClick={comp.handleLeaveGame.bind(comp, table)}>Leave game</button>

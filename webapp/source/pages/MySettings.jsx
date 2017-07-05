@@ -21,7 +21,7 @@ class MySettings extends React.Component
 
     this.state = {
       loaded: true,
-      allow_notifications: !!CONFIG.state.user.allow_notifications
+      allow_notifications: !!+(CONFIG.state.user.allow_notifications)
     };
 
     this.facebookResponse = this.facebookResponse.bind(this);

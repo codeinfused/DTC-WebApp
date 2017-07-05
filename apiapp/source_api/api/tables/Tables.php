@@ -13,7 +13,7 @@ abstract class Tables
   static function my_tables($pdo, $uid)
   {
     $dbCheck = $pdo->prepare(
-      "SELECT db.title, tb.id as table_id, tb.table_type, tb.seats, tb.table_location, tb.start_datetime, tb.lft, tb.allow_signups, tb.status, COUNT(gs.id) AS signups
+      "SELECT db.title, tb.id as table_id, tb.table_type, tb.seats, tb.table_location, tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft, tb.allow_signups, tb.status, COUNT(gs.id) AS signups
       FROM game_tables tb JOIN bgg_game_db db ON tb.bgg_id = db.bgg_id
       LEFT JOIN game_signups gs ON gs.table_id = tb.id
       WHERE tb.player_id=:uid AND tb.start_datetime > NOW() - INTERVAL 20 MINUTE
@@ -28,7 +28,8 @@ abstract class Tables
   static function my_plans($pdo, $uid)
   {
     $dbCheck = $pdo->prepare(
-      "SELECT db.title, tb.id as table_id, tb.player_id, CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as host_name, tb.table_type, tb.seats, tb.table_location, tb.start_datetime, tb.lft, tb.allow_signups, tb.status
+      "SELECT db.title, tb.id as table_id, tb.player_id, tb.table_type, tb.seats, tb.table_location, tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft, tb.allow_signups, tb.status,
+      CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as host_name,
       FROM game_tables tb
       LEFT JOIN game_signups gs ON gs.table_id = tb.id
       JOIN bgg_game_db db ON tb.bgg_id = db.bgg_id
@@ -46,7 +47,9 @@ abstract class Tables
   static function list_tables($pdo, $bgg_id, $table_type, $uid)
   {
     $dbCheck = $pdo->prepare(
-      "SELECT db.title, tb.id as table_id, tb.player_id, CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as host_name, tb.table_type, tb.seats, tb.table_location, tb.start_datetime, tb.lft, COUNT(gs.id) AS signups, tb.allow_signups, tb.status, (SELECT count(id) FROM game_signups WHERE table_id=tb.id AND player_id=:uid) as joined
+      "SELECT db.title, tb.id as table_id, tb.player_id, CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as host_name, tb.table_type, tb.seats, tb.table_location, tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft,
+      COUNT(gs.id) AS signups, tb.allow_signups, tb.status,
+      (SELECT count(id) FROM game_signups WHERE table_id=tb.id AND player_id=:uid) as joined
       FROM game_tables tb
       LEFT JOIN game_signups gs ON gs.table_id = tb.id
       JOIN bgg_game_db db ON tb.bgg_id = db.bgg_id
@@ -77,7 +80,9 @@ abstract class Tables
       ':table_location' => $data['table_location'],
       ':start_datetime' => $data['start_datetime'],
       ':lft' => $data['lft'] ? 1 : 0,
-      ':allow_signups' => $data['allow_signups'] ? 1 : 0
+      ':allow_signups' => $data['allow_signups'] ? 1 : 0,
+      ':subloc_alpha' => $data['table_sublocation_alpha'],
+      ':subloc_num' => $data['table_sublocation_num']
     );
 
     if($data['table_type']==='now'){
@@ -89,17 +94,51 @@ abstract class Tables
       }
     }
 
+    $inserting = false;
     if(!empty($data['table_id'])){
       $exec_params[':table_id'] = $data['table_id'];
       $dbCheck = $pdo->prepare(
-        "UPDATE game_tables SET bgg_id=:bid, table_type=:table_type, seats=:seats, table_location=:table_location, start_datetime=:start_datetime, lft=:lft, allow_signups=:allow_signups WHERE id=:table_id AND player_id=:uid"
+        "UPDATE game_tables SET bgg_id=:bid, table_type=:table_type, seats=:seats, table_location=:table_location, start_datetime=:start_datetime, lft=:lft, allow_signups=:allow_signups, table_sublocation_alpha=:subloc_alpha, table_sublocation_num=:subloc_num WHERE id=:table_id AND player_id=:uid"
       );
     }else{
+      $inserting = true;
       $dbCheck = $pdo->prepare(
-        "INSERT INTO game_tables SET player_id=:uid, bgg_id=:bid, table_type=:table_type, seats=:seats, table_location=:table_location, start_datetime=:start_datetime, lft=:lft, allow_signups=:allow_signups"
+        "INSERT INTO game_tables SET player_id=:uid, bgg_id=:bid, table_type=:table_type, seats=:seats, table_location=:table_location, start_datetime=:start_datetime, lft=:lft, allow_signups=:allow_signups, table_sublocation_alpha=:subloc_alpha, table_sublocation_num=:subloc_num"
       );
     }
     $dbCheck->execute($exec_params);
+
+    if($inserting === true){
+      $new_table_id = $pdo->lastInsertId();
+
+      $gamereq = $pdo->prepare("SELECT title, start_datetime FROM bgg_game_db WHERE bgg_id=:bgg_id LIMIT 1");
+      $gamereq->execute(array(':bgg_id'=>$data['bgg_id']));
+      $game_title = $gamereq->fetchColumn();
+
+      $userreq = $pdo->prepare("SELECT player_id FROM game_wtp WHERE bgg_id=:bgg_id AND notify_flag=1");
+      $userreq->execute(array(':bgg_id'=>$data['bgg_id']));
+      $users = $userreq->fetchAll();
+
+      $title = $data['table_type']==='now' ? 'Players Wanted Alert' : 'New Scheduled Game Alert';
+      $message = $game_title . ' at: ';
+      $table_fields = '';
+      $table_preps = '(?, ?, ?, ?, ?, ?, NOW())';
+
+      if(count($users) > 0)
+      {
+        foreach($users as $user){
+
+        }
+
+        $req = $pdo->prepare(
+          "INSERT INTO notifications n (user_id, title, message, game_title, game_start, reference_id, created_date) VALUES
+          ( created_date=NOW())
+
+        ");
+      }
+    }
+
+
 
     return array('success'=>true);
   }

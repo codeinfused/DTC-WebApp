@@ -22,6 +22,7 @@ import TableList from './pages/TableList.jsx';
 import MyTables from './pages/MyTables.jsx';
 import MyPlans from './pages/MyPlans.jsx';
 import MySettings from './pages/MySettings.jsx';
+import MyAlerts from './pages/MyAlerts.jsx';
 
 class AppLayout extends React.Component
 {
@@ -29,24 +30,29 @@ class AppLayout extends React.Component
   {
     super(props);
     var comp = this;
+    CONFIG.state.index = comp;
 
     this.state = {
       askDialogActive: false,
       appLoaded: false,
       appLoading: false,
       sideMenuOpen: false,
-      ignoreLandscape: false
+      ignoreLandscape: false,
+      alerts: []
     };
 
     this.navButtons = [
       {label:'Home',              path:'/home', icon:'store'},
       {label:'Search Games',      path:'/games', icon:'library_books', callback: comp.DBLoadBGG},
       {label:'Con Library',       path:'/library', icon:'import_contacts', callback: comp.DBLoadLibrary},
+      {label:'Game Alerts',       path:'/alerts', icon:'notifications'},
       {label:'My Plans',          path:'/myplans', icon:'date_range'},
       {label:'My Tables',         path:'/mytables', icon:'playlist_add_check'},
       {label:'My Settings',       path:'/me', icon:'settings_applications'},
       {label:'About',             path:'/about', icon:'info'}
     ];
+
+    this.getNewAlerts = this.getNewAlerts.bind(this);
   }
 
   componentDidMount()
@@ -91,6 +97,27 @@ class AppLayout extends React.Component
     browserHistory.push(item.path);
   }
 
+  getNewAlerts()
+  {
+    var comp = this;
+    var req = CONFIG.api.getAlerts;
+
+    axios({
+      method: 'post',
+      url: req,
+      responseType: 'json',
+      data: { t: (new Date()).getTime() },
+      headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
+    }).then(function(json){
+      if(json.data && json.data.alerts){
+        comp.setState({alerts: json.data.alerts});
+      }
+      setTimeout(comp.getNewAlerts, 120000);
+    }).catch(function(){
+      setTimeout(comp.getNewAlerts, 120000);
+    });
+  }
+
   render()
   {
     var comp = this;
@@ -117,7 +144,11 @@ class AppLayout extends React.Component
           <AppMenu width={280} pageWrapId={"app-main-body"} outerContainerId={"app-wrap"} isOpen={comp.state.sideMenuOpen} onStateChange={comp.isMenuOpen.bind(comp)} customBurgerIcon={false} customCrossIcon={<FontIcon value='close' />}>
             <h2 className="app-menu-head"><img src="/images/dtc-logo-transp-full.png" /></h2>
             {comp.navButtons.map(function(item, i){
-              return (<Button onClick={comp.handleAppNav.bind(comp, item)} key={'app-nav-'+i} label={item.label} icon={item.icon} />);
+              return (<Button
+                onClick={comp.handleAppNav.bind(comp, item)}
+                key={'app-nav-'+i}
+                icon={item.icon}
+              >{item.label}{item.path==='/alerts'?(<span className="alerts-count">{comp.state.alerts.length}</span>):''}</Button>);
             })}
           </AppMenu>
 
@@ -159,6 +190,7 @@ ReactDOM.render(
       <Route path="mytables" component={MyTables} />
       <Route path="myplans" component={MyPlans} />
       <Route path="me" component={MySettings} />
+      <Route path="alerts" component={MyAlerts} />
     </Route>
   </Router>,
   document.getElementById('app-wrapper')

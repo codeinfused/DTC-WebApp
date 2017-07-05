@@ -133,6 +133,10 @@
 	
 	var _MySettings2 = _interopRequireDefault(_MySettings);
 	
+	var _MyAlerts = __webpack_require__(849);
+	
+	var _MyAlerts2 = _interopRequireDefault(_MyAlerts);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -150,16 +154,20 @@
 	    var _this = _possibleConstructorReturn(this, (AppLayout.__proto__ || Object.getPrototypeOf(AppLayout)).call(this, props));
 	
 	    var comp = _this;
+	    _config2.default.state.index = comp;
 	
 	    _this.state = {
 	      askDialogActive: false,
 	      appLoaded: false,
 	      appLoading: false,
 	      sideMenuOpen: false,
-	      ignoreLandscape: false
+	      ignoreLandscape: false,
+	      alerts: []
 	    };
 	
-	    _this.navButtons = [{ label: 'Home', path: '/home', icon: 'store' }, { label: 'Search Games', path: '/games', icon: 'library_books', callback: comp.DBLoadBGG }, { label: 'Con Library', path: '/library', icon: 'import_contacts', callback: comp.DBLoadLibrary }, { label: 'My Plans', path: '/myplans', icon: 'date_range' }, { label: 'My Tables', path: '/mytables', icon: 'playlist_add_check' }, { label: 'My Settings', path: '/me', icon: 'settings_applications' }, { label: 'About', path: '/about', icon: 'info' }];
+	    _this.navButtons = [{ label: 'Home', path: '/home', icon: 'store' }, { label: 'Search Games', path: '/games', icon: 'library_books', callback: comp.DBLoadBGG }, { label: 'Con Library', path: '/library', icon: 'import_contacts', callback: comp.DBLoadLibrary }, { label: 'Game Alerts', path: '/alerts', icon: 'notifications' }, { label: 'My Plans', path: '/myplans', icon: 'date_range' }, { label: 'My Tables', path: '/mytables', icon: 'playlist_add_check' }, { label: 'My Settings', path: '/me', icon: 'settings_applications' }, { label: 'About', path: '/about', icon: 'info' }];
+	
+	    _this.getNewAlerts = _this.getNewAlerts.bind(_this);
 	    return _this;
 	  }
 	
@@ -208,6 +216,27 @@
 	      _reactRouter.browserHistory.push(item.path);
 	    }
 	  }, {
+	    key: 'getNewAlerts',
+	    value: function getNewAlerts() {
+	      var comp = this;
+	      var req = _config2.default.api.getAlerts;
+	
+	      (0, _axios2.default)({
+	        method: 'post',
+	        url: req,
+	        responseType: 'json',
+	        data: { t: new Date().getTime() },
+	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
+	      }).then(function (json) {
+	        if (json.data && json.data.alerts) {
+	          comp.setState({ alerts: json.data.alerts });
+	        }
+	        setTimeout(comp.getNewAlerts, 120000);
+	      }).catch(function () {
+	        setTimeout(comp.getNewAlerts, 120000);
+	      });
+	    }
+	  }, {
 	    key: 'render',
 	    value: function render() {
 	      var comp = this;
@@ -250,7 +279,20 @@
 	              _react2.default.createElement('img', { src: '/images/dtc-logo-transp-full.png' })
 	            ),
 	            comp.navButtons.map(function (item, i) {
-	              return _react2.default.createElement(_reactToolbox.Button, { onClick: comp.handleAppNav.bind(comp, item), key: 'app-nav-' + i, label: item.label, icon: item.icon });
+	              return _react2.default.createElement(
+	                _reactToolbox.Button,
+	                {
+	                  onClick: comp.handleAppNav.bind(comp, item),
+	                  key: 'app-nav-' + i,
+	                  icon: item.icon
+	                },
+	                item.label,
+	                item.path === '/alerts' ? _react2.default.createElement(
+	                  'span',
+	                  { className: 'alerts-count' },
+	                  comp.state.alerts.length
+	                ) : ''
+	              );
 	            })
 	          ),
 	          _react2.default.createElement(
@@ -306,7 +348,8 @@
 	    _react2.default.createElement(_reactRouter.Route, { path: 'tables/edit/:table_id', component: _TableEdit2.default }),
 	    _react2.default.createElement(_reactRouter.Route, { path: 'mytables', component: _MyTables2.default }),
 	    _react2.default.createElement(_reactRouter.Route, { path: 'myplans', component: _MyPlans2.default }),
-	    _react2.default.createElement(_reactRouter.Route, { path: 'me', component: _MySettings2.default })
+	    _react2.default.createElement(_reactRouter.Route, { path: 'me', component: _MySettings2.default }),
+	    _react2.default.createElement(_reactRouter.Route, { path: 'alerts', component: _MyAlerts2.default })
 	  )
 	), document.getElementById('app-wrapper'));
 
@@ -56921,6 +56964,7 @@
 	    verify: baseAPI + "verifyauth",
 	    wtp: baseAPI + "user/me/wtp",
 	    notify: baseAPI + "user/me/notify",
+	    getAlerts: baseAPI + "user/getalerts",
 	
 	    tableList: baseAPI + "tables/list",
 	    tableEdit: baseAPI + "tables/edit",
@@ -56965,6 +57009,8 @@
 	      if (location.pathname === '/') {
 	        _reactRouter.browserHistory.push('/home');
 	      }
+	
+	      comp.state.index.getNewAlerts();
 	    }).catch(function (json) {
 	      _ToastsAPI2.default.toast('error', null, json.response.data.message, { timeOut: 6000 });
 	      comp.state.authenticated = false;
@@ -56990,7 +57036,7 @@
 	      headers: { 'Authorization': 'Bearer ' + CONFIG.state.auth }
 	    }).then(function (json) {
 	      comp.state.user.allow_notifications = val;
-	      if (!!val) {
+	      if (val) {
 	        comp.checkNotificationPermission(true);
 	      }
 	    }).catch(function (json) {
@@ -57014,7 +57060,7 @@
 	        });
 	      } else {
 	        // notification not granted yet
-	        navigator.serviceWorker.register('sw.js');
+	        navigator.serviceWorker.register('/sw.js');
 	        Notification.requestPermission(function (result) {
 	          if (result === 'granted') {
 	            navigator.serviceWorker.ready.then(function (registration) {
@@ -57033,9 +57079,9 @@
 	    if ('serviceWorker' in navigator && 'Notification' in window && Notification.permission === "granted") {
 	      comp.notifier.showNotification(title, {
 	        body: message,
-	        icon: "/apple-touch-icon-192.png"
+	        icon: "/apple-touch-icon-192.png",
+	        vibrate: 400
 	      });
-	      window.navigator.vibrate(400);
 	    }
 	  },
 	
@@ -57067,6 +57113,7 @@
 	  // },
 	
 	  state: {
+	    index: {},
 	    transitionTime: 300,
 	    authenticated: false,
 	    auth: '',
@@ -82250,6 +82297,8 @@
 	      seats: 2,
 	      table_type: 'now',
 	      table_location: 'Caribbean Ballroom',
+	      table_sublocation_alpha: '',
+	      table_sublocation_num: '',
 	      start_datetime: '',
 	      start_date: new Date(),
 	      start_time: new Date(),
@@ -82259,6 +82308,10 @@
 	    };
 	
 	    _this.dateRange = ['2017-07-04', '2017-07-09'];
+	
+	    _this.sublocs_alpha = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q'];
+	    _this.sublocs_num = Array.apply(null, { length: 36 }).map(Number.call, Number);
+	    _this.sublocs_num = _this.sublocs_num.slice(1);
 	
 	    _this.tableLocations = [{ label: 'Caribbean Ballroom', value: 'Caribbean Ballroom' }, { label: 'Grand Sierra Ballroom', value: 'Grand Sierra Ballroom' }, { label: 'Boca I/II', value: 'Boca I/II' }, { label: 'Boca V-VIII', value: 'Boca V-VIII' }, { label: 'Antigua', value: 'Antigua' }, { label: 'Bonaire', value: 'Bonaire' }, { label: 'Curaco', value: 'Curaco' }, { label: 'Hibiscus', value: 'Hibiscus' }, { label: 'Reception Lobby', value: 'Reception Lobby' }];
 	
@@ -82327,6 +82380,11 @@
 	      this.setState(_defineProperty({}, field, value));
 	    }
 	  }, {
+	    key: 'handleChangeSelect',
+	    value: function handleChangeSelect(field, value) {
+	      this.setState(_defineProperty({}, field, value.target.value));
+	    }
+	  }, {
 	    key: 'handleChangeDatetime',
 	    value: function handleChangeDatetime(field, value) {
 	      var _comp$setState;
@@ -82354,7 +82412,9 @@
 	        table_location: comp.state.table_location,
 	        table_type: comp.state.table_type,
 	        lft: comp.state.lft,
-	        allow_signups: comp.state.allow_signups
+	        allow_signups: comp.state.allow_signups,
+	        table_sublocation_alpha: comp.state.table_sublocation_alpha,
+	        table_sublocation_num: comp.state.table_sublocation_num
 	      }, {
 	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
 	      }).then(function (json) {
@@ -82424,7 +82484,29 @@
 	            _react2.default.createElement(
 	              'div',
 	              { className: 'table-form-item' },
-	              _react2.default.createElement(_reactToolbox.Dropdown, { label: 'Room Location', source: comp.tableLocations, value: comp.state.table_location, onChange: comp.handleChangeInput.bind(comp, 'table_location') })
+	              _react2.default.createElement(_reactToolbox.Dropdown, { label: 'Room Location', source: comp.tableLocations, value: comp.state.table_location, onChange: comp.handleChangeInput.bind(comp, 'table_location') }),
+	              _react2.default.createElement(
+	                'select',
+	                { className: 'sublocation_alpha', value: comp.state.table_sublocation_alpha, onChange: comp.handleChangeSelect.bind(comp, 'table_sublocation_alpha') },
+	                this.sublocs_alpha.map(function (alpha) {
+	                  return _react2.default.createElement(
+	                    'option',
+	                    { key: "localpha-" + alpha, value: alpha },
+	                    alpha
+	                  );
+	                })
+	              ),
+	              _react2.default.createElement(
+	                'select',
+	                { className: 'sublocation_num', value: comp.state.table_sublocation_num, onChange: comp.handleChangeSelect.bind(comp, 'table_sublocation_num') },
+	                this.sublocs_num.map(function (num) {
+	                  return _react2.default.createElement(
+	                    'option',
+	                    { key: "locnum" + num, value: num },
+	                    num
+	                  );
+	                })
+	              )
 	            ),
 	            _react2.default.createElement(
 	              'div',
@@ -98515,7 +98597,7 @@
 	              _react2.default.createElement(
 	                'span',
 	                { className: 'table-item-tag' },
-	                table.table_location
+	                table.table_location + ' ' + (table.table_sublocation_alpha || '') + '-' + (table.table_sublocation_num || '')
 	              ),
 	              table.table_type === 'future' ? _react2.default.createElement(
 	                'span',
@@ -98801,7 +98883,7 @@
 	                _react2.default.createElement(
 	                  'span',
 	                  { className: 'table-item-tag' },
-	                  table.table_location
+	                  table.table_location + ' ' + (table.table_sublocation_alpha || '') + '-' + (table.table_sublocation_num || '')
 	                ),
 	                table.table_type === 'future' ? _react2.default.createElement(
 	                  'span',
@@ -99095,8 +99177,7 @@
 	                  _react2.default.createElement(
 	                    'span',
 	                    { className: 'plan-tag' },
-	                    'Room: ',
-	                    table.table_location
+	                    table.table_location + ' ' + (table.table_sublocation_alpha || '') + '-' + (table.table_sublocation_num || '')
 	                  ),
 	                  _react2.default.createElement(
 	                    'span',
@@ -99235,7 +99316,7 @@
 	
 	    _this.state = {
 	      loaded: true,
-	      allow_notifications: !!_config2.default.state.user.allow_notifications
+	      allow_notifications: !!+_config2.default.state.user.allow_notifications
 	    };
 	
 	    _this.facebookResponse = _this.facebookResponse.bind(_this);
@@ -99422,6 +99503,283 @@
 	}(_react2.default.Component);
 	
 	exports.default = MySettings;
+
+/***/ }),
+/* 849 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _config = __webpack_require__(552);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	var _axios = __webpack_require__(525);
+	
+	var _axios2 = _interopRequireDefault(_axios);
+	
+	var _react = __webpack_require__(2);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _reactRouter = __webpack_require__(185);
+	
+	var _reactToolbox = __webpack_require__(243);
+	
+	var _button = __webpack_require__(244);
+	
+	var _reactTransitionGroup = __webpack_require__(551);
+	
+	var _lodash = __webpack_require__(554);
+	
+	var _moment = __webpack_require__(728);
+	
+	var _moment2 = _interopRequireDefault(_moment);
+	
+	var _Loaders = __webpack_require__(715);
+	
+	var _ToastsAPI = __webpack_require__(556);
+	
+	var _ToastsAPI2 = _interopRequireDefault(_ToastsAPI);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var MyAlerts = function (_React$Component) {
+	  _inherits(MyAlerts, _React$Component);
+	
+	  function MyAlerts(props) {
+	    _classCallCheck(this, MyAlerts);
+	
+	    var _this = _possibleConstructorReturn(this, (MyAlerts.__proto__ || Object.getPrototypeOf(MyAlerts)).call(this, props));
+	
+	    var comp = _this;
+	
+	    _this.state = {
+	      loaded: true,
+	      cancelDialogActive: false,
+	      currentTableId: -1,
+	      tables: []
+	    };
+	
+	    _this.renderTableList = _this.renderTableList.bind(_this);
+	    _this.renderNoTables = _this.renderNoTables.bind(_this);
+	    _this.getTableList = _this.getTableList.bind(_this);
+	    _this.handleToggleCancel = _this.handleToggleCancel.bind(_this);
+	    _this.deleteTable = _this.deleteTable.bind(_this);
+	    return _this;
+	  }
+	
+	  _createClass(MyAlerts, [{
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      //this.getTableList();
+	    }
+	  }, {
+	    key: 'componentWillReceiveProps',
+	    value: function componentWillReceiveProps(nextProps) {}
+	  }, {
+	    key: 'getTableList',
+	    value: function getTableList() {
+	      var comp = this;
+	      _axios2.default.post(_config2.default.api.myTables, {
+	        t: new Date().getTime()
+	      }, {
+	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
+	      }).then(function (json) {
+	        comp.setState({
+	          loaded: true,
+	          tables: json.data.tables
+	        });
+	      }).catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, 'Failed to set.', { timeOut: 6000 });
+	      });
+	    }
+	  }, {
+	    key: 'deleteTable',
+	    value: function deleteTable() {
+	      var comp = this;
+	      _axios2.default.post(_config2.default.api.cancelTable, {
+	        table_id: comp.state.currentTableId,
+	        t: new Date().getTime()
+	      }, {
+	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
+	      }).then(function (json) {
+	        _ToastsAPI2.default.toast('success', 'Table cancelled.', null, { timeout: 6000 });
+	        comp.setState({ cancelDialogActive: false });
+	        comp.getTableList();
+	      }).catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, json.response.data.message, { timeOut: 6000 });
+	      });
+	    }
+	  }, {
+	    key: 'handleConfirmCancel',
+	    value: function handleConfirmCancel(table) {
+	      this.setState({
+	        currentTableId: table.table_id,
+	        cancelDialogActive: true
+	      });
+	    }
+	  }, {
+	    key: 'handleToggleCancel',
+	    value: function handleToggleCancel() {
+	      this.setState({ cancelDialogActive: false });
+	    }
+	  }, {
+	    key: 'refreshTable',
+	    value: function refreshTable(table) {
+	      var comp = this;
+	      _axios2.default.post(_config2.default.api.refreshTable, {
+	        table_id: table.table_id,
+	        t: new Date().getTime()
+	      }, {
+	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
+	      }).then(function (json) {
+	        _ToastsAPI2.default.toast('success', 'Table updated.', null, { timeout: 6000 });
+	        comp.getTableList();
+	      }).catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, json.response.data.message, { timeOut: 6000 });
+	      });
+	    }
+	  }, {
+	    key: 'viewPlayers',
+	    value: function viewPlayers(table) {}
+	  }, {
+	    key: 'renderTableList',
+	    value: function renderTableList() {
+	      var comp = this;
+	
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'table-list' },
+	        _react2.default.createElement(
+	          'h2',
+	          null,
+	          'My Tables'
+	        ),
+	        _react2.default.createElement(
+	          _reactTransitionGroup.CSSTransitionGroup,
+	          {
+	            transitionName: 'router',
+	            transitionEnterTimeout: 500,
+	            transitionLeaveTimeout: 500
+	          },
+	          comp.state.tables.map(function (table, i) {
+	            return _react2.default.createElement(
+	              'div',
+	              { className: 'table-item', key: "table-item-" + table.table_id },
+	              _react2.default.createElement(
+	                'div',
+	                { className: 'table-item-header' },
+	                _react2.default.createElement(
+	                  'span',
+	                  { className: 'table-item-title' },
+	                  table.title
+	                ),
+	                _react2.default.createElement(
+	                  'span',
+	                  { className: "table-item-when " + table.status },
+	                  table.status === 'cancelled' ? 'Cancelled' : (0, _moment2.default)(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').fromNow()
+	                )
+	              ),
+	              _react2.default.createElement(
+	                'div',
+	                { className: 'table-item-details' },
+	                table.table_type === 'future' ? _react2.default.createElement(
+	                  'span',
+	                  { className: 'table-item-tag' },
+	                  table.signups,
+	                  ' of ',
+	                  table.seats,
+	                  ' seats taken'
+	                ) : '',
+	                _react2.default.createElement(
+	                  'span',
+	                  { className: 'table-item-tag' },
+	                  table.table_location
+	                ),
+	                table.table_type === 'future' ? _react2.default.createElement(
+	                  'span',
+	                  { className: 'table-item-tag' },
+	                  (0, _moment2.default)(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, MMM Do YYYY, h:mm a')
+	                ) : ''
+	              ),
+	              table.status === 'cancelled' ? '' : _react2.default.createElement(
+	                'div',
+	                { className: 'table-item-actions' },
+	                _react2.default.createElement(
+	                  'button',
+	                  { className: 'delete', onClick: comp.handleConfirmCancel.bind(comp, table) },
+	                  _react2.default.createElement(_reactToolbox.FontIcon, { value: 'close' })
+	                ),
+	                table.table_type === 'now' ? _react2.default.createElement(
+	                  'button',
+	                  { onClick: comp.refreshTable.bind(comp, table) },
+	                  'Refresh this listing'
+	                ) : _react2.default.createElement(
+	                  'button',
+	                  { onClick: comp.viewPlayers.bind(comp, table) },
+	                  'View your players'
+	                )
+	              )
+	            );
+	          })
+	        )
+	      );
+	    }
+	  }, {
+	    key: 'renderNoTables',
+	    value: function renderNoTables() {
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'game-search-list-empty' },
+	        _react2.default.createElement(
+	          'h3',
+	          null,
+	          'No hosted tables.'
+	        ),
+	        _react2.default.createElement(
+	          'p',
+	          null,
+	          'Either you haven\'t made any tables yet, or your other games have already happened.'
+	        )
+	      );
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var comp = this;
+	      return _react2.default.createElement(
+	        'div',
+	        { id: 'page-my-alerts', className: 'transition-item page-my-alerts page-wrap' },
+	        _react2.default.createElement(
+	          'h2',
+	          null,
+	          'Game Alerts Coming Soon'
+	        ),
+	        _react2.default.createElement('div', { className: "alert-list-wrap" + (comp.state.loader ? " loading" : "") }),
+	        _react2.default.createElement(_Loaders.LoadingInline, {
+	          active: !comp.state.loaded
+	        })
+	      );
+	    }
+	  }]);
+	
+	  return MyAlerts;
+	}(_react2.default.Component);
+	
+	exports.default = MyAlerts;
 
 /***/ })
 /******/ ]);

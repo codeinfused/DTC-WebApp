@@ -188,7 +188,7 @@ button, button:focus, button:visited{ outline: none !important; cursor: pointer;
 .app-menu-head{
   display: block;
   outline: none;
-  width: 70%;
+  width: 60%;
   text-align: center;
   margin: 0 0 1rem;
   opacity: 0.2;
@@ -209,6 +209,20 @@ button, button:focus, button:visited{ outline: none !important; cursor: pointer;
 .bm-menu nav button .material-icons {
   font-size: 2.3rem;
   margin-right: 0.9rem;
+}
+span.alerts-count {
+  display: inline-block !important;
+  margin-left: 10px;
+  background: #602565;
+  height: 22px;
+  line-height: 22px !important;
+  padding: 0 8px;
+  border-radius: 5px;
+  text-align: center;
+  color: #eee;
+  font-size: 1.08rem;
+  margin-top: 8px;
+  border: 1px solid #9376ab;
 }
 
 /* Position and sizing of burger button */

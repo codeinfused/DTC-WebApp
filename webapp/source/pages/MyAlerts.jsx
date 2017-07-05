@@ -4,14 +4,14 @@ import React from 'react';
 import {browserHistory} from 'react-router';
 import {FontIcon, Dialog} from 'react-toolbox';
 import {Button, IconButton} from 'react-toolbox/lib/button';
+import {CSSTransitionGroup} from 'react-transition-group';
 import {cloneDeep, slice} from 'lodash';
-import {XmlEntities, AllHtmlEntities} from 'html-entities';
 import moment from 'moment';
 
 import {LoadingInline} from '../components/Loaders.jsx';
 import ToastsAPI from '../components/ToastsAPI.jsx';
 
-class TableList extends React.Component
+class MyAlerts extends React.Component
 {
   constructor(props)
   {
@@ -19,10 +19,9 @@ class TableList extends React.Component
     var comp = this;
 
     this.state = {
-      loaded: false,
+      loaded: true,
       cancelDialogActive: false,
-      bgg_id: this.props.params.bgg_id,
-      table_type: this.props.params.type,
+      currentTableId: -1,
       tables: []
     };
 
@@ -35,7 +34,7 @@ class TableList extends React.Component
 
   componentDidMount()
   {
-    this.getTableList();
+    //this.getTableList();
   }
 
   componentWillReceiveProps(nextProps)
@@ -46,9 +45,7 @@ class TableList extends React.Component
   getTableList()
   {
     var comp = this;
-    axios.post(CONFIG.api.tableList, {
-      bgg_id: comp.state.bgg_id,
-      table_type: comp.state.table_type,
+    axios.post(CONFIG.api.myTables, {
       t: (new Date()).getTime()
     }, {
       headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
@@ -58,8 +55,7 @@ class TableList extends React.Component
         tables: json.data.tables
       });
     }).catch(function(json){
-      comp.setState({loaded: true});
-      ToastsAPI.toast('error', null, 'Failed to get.', {timeOut:6000});
+      ToastsAPI.toast('error', null, 'Failed to set.', {timeOut:6000});
     });
   }
 
@@ -91,36 +87,25 @@ class TableList extends React.Component
   handleToggleCancel(){ this.setState({cancelDialogActive: false}); }
 
 
-  handleJoinGame(table)
+  refreshTable(table)
   {
     var comp = this;
-    axios.post(CONFIG.api.joinTable, {
+    axios.post(CONFIG.api.refreshTable, {
       table_id: table.table_id,
       t: (new Date()).getTime()
     }, {
       headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
     }).then(function(json){
-      ToastsAPI.toast('success', 'Joined game!', null, {timeout:6000});
+      ToastsAPI.toast('success', 'Table updated.', null, {timeout:6000});
       comp.getTableList();
     }).catch(function(json){
       ToastsAPI.toast('error', null, json.response.data.message, {timeOut:6000});
     });
   }
 
-  handleLeaveGame(table)
+  viewPlayers(table)
   {
-    var comp = this;
-    axios.post(CONFIG.api.leaveTable, {
-      table_id: table.table_id,
-      t: (new Date()).getTime()
-    }, {
-      headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
-    }).then(function(json){
-      ToastsAPI.toast('success', 'Left game table', null, {timeout:6000});
-      comp.getTableList();
-    }).catch(function(json){
-      ToastsAPI.toast('error', null, json.response.data.message, {timeOut:6000});
-    });
+
   }
 
 
@@ -130,7 +115,12 @@ class TableList extends React.Component
 
     return (
       <div className="table-list">
-        <h2>Closest Tables</h2>
+        <h2>My Tables</h2>
+        <CSSTransitionGroup
+          transitionName="router"
+          transitionEnterTimeout={500}
+          transitionLeaveTimeout={500}
+        >
           {comp.state.tables.map(function(table, i)
           {
             return (
@@ -142,30 +132,24 @@ class TableList extends React.Component
                   </span>
                 </div>
                 <div className="table-item-details">
-                  {table.table_type==='now' ? (
-                    <span className="table-item-tag">Host: {table.host_name}</span>
-                  ) : (
-                    <span className="table-item-tag">{table.signups} of {table.seats} seats taken</span>
-                  )}
-                  <span className="table-item-tag">{table.table_location +' '+ (table.table_sublocation_alpha||'') + '-' + (table.table_sublocation_num||'')}</span>
+                  {table.table_type==='future' ? (<span className="table-item-tag">{table.signups} of {table.seats} seats taken</span>) : ''}
+                  <span className="table-item-tag">{table.table_location}</span>
                   {table.table_type==='future' ? (<span className="table-item-tag">{moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, MMM Do YYYY, h:mm a')}</span>) : ''}
                 </div>
                 {table.status === 'cancelled' ? '' : (
                   <div className="table-item-actions">
+                    <button className='delete' onClick={comp.handleConfirmCancel.bind(comp, table)}><FontIcon value='close' /></button>
                     {table.table_type==='now' ? (
-                      <div></div>
-                    ) :
-                      (table.joined>0 ? (
-                        <button className='leave' onClick={comp.handleLeaveGame.bind(comp, table)}>Leave this scheduled game</button>
-                      ) : (
-                        <button onClick={comp.handleJoinGame.bind(comp, table)}>Join This Game!</button>
-                      ))
-                    }
+                      <button onClick={comp.refreshTable.bind(comp, table)}>Refresh this listing</button>
+                    ) : (
+                      <button onClick={comp.viewPlayers.bind(comp, table)}>View your players</button>
+                    )}
                   </div>
                 )}
               </div>
             );
           })}
+        </CSSTransitionGroup>
       </div>
     );
   }
@@ -173,7 +157,7 @@ class TableList extends React.Component
   renderNoTables()
   {
     return (
-      <div className="game-search-list-empty"><h3>No tables found.</h3><p>Probably these games ended, or there was a bad search.</p></div>
+      <div className="game-search-list-empty"><h3>No hosted tables.</h3><p>Either you haven't made any tables yet, or your other games have already happened.</p></div>
     );
   }
 
@@ -181,31 +165,20 @@ class TableList extends React.Component
   {
     var comp = this;
     return (
-      <div id="page-list-tables" className="transition-item page-list-tables page-wrap">
-        <div className={"table-list-wrap" + (comp.state.loaded ? " loading" : "")}>
-          {(comp.state.tables && comp.state.tables.length > 0) ? comp.renderTableList() : comp.renderNoTables()}
+      <div id="page-my-alerts" className="transition-item page-my-alerts page-wrap">
+
+        <h2>Game Alerts Coming Soon</h2>
+        <div className={"alert-list-wrap" + (comp.state.loader ? " loading" : "")}>
+          {/* {(comp.state.tables && comp.state.tables.length > 0) ? comp.renderTableList() : comp.renderNoTables()} */}
         </div>
 
         <LoadingInline
           active={!comp.state.loaded}
         />
 
-        <Dialog
-          title="Cancel This Table?"
-          type="small"
-          onEscKeyDown={this.handleToggleCancel}
-          onOverlayClick={this.handleToggleCancel}
-          active={this.state.cancelDialogActive}
-          actions={[
-            {label: "Nevermind", onClick: this.handleToggleCancel, raised: true},
-            {label: "Cancel It", onClick: this.deleteTable, primary: true, raised: true}
-          ]}
-        >
-          <p>You cannot undo this action if you cancel this table. If players have signed up, they will see a status change.</p>
-        </Dialog>
       </div>
     );
   }
 }
 
-export default TableList;
+export default MyAlerts;

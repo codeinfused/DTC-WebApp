@@ -31,6 +31,8 @@ class TableEdit extends React.Component
       seats: 2,
       table_type: 'now',
       table_location: 'Caribbean Ballroom',
+      table_sublocation_alpha: '',
+      table_sublocation_num: '',
       start_datetime: '',
       start_date: new Date(),
       start_time: new Date(),
@@ -43,6 +45,11 @@ class TableEdit extends React.Component
       '2017-07-04',
       '2017-07-09'
     ];
+
+    this.sublocs_alpha = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q'];
+    this.sublocs_num = Array.apply(null, {length: 36}).map(Number.call, Number);
+    this.sublocs_num = this.sublocs_num.slice(1);
+
 
     this.tableLocations = [
       {label: 'Caribbean Ballroom', value: 'Caribbean Ballroom' },
@@ -119,6 +126,11 @@ class TableEdit extends React.Component
     this.setState({[field]: value});
   }
 
+  handleChangeSelect(field, value)
+  {
+    this.setState({[field]: value.target.value});
+  }
+
   handleChangeDatetime(field, value)
   {
     var comp = this;
@@ -147,7 +159,9 @@ class TableEdit extends React.Component
       table_location: comp.state.table_location,
       table_type: comp.state.table_type,
       lft: comp.state.lft,
-      allow_signups: comp.state.allow_signups
+      allow_signups: comp.state.allow_signups,
+      table_sublocation_alpha: comp.state.table_sublocation_alpha,
+      table_sublocation_num: comp.state.table_sublocation_num
     },{
       headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
     }).then(function(json){
@@ -203,6 +217,16 @@ class TableEdit extends React.Component
               )}
               <div className="table-form-item">
                 <Dropdown label='Room Location' source={comp.tableLocations} value={comp.state.table_location} onChange={comp.handleChangeInput.bind(comp, 'table_location')} />
+                <select className="sublocation_alpha" value={comp.state.table_sublocation_alpha} onChange={comp.handleChangeSelect.bind(comp, 'table_sublocation_alpha')}>
+                  {this.sublocs_alpha.map(function(alpha){
+                    return (<option key={"localpha-"+alpha} value={alpha}>{alpha}</option>);
+                  })}
+                </select>
+                <select className="sublocation_num" value={comp.state.table_sublocation_num} onChange={comp.handleChangeSelect.bind(comp, 'table_sublocation_num')}>
+                  {this.sublocs_num.map(function(num){
+                    return (<option key={"locnum"+num} value={num}>{num}</option>);
+                  })}
+                </select>
               </div>
               <div className="table-form-item">
                 <div className="table-form-playerseats" style={{marginTop:'8px'}}>How Many Players <span>({comp.state.game.players[0] + '-' + comp.state.game.players[1]})</span></div>
