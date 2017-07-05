@@ -4,6 +4,28 @@ use api\games\GamesDB;
 use api\tables\Tables;
 
 
+$app->get('/table_data/[{table_id}]', function($req, $resp, $args) use ($app)
+{
+  $body = $req->getParsedBody();
+  $table_id = $args['table_id'];
+
+  $token = Auth::checkAuthorization($this->db, $req);
+  if( is_error($token) ){
+    return $resp->withStatus((int)$token->get_code())->withJson($token->json());
+  }
+  if(empty($table_id)){
+    return $resp->withStatus(401)->withJson(array('error'=>'No table found.'));
+  }
+
+  $table = Tables::get_all_table_data_by_id($this->db, $table_id);
+  if( is_error($game) ){
+    return $resp->withStatus((int)$table->get_code())->withJson($table->json());
+  }
+
+  return $resp->withJson($table);
+});
+
+
 $app->post('/me/plans', function($req, $resp, $args) use ($app)
 {
   $body = $req->getParsedBody();

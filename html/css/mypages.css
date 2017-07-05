@@ -127,10 +127,12 @@ p.plans-time {
   color: #666;
 }
 
-.plans-item button{
+.plans-btns{
   position: absolute;
   bottom: -20px;
   left: 14px;
+}
+.plans-btns button{
   border: none;
   outline: none;
   height: 32px;

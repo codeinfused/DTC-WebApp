@@ -145,7 +145,10 @@ class MyPlans extends React.Component
                     <span className="plan-tag">{table.table_location +' '+ (table.table_sublocation_alpha||'') + '-' + (table.table_sublocation_num||'')}</span>
                     <span className={"plan-tag" + (table.player_id === CONFIG.state.user.id ? " hosting" : "")}>Host: {table.host_name}</span>
                   </div>
-                  <button onClick={comp.handleLeaveGame.bind(comp, table)}>Leave game</button>
+                  <div className="plans-btns">
+                    <button onClick={comp.handleLeaveGame.bind(comp, table)}>Leave game</button>
+                    {table.player_id === CONFIG.state.user.id ? (<button className='edit' onClick={()=>{browserHistory.push('/tables/edit/'+table.table_id)}}>Edit</button>) : ''}
+                  </div>
                 </div>
               </li>
             );

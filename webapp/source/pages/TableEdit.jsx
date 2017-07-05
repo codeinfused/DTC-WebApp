@@ -72,7 +72,11 @@ class TableEdit extends React.Component
   {
     var comp = this;
     if(!CONFIG.state.auth){ browserHistory.push('/home'); return; }
-    this.getGameData(this.props.params.bgg_id);
+    if(this.props.params.bgg_id){
+      this.getGameData(this.props.params.bgg_id);
+    }else if(this.props.params.table_id){
+      this.getTableData(this.props.params.table_id);
+    }
   }
 
   componentWillReceiveProps(nextProps)
@@ -115,10 +119,25 @@ class TableEdit extends React.Component
     });
   }
 
-  getTableData()
+  getTableData(table_id)
   {
     var comp = this;
+    var curState = _.cloneDeep(comp.state);
     comp.setState({loaded: false});
+
+    axios.get(CONFIG.api.tableFullData + table_id, {
+      headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
+    }).then(function(json){
+      if(json.data.table){
+        var newState = Object.assign({}, curState, json.data.table);
+        newState.loaded = true;
+        console.log(newState);
+        comp.setState(newState);
+      }
+    }).catch(function(json){
+      //ToastsAPI.toast('error', null, '', {timeOut:8000});
+      //comp.setState({loaded: true});
+    });
   }
 
   handleChangeInput(field, value)

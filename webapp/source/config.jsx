@@ -23,6 +23,7 @@ const CONFIG = {
     notify: baseAPI+"user/me/notify",
     getAlerts: baseAPI+"user/getalerts",
 
+    tableFullData: baseAPI+"table_data/",
     tableList: baseAPI+"tables/list",
     tableEdit: baseAPI+"tables/edit",
     myTables: baseAPI+"tables/mine",

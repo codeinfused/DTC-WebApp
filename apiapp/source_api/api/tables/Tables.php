@@ -10,6 +10,24 @@ abstract class Tables
     return $d && $d->format('Y-m-d H:i:s') === $date;
   }
 
+  static function get_all_table_data_by_id($pdo, $table_id)
+  {
+    $dbCheck = $pdo->prepare(
+      "SELECT db.title, db.minplayers, db.maxplayers, tb.bgg_id, tb.id as table_id, tb.player_id, tb.table_type, tb.seats, tb.table_location, tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft, tb.allow_signups, tb.status
+      FROM game_tables tb
+      JOIN bgg_game_db db ON tb.bgg_id = db.bgg_id
+      WHERE tb.id=:table_id"
+    );
+    $dbCheck->execute(array(':table_id' => $table_id));
+    $table = $dbCheck->fetch();
+    if($table){
+      $table['game'] = array('title'=>$table['title'], 'players'=>[$table['minplayers'], $table['maxplayers']]);
+      $table['allow_signups'] = (boolean) $table['allow_signups'];
+      $table['lft'] = (boolean) $table['lft'];
+    }
+    return array('table'=>$table);
+  }
+
   static function my_tables($pdo, $uid)
   {
     $dbCheck = $pdo->prepare(
@@ -29,13 +47,12 @@ abstract class Tables
   {
     $dbCheck = $pdo->prepare(
       "SELECT db.title, tb.id as table_id, tb.player_id, tb.table_type, tb.seats, tb.table_location, tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft, tb.allow_signups, tb.status,
-      CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as host_name,
+      CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as host_name
       FROM game_tables tb
       LEFT JOIN game_signups gs ON gs.table_id = tb.id
       JOIN bgg_game_db db ON tb.bgg_id = db.bgg_id
       LEFT JOIN users u ON u.id = tb.player_id
       WHERE (tb.player_id=:uid OR gs.player_id=:uid)
-      AND tb.table_type='future'
       AND tb.start_datetime > NOW() - INTERVAL 20 MINUTE
       ORDER BY tb.start_datetime ASC"
     );

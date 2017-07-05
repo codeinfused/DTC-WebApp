@@ -139,10 +139,11 @@ class MyTables extends React.Component
                 {table.status === 'cancelled' ? '' : (
                   <div className="table-item-actions">
                     <button className='delete' onClick={comp.handleConfirmCancel.bind(comp, table)}><FontIcon value='close' /></button>
+                    <button className='edit' onClick={()=>{browserHistory.push('/tables/edit/'+table.table_id)}}>Edit</button>
                     {table.table_type==='now' ? (
-                      <button onClick={comp.refreshTable.bind(comp, table)}>Refresh this listing</button>
+                      <button onClick={comp.refreshTable.bind(comp, table)}>Refresh listing</button>
                     ) : (
-                      <button onClick={comp.viewPlayers.bind(comp, table)}>View your players</button>
+                      <button onClick={comp.viewPlayers.bind(comp, table)}>View players</button>
                     )}
                   </div>
                 )}

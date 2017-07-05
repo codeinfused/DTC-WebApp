@@ -56966,6 +56966,7 @@
 	    notify: baseAPI + "user/me/notify",
 	    getAlerts: baseAPI + "user/getalerts",
 	
+	    tableFullData: baseAPI + "table_data/",
 	    tableList: baseAPI + "tables/list",
 	    tableEdit: baseAPI + "tables/edit",
 	    myTables: baseAPI + "tables/mine",
@@ -82328,7 +82329,11 @@
 	      if (!_config2.default.state.auth) {
 	        _reactRouter.browserHistory.push('/home');return;
 	      }
-	      this.getGameData(this.props.params.bgg_id);
+	      if (this.props.params.bgg_id) {
+	        this.getGameData(this.props.params.bgg_id);
+	      } else if (this.props.params.table_id) {
+	        this.getTableData(this.props.params.table_id);
+	      }
 	    }
 	  }, {
 	    key: 'componentWillReceiveProps',
@@ -82370,9 +82375,24 @@
 	    }
 	  }, {
 	    key: 'getTableData',
-	    value: function getTableData() {
+	    value: function getTableData(table_id) {
 	      var comp = this;
+	      var curState = _.cloneDeep(comp.state);
 	      comp.setState({ loaded: false });
+	
+	      _axios2.default.get(_config2.default.api.tableFullData + table_id, {
+	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
+	      }).then(function (json) {
+	        if (json.data.table) {
+	          var newState = Object.assign({}, curState, json.data.table);
+	          newState.loaded = true;
+	          console.log(newState);
+	          comp.setState(newState);
+	        }
+	      }).catch(function (json) {
+	        //ToastsAPI.toast('error', null, '', {timeOut:8000});
+	        //comp.setState({loaded: true});
+	      });
 	    }
 	  }, {
 	    key: 'handleChangeInput',
@@ -98899,14 +98919,21 @@
 	                  { className: 'delete', onClick: comp.handleConfirmCancel.bind(comp, table) },
 	                  _react2.default.createElement(_reactToolbox.FontIcon, { value: 'close' })
 	                ),
+	                _react2.default.createElement(
+	                  'button',
+	                  { className: 'edit', onClick: function onClick() {
+	                      _reactRouter.browserHistory.push('/tables/edit/' + table.table_id);
+	                    } },
+	                  'Edit'
+	                ),
 	                table.table_type === 'now' ? _react2.default.createElement(
 	                  'button',
 	                  { onClick: comp.refreshTable.bind(comp, table) },
-	                  'Refresh this listing'
+	                  'Refresh listing'
 	                ) : _react2.default.createElement(
 	                  'button',
 	                  { onClick: comp.viewPlayers.bind(comp, table) },
-	                  'View your players'
+	                  'View players'
 	                )
 	              )
 	            );
@@ -99187,9 +99214,20 @@
 	                  )
 	                ),
 	                _react2.default.createElement(
-	                  'button',
-	                  { onClick: comp.handleLeaveGame.bind(comp, table) },
-	                  'Leave game'
+	                  'div',
+	                  { className: 'plans-btns' },
+	                  _react2.default.createElement(
+	                    'button',
+	                    { onClick: comp.handleLeaveGame.bind(comp, table) },
+	                    'Leave game'
+	                  ),
+	                  table.player_id === _config2.default.state.user.id ? _react2.default.createElement(
+	                    'button',
+	                    { className: 'edit', onClick: function onClick() {
+	                        _reactRouter.browserHistory.push('/tables/edit/' + table.table_id);
+	                      } },
+	                    'Edit'
+	                  ) : ''
 	                )
 	              )
 	            );
