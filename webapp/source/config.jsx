@@ -31,7 +31,8 @@ const CONFIG = {
     cancelTable: baseAPI+"tables/cancel",
     refreshTable: baseAPI+"tables/refresh",
     joinTable: baseAPI+"tables/join",
-    leaveTable: baseAPI+"tables/leave"
+    leaveTable: baseAPI+"tables/leave",
+    lfp: baseAPI+"lfp"
   },
 
   checkAuth: function(context, loadVar)

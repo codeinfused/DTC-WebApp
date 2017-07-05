@@ -137,6 +137,10 @@
 	
 	var _MyAlerts2 = _interopRequireDefault(_MyAlerts);
 	
+	var _PlayersWanted = __webpack_require__(850);
+	
+	var _PlayersWanted2 = _interopRequireDefault(_PlayersWanted);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -165,7 +169,7 @@
 	      alerts: []
 	    };
 	
-	    _this.navButtons = [{ label: 'Home', path: '/home', icon: 'store' }, { label: 'Search Games', path: '/games', icon: 'library_books', callback: comp.DBLoadBGG }, { label: 'Con Library', path: '/library', icon: 'import_contacts', callback: comp.DBLoadLibrary }, { label: 'Game Alerts', path: '/alerts', icon: 'notifications' }, { label: 'My Plans', path: '/myplans', icon: 'date_range' }, { label: 'My Tables', path: '/mytables', icon: 'playlist_add_check' }, { label: 'My Settings', path: '/me', icon: 'settings_applications' }, { label: 'About', path: '/about', icon: 'info' }];
+	    _this.navButtons = [{ label: 'Home', path: '/home', icon: 'store' }, { label: 'Players Wanted Now', path: '/lfp', icon: 'video_library' }, { label: 'Search Games', path: '/games', icon: 'library_books', callback: comp.DBLoadBGG }, { label: 'Con Library', path: '/library', icon: 'import_contacts', callback: comp.DBLoadLibrary }, { label: 'Game Alerts', path: '/alerts', icon: 'notifications' }, { label: 'My Plans', path: '/myplans', icon: 'date_range' }, { label: 'My Tables', path: '/mytables', icon: 'playlist_add_check' }, { label: 'My Settings', path: '/me', icon: 'settings_applications' }, { label: 'About', path: '/about', icon: 'info' }];
 	
 	    _this.getNewAlerts = _this.getNewAlerts.bind(_this);
 	    return _this;
@@ -349,7 +353,8 @@
 	    _react2.default.createElement(_reactRouter.Route, { path: 'mytables', component: _MyTables2.default }),
 	    _react2.default.createElement(_reactRouter.Route, { path: 'myplans', component: _MyPlans2.default }),
 	    _react2.default.createElement(_reactRouter.Route, { path: 'me', component: _MySettings2.default }),
-	    _react2.default.createElement(_reactRouter.Route, { path: 'alerts', component: _MyAlerts2.default })
+	    _react2.default.createElement(_reactRouter.Route, { path: 'alerts', component: _MyAlerts2.default }),
+	    _react2.default.createElement(_reactRouter.Route, { path: 'lfp', component: _PlayersWanted2.default })
 	  )
 	), document.getElementById('app-wrapper'));
 
@@ -56974,7 +56979,8 @@
 	    cancelTable: baseAPI + "tables/cancel",
 	    refreshTable: baseAPI + "tables/refresh",
 	    joinTable: baseAPI + "tables/join",
-	    leaveTable: baseAPI + "tables/leave"
+	    leaveTable: baseAPI + "tables/leave",
+	    lfp: baseAPI + "lfp"
 	  },
 	
 	  checkAuth: function checkAuth(context, loadVar) {
@@ -99818,6 +99824,209 @@
 	}(_react2.default.Component);
 	
 	exports.default = MyAlerts;
+
+/***/ }),
+/* 850 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _config = __webpack_require__(552);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	var _axios = __webpack_require__(525);
+	
+	var _axios2 = _interopRequireDefault(_axios);
+	
+	var _react = __webpack_require__(2);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _reactRouter = __webpack_require__(185);
+	
+	var _reactToolbox = __webpack_require__(243);
+	
+	var _button = __webpack_require__(244);
+	
+	var _reactTransitionGroup = __webpack_require__(551);
+	
+	var _lodash = __webpack_require__(554);
+	
+	var _moment = __webpack_require__(728);
+	
+	var _moment2 = _interopRequireDefault(_moment);
+	
+	var _Loaders = __webpack_require__(715);
+	
+	var _ToastsAPI = __webpack_require__(556);
+	
+	var _ToastsAPI2 = _interopRequireDefault(_ToastsAPI);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var MyTables = function (_React$Component) {
+	  _inherits(MyTables, _React$Component);
+	
+	  function MyTables(props) {
+	    _classCallCheck(this, MyTables);
+	
+	    var _this = _possibleConstructorReturn(this, (MyTables.__proto__ || Object.getPrototypeOf(MyTables)).call(this, props));
+	
+	    var comp = _this;
+	
+	    _this.state = {
+	      loaded: false,
+	      tables: []
+	    };
+	
+	    _this.renderTableList = _this.renderTableList.bind(_this);
+	    _this.renderNoTables = _this.renderNoTables.bind(_this);
+	    _this.getTableList = _this.getTableList.bind(_this);
+	    return _this;
+	  }
+	
+	  _createClass(MyTables, [{
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      this.getTableList();
+	    }
+	  }, {
+	    key: 'componentWillReceiveProps',
+	    value: function componentWillReceiveProps(nextProps) {}
+	  }, {
+	    key: 'getTableList',
+	    value: function getTableList() {
+	      var comp = this;
+	      _axios2.default.post(_config2.default.api.lfp, {
+	        t: new Date().getTime()
+	      }, {
+	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
+	      }).then(function (json) {
+	        comp.setState({
+	          loaded: true,
+	          tables: json.data.tables
+	        });
+	      }).catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, 'Failed to set.', { timeOut: 6000 });
+	      });
+	    }
+	  }, {
+	    key: 'renderTableList',
+	    value: function renderTableList() {
+	      var comp = this;
+	
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'table-list' },
+	        _react2.default.createElement(
+	          'h2',
+	          null,
+	          'Players Wanted For:'
+	        ),
+	        comp.state.tables.map(function (table, i) {
+	          return _react2.default.createElement(
+	            'div',
+	            { className: 'table-item', key: "table-item-" + table.table_id },
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'table-item-header' },
+	              _react2.default.createElement(
+	                'span',
+	                { className: 'table-item-title' },
+	                table.title
+	              ),
+	              _react2.default.createElement(
+	                'span',
+	                { className: "table-item-when " + table.status },
+	                table.status === 'cancelled' ? 'Cancelled' : (0, _moment2.default)(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').fromNow()
+	              )
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'table-item-details' },
+	              table.table_type === 'future' ? _react2.default.createElement(
+	                'span',
+	                { className: 'table-item-tag' },
+	                table.signups,
+	                ' of ',
+	                table.seats,
+	                ' seats taken'
+	              ) : '',
+	              _react2.default.createElement(
+	                'span',
+	                { className: 'table-item-tag' },
+	                table.table_location + ' ' + (table.table_sublocation_alpha || '') + '-' + (table.table_sublocation_num || '')
+	              ),
+	              table.table_type === 'future' ? _react2.default.createElement(
+	                'span',
+	                { className: 'table-item-tag' },
+	                (0, _moment2.default)(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, MMM Do YYYY, h:mm a')
+	              ) : '',
+	              _react2.default.createElement(
+	                'span',
+	                { className: 'table-item-tag' },
+	                'Host: ',
+	                table.host_name
+	              )
+	            )
+	          );
+	        })
+	      );
+	    }
+	  }, {
+	    key: 'renderNoTables',
+	    value: function renderNoTables() {
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'game-search-list-empty' },
+	        _react2.default.createElement(
+	          'h3',
+	          null,
+	          'No tables found.'
+	        ),
+	        _react2.default.createElement(
+	          'p',
+	          null,
+	          'Start up one! Pick up a game at the library, grab a "Players Wanted" sign, and post your table in the app!'
+	        )
+	      );
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var comp = this;
+	      return _react2.default.createElement(
+	        'div',
+	        { id: 'page-my-tables', className: 'transition-item page-my-tables page-wrap' },
+	        _react2.default.createElement(
+	          'div',
+	          { className: "table-list-wrap" + (comp.state.loader ? " loading" : "") },
+	          comp.state.tables && comp.state.tables.length > 0 ? comp.renderTableList() : comp.renderNoTables()
+	        ),
+	        _react2.default.createElement(_Loaders.LoadingInline, {
+	          active: !comp.state.loaded
+	        })
+	      );
+	    }
+	  }]);
+	
+	  return MyTables;
+	}(_react2.default.Component);
+	
+	exports.default = MyTables;
 
 /***/ })
 /******/ ]);

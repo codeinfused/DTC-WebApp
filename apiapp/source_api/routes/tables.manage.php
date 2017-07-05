@@ -26,6 +26,24 @@ $app->get('/table_data/[{table_id}]', function($req, $resp, $args) use ($app)
 });
 
 
+$app->post('/lfp', function($req, $resp, $args) use ($app)
+{
+  $body = $req->getParsedBody();
+
+  $token = Auth::checkAuthorization($this->db, $req);
+  if( is_error($token) ){
+    return $resp->withStatus((int)$token->get_code())->withJson($token->json());
+  }
+
+  $tables = Tables::list_lfp($this->db);
+  if( is_error($tables) ){
+    return $resp->withStatus((int)$tables->get_code())->withJson($tables->json());
+  }
+
+  return $resp->withJson($tables);
+});
+
+
 $app->post('/me/plans', function($req, $resp, $args) use ($app)
 {
   $body = $req->getParsedBody();

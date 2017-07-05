@@ -23,6 +23,7 @@ import MyTables from './pages/MyTables.jsx';
 import MyPlans from './pages/MyPlans.jsx';
 import MySettings from './pages/MySettings.jsx';
 import MyAlerts from './pages/MyAlerts.jsx';
+import PlayersWanted from './pages/PlayersWanted.jsx';
 
 class AppLayout extends React.Component
 {
@@ -43,6 +44,7 @@ class AppLayout extends React.Component
 
     this.navButtons = [
       {label:'Home',              path:'/home', icon:'store'},
+      {label:'Players Wanted Now',path:'/lfp', icon:'video_library'},
       {label:'Search Games',      path:'/games', icon:'library_books', callback: comp.DBLoadBGG},
       {label:'Con Library',       path:'/library', icon:'import_contacts', callback: comp.DBLoadLibrary},
       {label:'Game Alerts',       path:'/alerts', icon:'notifications'},
@@ -191,6 +193,7 @@ ReactDOM.render(
       <Route path="myplans" component={MyPlans} />
       <Route path="me" component={MySettings} />
       <Route path="alerts" component={MyAlerts} />
+      <Route path="lfp" component={PlayersWanted} />
     </Route>
   </Router>,
   document.getElementById('app-wrapper')

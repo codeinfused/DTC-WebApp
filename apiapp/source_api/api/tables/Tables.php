@@ -84,6 +84,25 @@ abstract class Tables
   }
 
 
+  static function list_lfp($pdo)
+  {
+    $dbCheck = $pdo->prepare(
+      "SELECT db.title, tb.id as table_id, tb.player_id, CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as host_name, tb.table_type, tb.seats, tb.table_location, tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft, tb.allow_signups, tb.status
+      FROM game_tables tb
+      JOIN bgg_game_db db ON tb.bgg_id = db.bgg_id
+      LEFT JOIN users u ON u.id = tb.player_id
+      WHERE tb.table_type=:table_type
+      AND tb.start_datetime > NOW() - INTERVAL 20 MINUTE
+      AND tb.status='ready'
+      GROUP BY tb.id
+      ORDER BY tb.start_datetime ASC"
+    );
+    $dbCheck->execute(array(':table_type' => 'now'));
+    $tables = $dbCheck->fetchAll();
+    return array('tables'=>$tables);
+  }
+
+
   /* EDIT CONTROLS
     ---------------------------------------------------------- */
 
