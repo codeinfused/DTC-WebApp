@@ -57029,6 +57029,7 @@
 	    }
 	  },
 	  sendNotification: function sendNotification(title, message) {
+	    var comp = this;
 	    if ('serviceWorker' in navigator && 'Notification' in window && Notification.permission === "granted") {
 	      comp.notifier.showNotification(title, {
 	        body: message,
