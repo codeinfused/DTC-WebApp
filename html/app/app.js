@@ -100473,7 +100473,15 @@
 	                    { className: "plan-tag" + (table.player_id === _config2.default.state.user.id ? " hosting" : "") },
 	                    'Host: ',
 	                    table.host_name
-	                  )
+	                  ),
+	                  table.allow_signups == 1 ? _react2.default.createElement(
+	                    'span',
+	                    { className: 'plan-tag' },
+	                    table.signups,
+	                    ' of ',
+	                    table.seats,
+	                    ' seats taken'
+	                  ) : ''
 	                ),
 	                _react2.default.createElement(
 	                  'div',
