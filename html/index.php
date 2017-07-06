@@ -16,8 +16,9 @@
   <!-- IOS Meta -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="apple-touch-startup-image" href="/ios-launch.png">
+  <!-- <link rel="apple-touch-startup-image" href="/ios-launch.png"> -->
   <meta name="apple-mobile-web-app-title" content="Dice Tower Con">
+  <link rel="shortcut icon" href="/favicon.ico">
 
   <!-- Android Meta -->
   <link rel="manifest" href="/android-manifest.json">
@@ -28,8 +29,8 @@
   <meta name="msapplication-starturl" content="/">
 
   <!-- Icon Meta -->
-  <link rel="icon" type="image/png" href="/apple-touch-icon.png" />
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" /> <!-- bookmarked icon? -->
+  <link rel="icon" type="image/png" href="/apple-touch-icon-192.png" sizes="192x192" />
+  <link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon-192.png" sizes="192x192" /> <!-- bookmarked icon? -->
 
   <!-- No Cache For Testing -->
   <meta http-equiv="cache-control" content="max-age=0" />
