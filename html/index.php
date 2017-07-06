@@ -43,7 +43,7 @@
   <link rel="stylesheet" href="/css/font-awesome.min.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
   <link rel="stylesheet" href="/app/app.css">
-  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/main.css?v=1">
 
   <script>
     const baseAPI = '<?php echo "/api/"; ?>';
