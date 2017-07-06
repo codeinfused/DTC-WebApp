@@ -24,6 +24,7 @@ import MyPlans from './pages/MyPlans.jsx';
 import MySettings from './pages/MySettings.jsx';
 import MyAlerts from './pages/MyAlerts.jsx';
 import PlayersWanted from './pages/PlayersWanted.jsx';
+import ScheduledList from './pages/ScheduledList.jsx';
 
 class AppLayout extends React.Component
 {
@@ -43,15 +44,15 @@ class AppLayout extends React.Component
     };
 
     this.navButtons = [
-      {label:'Home',              path:'/home', icon:'store'},
-      {label:'Players Wanted Now',path:'/lfp', icon:'video_library'},
-      {label:'Search Games',      path:'/games', icon:'library_books', callback: comp.DBLoadBGG},
-      {label:'Con Library',       path:'/library', icon:'import_contacts', callback: comp.DBLoadLibrary},
-      {label:'Game Alerts',       path:'/alerts', icon:'notifications'},
-      {label:'My Plans',          path:'/myplans', icon:'date_range'},
-      {label:'My Tables',         path:'/mytables', icon:'playlist_add_check'},
-      {label:'My Settings',       path:'/me', icon:'settings_applications'},
-      {label:'About',             path:'/about', icon:'info'}
+      {label:'Players Wanted',      path:'/lfp', icon:'video_library'},
+      {label:'Scheduled Games',     path:'/schedules', icon:'event_note'},
+      {label:'Search By Game',      path:'/games', icon:'library_books', callback: comp.DBLoadBGG},
+      {label:'Con Library',         path:'/library', icon:'import_contacts', callback: comp.DBLoadLibrary},
+      {label:'Game Alerts',         path:'/alerts', icon:'notifications'},
+      {label:'My Plans',            path:'/myplans', icon:'date_range'},
+      {label:'My Tables',           path:'/mytables', icon:'playlist_add_check'},
+      {label:'My Settings',         path:'/me', icon:'settings_applications'},
+      {label:'About',               path:'/about', icon:'info'}
     ];
 
     this.getNewAlerts = this.getNewAlerts.bind(this);
@@ -194,6 +195,7 @@ ReactDOM.render(
       <Route path="me" component={MySettings} />
       <Route path="alerts" component={MyAlerts} />
       <Route path="lfp" component={PlayersWanted} />
+      <Route path="schedules" component={ScheduledList} />
     </Route>
   </Router>,
   document.getElementById('app-wrapper')

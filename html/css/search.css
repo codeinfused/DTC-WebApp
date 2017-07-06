@@ -90,8 +90,8 @@
 }
 
 .game-search-list{
-  position: absolute;
-  top: 94px; left: 0; right: 0; bottom: 0;
+  position: fixed;
+  top: 92px; left: 0; right: 0; bottom: 44px;
   padding: 0px 0;
   overflow: auto;
 }

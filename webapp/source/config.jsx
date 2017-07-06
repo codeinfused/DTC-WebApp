@@ -24,6 +24,7 @@ const CONFIG = {
     getAlerts: baseAPI+"user/getalerts",
     myAlertSettings: baseAPI+"user/myalertgames",
 
+    getSchedulesByDay: baseAPI+"tables/byday",
     tableFullData: baseAPI+"table_data/",
     tableList: baseAPI+"tables/list",
     tableEdit: baseAPI+"tables/edit",

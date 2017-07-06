@@ -89,7 +89,9 @@ class MyTables extends React.Component
   renderNoTables()
   {
     return (
-      <div className="game-search-list-empty"><h3>No tables found.</h3><p>Start up one! Pick up a game at the library, grab a "Players Wanted" sign, and post your table in the app!</p></div>
+      <div className="game-search-list-empty">
+        <h3>No tables waiting.</h3><p>Start up one! Pick up a game at the library, grab a "Players Wanted" sign, and post your table in the app!</p>
+      </div>
     );
   }
 

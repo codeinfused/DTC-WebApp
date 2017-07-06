@@ -11,7 +11,7 @@ import moment from 'moment';
 import {LoadingInline} from '../components/Loaders.jsx';
 import ToastsAPI from '../components/ToastsAPI.jsx';
 
-class MyPlans extends React.Component
+class ScheduledList extends React.Component
 {
   constructor(props)
   {
@@ -21,6 +21,8 @@ class MyPlans extends React.Component
     this.state = {
       loaded: false,
       currentDay: moment().date(),
+      currentDayObj: {},
+      currentDayFull: '',
       tables: []
     };
 
@@ -30,7 +32,7 @@ class MyPlans extends React.Component
       {full:'2017-07-06', date:'6', name:'Thu'},
       {full:'2017-07-07', date:'7', name:'Fri'},
       {full:'2017-07-08', date:'8', name:'Sat'},
-      {full:'2017-07-09', date:'9', name:'Sun'},
+      {full:'2017-07-09', date:'9', name:'Sun'}
     ];
 
     this.renderTableList = this.renderTableList.bind(this);
@@ -40,7 +42,12 @@ class MyPlans extends React.Component
 
   componentDidMount()
   {
-    this.getTableList();
+    var comp = this;
+    var mo = moment();
+    var day = mo.date();
+    var selectedObj = comp.conDays.filter(function(item){ return item.date==day; });
+    this.setState({currentDayFull: selectedObj[0].full});
+    this.getTableList(selectedObj[0].full);
   }
 
   componentWillReceiveProps(nextProps)
@@ -48,10 +55,12 @@ class MyPlans extends React.Component
 
   }
 
-  getTableList()
+  getTableList(fulldate)
   {
     var comp = this;
-    axios.post(CONFIG.api.myPlans, {
+    comp.setState({loaded: false, currentDayFull: fulldate});
+    axios.post(CONFIG.api.getSchedulesByDay, {
+      date: fulldate,
       t: (new Date()).getTime()
     }, {
       headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
@@ -67,22 +76,12 @@ class MyPlans extends React.Component
 
   handleSelectDay(day)
   {
-    this.setState({currentDay: day});
-  }
-
-  refreshTable(table)
-  {
     var comp = this;
-    axios.post(CONFIG.api.refreshTable, {
-      table_id: table.table_id,
-      t: (new Date()).getTime()
-    }, {
-      headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
-    }).then(function(json){
-      ToastsAPI.toast('success', 'Table updated.', null, {timeout:6000});
-      comp.getTableList();
-    }).catch(function(json){
-      ToastsAPI.toast('error', null, json.response.data.message, {timeOut:6000});
+    var selectedObj = comp.conDays.filter(function(item){ return item.date==day; });
+    var date = selectedObj[0].full;
+
+    comp.setState({currentDay: day}, function(){
+      comp.getTableList(date);
     });
   }
 
@@ -102,7 +101,23 @@ class MyPlans extends React.Component
       headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
     }).then(function(json){
       ToastsAPI.toast('success', 'Left game table', null, {timeout:6000});
-      comp.getTableList();
+      comp.getTableList(comp.state.currentDayFull);
+    }).catch(function(json){
+      ToastsAPI.toast('error', null, json.response.data.message, {timeOut:6000});
+    });
+  }
+
+  handleJoinGame(table)
+  {
+    var comp = this;
+    axios.post(CONFIG.api.joinTable, {
+      table_id: table.table_id,
+      t: (new Date()).getTime()
+    }, {
+      headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
+    }).then(function(json){
+      ToastsAPI.toast('success', 'Joined game!', null, {timeout:6000});
+      comp.getTableList(comp.state.currentDayFull);
     }).catch(function(json){
       ToastsAPI.toast('error', null, json.response.data.message, {timeOut:6000});
     });
@@ -157,8 +172,14 @@ class MyPlans extends React.Component
                       <span className={"plan-tag" + (table.player_id === CONFIG.state.user.id ? " hosting" : "")}>Host: {table.host_name}</span>
                     </div>
                     <div className="plans-btns">
-                      {table.player_id !== CONFIG.state.user.id ? (<button onClick={comp.handleLeaveGame.bind(comp, table)}>Leave Game</button>) : ''}
-                      {table.player_id === CONFIG.state.user.id ? (<button className='edit' onClick={()=>{browserHistory.push('/tables/edit/'+table.table_id)}}>Edit</button>) : ''}
+                      {table.player_id !== CONFIG.state.user.id ? table.allow_signups==1 ? (table.joined==1 ? (
+                        <button className='leave' onClick={comp.handleLeaveGame.bind(comp, table)}>Leave Game</button>
+                      ) : (
+                        <button className='join' onClick={comp.handleJoinGame.bind(comp, table)}>Join Game</button>
+                      )) : (<button disabled>First Come (no sign up)</button>) : ''}
+                      {table.player_id === CONFIG.state.user.id ? (
+                        <button className='edit' onClick={()=>{browserHistory.push('/tables/edit/'+table.table_id)}}>Edit</button>
+                      ) : ''}
                     </div>
                   </div>
                 </li>
@@ -175,7 +196,7 @@ class MyPlans extends React.Component
   renderNoTables()
   {
     return (
-      <div className="game-search-list-empty"><h3>No current plans.</h3><p>Either you don't have plans for this day, or your other games have already happened.</p></div>
+      <div className="game-search-list-empty"><h3>No games listed.</h3><p>There are no games left planned for this day.</p></div>
     );
   }
 
@@ -199,4 +220,4 @@ class MyPlans extends React.Component
   }
 }
 
-export default MyPlans;
+export default ScheduledList;

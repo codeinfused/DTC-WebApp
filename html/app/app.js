@@ -141,6 +141,10 @@
 	
 	var _PlayersWanted2 = _interopRequireDefault(_PlayersWanted);
 	
+	var _ScheduledList = __webpack_require__(851);
+	
+	var _ScheduledList2 = _interopRequireDefault(_ScheduledList);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -169,7 +173,7 @@
 	      alerts: []
 	    };
 	
-	    _this.navButtons = [{ label: 'Home', path: '/home', icon: 'store' }, { label: 'Players Wanted Now', path: '/lfp', icon: 'video_library' }, { label: 'Search Games', path: '/games', icon: 'library_books', callback: comp.DBLoadBGG }, { label: 'Con Library', path: '/library', icon: 'import_contacts', callback: comp.DBLoadLibrary }, { label: 'Game Alerts', path: '/alerts', icon: 'notifications' }, { label: 'My Plans', path: '/myplans', icon: 'date_range' }, { label: 'My Tables', path: '/mytables', icon: 'playlist_add_check' }, { label: 'My Settings', path: '/me', icon: 'settings_applications' }, { label: 'About', path: '/about', icon: 'info' }];
+	    _this.navButtons = [{ label: 'Players Wanted', path: '/lfp', icon: 'video_library' }, { label: 'Scheduled Games', path: '/schedules', icon: 'event_note' }, { label: 'Search By Game', path: '/games', icon: 'library_books', callback: comp.DBLoadBGG }, { label: 'Con Library', path: '/library', icon: 'import_contacts', callback: comp.DBLoadLibrary }, { label: 'Game Alerts', path: '/alerts', icon: 'notifications' }, { label: 'My Plans', path: '/myplans', icon: 'date_range' }, { label: 'My Tables', path: '/mytables', icon: 'playlist_add_check' }, { label: 'My Settings', path: '/me', icon: 'settings_applications' }, { label: 'About', path: '/about', icon: 'info' }];
 	
 	    _this.getNewAlerts = _this.getNewAlerts.bind(_this);
 	    return _this;
@@ -354,7 +358,8 @@
 	    _react2.default.createElement(_reactRouter.Route, { path: 'myplans', component: _MyPlans2.default }),
 	    _react2.default.createElement(_reactRouter.Route, { path: 'me', component: _MySettings2.default }),
 	    _react2.default.createElement(_reactRouter.Route, { path: 'alerts', component: _MyAlerts2.default }),
-	    _react2.default.createElement(_reactRouter.Route, { path: 'lfp', component: _PlayersWanted2.default })
+	    _react2.default.createElement(_reactRouter.Route, { path: 'lfp', component: _PlayersWanted2.default }),
+	    _react2.default.createElement(_reactRouter.Route, { path: 'schedules', component: _ScheduledList2.default })
 	  )
 	), document.getElementById('app-wrapper'));
 
@@ -56972,6 +56977,7 @@
 	    getAlerts: baseAPI + "user/getalerts",
 	    myAlertSettings: baseAPI + "user/myalertgames",
 	
+	    getSchedulesByDay: baseAPI + "tables/byday",
 	    tableFullData: baseAPI + "table_data/",
 	    tableList: baseAPI + "tables/list",
 	    tableEdit: baseAPI + "tables/edit",
@@ -80701,6 +80707,11 @@
 	            'p',
 	            null,
 	            'Snapshots of player data and games being played, to be determined as the con goes on!'
+	          ),
+	          _react2.default.createElement(
+	            'p',
+	            { style: { fontSize: '1.6rem', marginTop: '80px' } },
+	            'Use the button at the bottom of this app to open the menu for more options.'
 	          )
 	        ),
 	        _react2.default.createElement(_Loaders.LoadingInline, {
@@ -99162,14 +99173,18 @@
 	          'div',
 	          { className: "calendar-day" + isSel, key: "calendar-day-" + day.date, onClick: comp.handleSelectDay.bind(comp, day.date) },
 	          _react2.default.createElement(
-	            'span',
-	            { className: 'calendar-day-date' },
-	            day.date
-	          ),
-	          _react2.default.createElement(
-	            'span',
-	            { className: 'calendar-day-name' },
-	            day.name
+	            'div',
+	            { className: 'calendar-day-inner' },
+	            _react2.default.createElement(
+	              'span',
+	              { className: 'calendar-day-date' },
+	              day.date
+	            ),
+	            _react2.default.createElement(
+	              'span',
+	              { className: 'calendar-day-name' },
+	              day.name
+	            )
 	          )
 	        );
 	      });
@@ -99181,12 +99196,21 @@
 	      var selectedObj = comp.conDays.filter(function (item) {
 	        return item.date == comp.state.currentDay;
 	      });
-	      return _react2.default.createElement(
-	        'ul',
-	        { className: 'plans-timeline' },
-	        comp.state.tables.map(function (table, i) {
-	          var isSelected = (0, _moment2.default)(selectedObj[0].full, 'YYYY-MM-DD').isSame((0, _moment2.default)(table.start_datetime, 'YYYY-MM-DD HH:mm:ss'), 'day');
-	          if (isSelected) {
+	
+	      var thisDayList = comp.state.tables.filter(function (table, i) {
+	        var isSelected = (0, _moment2.default)(selectedObj[0].full, 'YYYY-MM-DD').isSame((0, _moment2.default)(table.start_datetime, 'YYYY-MM-DD HH:mm:ss'), 'day');
+	        return isSelected;
+	      });
+	
+	      if (thisDayList.length < 1) {
+	        return comp.renderNoTables();
+	      } else {
+	        return _react2.default.createElement(
+	          'ul',
+	          { className: 'plans-timeline' },
+	          thisDayList.map(function (table, i) {
+	            //var isSelected = moment(selectedObj[0].full, 'YYYY-MM-DD').isSame(moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss'), 'day');
+	            //if(isSelected){
 	            return _react2.default.createElement(
 	              'li',
 	              { key: "table-item-" + table.table_id, className: table.status },
@@ -99228,11 +99252,11 @@
 	                _react2.default.createElement(
 	                  'div',
 	                  { className: 'plans-btns' },
-	                  _react2.default.createElement(
+	                  table.player_id !== _config2.default.state.user.id ? _react2.default.createElement(
 	                    'button',
 	                    { onClick: comp.handleLeaveGame.bind(comp, table) },
-	                    'Leave game'
-	                  ),
+	                    'Leave Game'
+	                  ) : '',
 	                  table.player_id === _config2.default.state.user.id ? _react2.default.createElement(
 	                    'button',
 	                    { className: 'edit', onClick: function onClick() {
@@ -99243,11 +99267,12 @@
 	                )
 	              )
 	            );
-	          } else {
-	            return '';
-	          }
-	        })
-	      );
+	            //}else{
+	            //return '';
+	            //}
+	          })
+	        );
+	      } // end if
 	    }
 	  }, {
 	    key: 'renderNoTables',
@@ -99258,12 +99283,12 @@
 	        _react2.default.createElement(
 	          'h3',
 	          null,
-	          'No current tables.'
+	          'No current plans.'
 	        ),
 	        _react2.default.createElement(
 	          'p',
 	          null,
-	          'Either you haven\'t made any tables yet, or your other games have already happened.'
+	          'Either you don\'t have plans for this day, or your other games have already happened.'
 	        )
 	      );
 	    }
@@ -100171,7 +100196,7 @@
 	        _react2.default.createElement(
 	          'h3',
 	          null,
-	          'No tables found.'
+	          'No tables waiting.'
 	        ),
 	        _react2.default.createElement(
 	          'p',
@@ -100203,6 +100228,332 @@
 	}(_react2.default.Component);
 	
 	exports.default = MyTables;
+
+/***/ }),
+/* 851 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _config = __webpack_require__(552);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	var _axios = __webpack_require__(525);
+	
+	var _axios2 = _interopRequireDefault(_axios);
+	
+	var _react = __webpack_require__(2);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _reactRouter = __webpack_require__(185);
+	
+	var _reactToolbox = __webpack_require__(243);
+	
+	var _button = __webpack_require__(244);
+	
+	var _reactTransitionGroup = __webpack_require__(551);
+	
+	var _lodash = __webpack_require__(554);
+	
+	var _moment = __webpack_require__(728);
+	
+	var _moment2 = _interopRequireDefault(_moment);
+	
+	var _Loaders = __webpack_require__(715);
+	
+	var _ToastsAPI = __webpack_require__(556);
+	
+	var _ToastsAPI2 = _interopRequireDefault(_ToastsAPI);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var ScheduledList = function (_React$Component) {
+	  _inherits(ScheduledList, _React$Component);
+	
+	  function ScheduledList(props) {
+	    _classCallCheck(this, ScheduledList);
+	
+	    var _this = _possibleConstructorReturn(this, (ScheduledList.__proto__ || Object.getPrototypeOf(ScheduledList)).call(this, props));
+	
+	    var comp = _this;
+	
+	    _this.state = {
+	      loaded: false,
+	      currentDay: (0, _moment2.default)().date(),
+	      currentDayObj: {},
+	      currentDayFull: '',
+	      tables: []
+	    };
+	
+	    _this.conDays = [{ full: '2017-07-04', date: '4', name: 'Tue' }, { full: '2017-07-05', date: '5', name: 'Wed' }, { full: '2017-07-06', date: '6', name: 'Thu' }, { full: '2017-07-07', date: '7', name: 'Fri' }, { full: '2017-07-08', date: '8', name: 'Sat' }, { full: '2017-07-09', date: '9', name: 'Sun' }];
+	
+	    _this.renderTableList = _this.renderTableList.bind(_this);
+	    _this.renderNoTables = _this.renderNoTables.bind(_this);
+	    _this.getTableList = _this.getTableList.bind(_this);
+	    return _this;
+	  }
+	
+	  _createClass(ScheduledList, [{
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      var comp = this;
+	      var mo = (0, _moment2.default)();
+	      var day = mo.date();
+	      var selectedObj = comp.conDays.filter(function (item) {
+	        return item.date == day;
+	      });
+	      this.setState({ currentDayFull: selectedObj[0].full });
+	      this.getTableList(selectedObj[0].full);
+	    }
+	  }, {
+	    key: 'componentWillReceiveProps',
+	    value: function componentWillReceiveProps(nextProps) {}
+	  }, {
+	    key: 'getTableList',
+	    value: function getTableList(fulldate) {
+	      var comp = this;
+	      comp.setState({ loaded: false, currentDayFull: fulldate });
+	      _axios2.default.post(_config2.default.api.getSchedulesByDay, {
+	        date: fulldate,
+	        t: new Date().getTime()
+	      }, {
+	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
+	      }).then(function (json) {
+	        comp.setState({
+	          loaded: true,
+	          tables: json.data.tables
+	        });
+	      }).catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, 'Failed to set.', { timeOut: 6000 });
+	      });
+	    }
+	  }, {
+	    key: 'handleSelectDay',
+	    value: function handleSelectDay(day) {
+	      var comp = this;
+	      var selectedObj = comp.conDays.filter(function (item) {
+	        return item.date == day;
+	      });
+	      var date = selectedObj[0].full;
+	
+	      comp.setState({ currentDay: day }, function () {
+	        comp.getTableList(date);
+	      });
+	    }
+	  }, {
+	    key: 'viewPlayers',
+	    value: function viewPlayers(table) {}
+	  }, {
+	    key: 'handleLeaveGame',
+	    value: function handleLeaveGame(table) {
+	      var comp = this;
+	      _axios2.default.post(_config2.default.api.leaveTable, {
+	        table_id: table.table_id,
+	        t: new Date().getTime()
+	      }, {
+	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
+	      }).then(function (json) {
+	        _ToastsAPI2.default.toast('success', 'Left game table', null, { timeout: 6000 });
+	        comp.getTableList(comp.state.currentDayFull);
+	      }).catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, json.response.data.message, { timeOut: 6000 });
+	      });
+	    }
+	  }, {
+	    key: 'handleJoinGame',
+	    value: function handleJoinGame(table) {
+	      var comp = this;
+	      _axios2.default.post(_config2.default.api.joinTable, {
+	        table_id: table.table_id,
+	        t: new Date().getTime()
+	      }, {
+	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
+	      }).then(function (json) {
+	        _ToastsAPI2.default.toast('success', 'Joined game!', null, { timeout: 6000 });
+	        comp.getTableList(comp.state.currentDayFull);
+	      }).catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, json.response.data.message, { timeOut: 6000 });
+	      });
+	    }
+	  }, {
+	    key: 'renderCalendar',
+	    value: function renderCalendar() {
+	      var comp = this;
+	      return comp.conDays.map(function (day, i) {
+	        var isSel = day.date == comp.state.currentDay ? ' active' : '';
+	        return _react2.default.createElement(
+	          'div',
+	          { className: "calendar-day" + isSel, key: "calendar-day-" + day.date, onClick: comp.handleSelectDay.bind(comp, day.date) },
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'calendar-day-inner' },
+	            _react2.default.createElement(
+	              'span',
+	              { className: 'calendar-day-date' },
+	              day.date
+	            ),
+	            _react2.default.createElement(
+	              'span',
+	              { className: 'calendar-day-name' },
+	              day.name
+	            )
+	          )
+	        );
+	      });
+	    }
+	  }, {
+	    key: 'renderTableList',
+	    value: function renderTableList() {
+	      var comp = this;
+	      var selectedObj = comp.conDays.filter(function (item) {
+	        return item.date == comp.state.currentDay;
+	      });
+	
+	      var thisDayList = comp.state.tables.filter(function (table, i) {
+	        var isSelected = (0, _moment2.default)(selectedObj[0].full, 'YYYY-MM-DD').isSame((0, _moment2.default)(table.start_datetime, 'YYYY-MM-DD HH:mm:ss'), 'day');
+	        return isSelected;
+	      });
+	
+	      if (thisDayList.length < 1) {
+	        return comp.renderNoTables();
+	      } else {
+	        return _react2.default.createElement(
+	          'ul',
+	          { className: 'plans-timeline' },
+	          thisDayList.map(function (table, i) {
+	            //var isSelected = moment(selectedObj[0].full, 'YYYY-MM-DD').isSame(moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss'), 'day');
+	            //if(isSelected){
+	            return _react2.default.createElement(
+	              'li',
+	              { key: "table-item-" + table.table_id, className: table.status },
+	              _react2.default.createElement('i', { className: table.status === 'cancelled' ? "fa fa-calendar-times-o cancelled" : "fa fa-calendar-check-o" }),
+	              ' ',
+	              _react2.default.createElement(
+	                'div',
+	                { className: 'plans-item' },
+	                _react2.default.createElement(
+	                  'div',
+	                  { className: 'plans-item-head' },
+	                  table.title
+	                ),
+	                _react2.default.createElement(
+	                  'div',
+	                  { className: 'plans-item-body' },
+	                  _react2.default.createElement(
+	                    'p',
+	                    { className: 'plans-time' },
+	                    table.status === 'cancelled' ? 'Cancelled' : (0, _moment2.default)(table.start_datetime).fromNow()
+	                  ),
+	                  _react2.default.createElement(
+	                    'span',
+	                    { className: 'plan-tag' },
+	                    (0, _moment2.default)(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, MMM Do YYYY, h:mm a')
+	                  ),
+	                  _react2.default.createElement(
+	                    'span',
+	                    { className: 'plan-tag' },
+	                    table.table_location + ' ' + (table.table_sublocation_alpha || '') + '-' + (table.table_sublocation_num || '')
+	                  ),
+	                  _react2.default.createElement(
+	                    'span',
+	                    { className: "plan-tag" + (table.player_id === _config2.default.state.user.id ? " hosting" : "") },
+	                    'Host: ',
+	                    table.host_name
+	                  )
+	                ),
+	                _react2.default.createElement(
+	                  'div',
+	                  { className: 'plans-btns' },
+	                  table.player_id !== _config2.default.state.user.id ? table.allow_signups == 1 ? table.joined == 1 ? _react2.default.createElement(
+	                    'button',
+	                    { className: 'leave', onClick: comp.handleLeaveGame.bind(comp, table) },
+	                    'Leave Game'
+	                  ) : _react2.default.createElement(
+	                    'button',
+	                    { className: 'join', onClick: comp.handleJoinGame.bind(comp, table) },
+	                    'Join Game'
+	                  ) : _react2.default.createElement(
+	                    'button',
+	                    { disabled: true },
+	                    'First Come (no sign up)'
+	                  ) : '',
+	                  table.player_id === _config2.default.state.user.id ? _react2.default.createElement(
+	                    'button',
+	                    { className: 'edit', onClick: function onClick() {
+	                        _reactRouter.browserHistory.push('/tables/edit/' + table.table_id);
+	                      } },
+	                    'Edit'
+	                  ) : ''
+	                )
+	              )
+	            );
+	            //}else{
+	            //return '';
+	            //}
+	          })
+	        );
+	      } // end if
+	    }
+	  }, {
+	    key: 'renderNoTables',
+	    value: function renderNoTables() {
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'game-search-list-empty' },
+	        _react2.default.createElement(
+	          'h3',
+	          null,
+	          'No games listed.'
+	        ),
+	        _react2.default.createElement(
+	          'p',
+	          null,
+	          'There are no games left planned for this day.'
+	        )
+	      );
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var comp = this;
+	      return _react2.default.createElement(
+	        'div',
+	        { id: 'page-my-plans', className: 'transition-item page-my-plans page-wrap' },
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'calendar-days' },
+	          comp.renderCalendar()
+	        ),
+	        _react2.default.createElement(
+	          'div',
+	          { className: "table-list-wrap" + (comp.state.loaded ? " loading" : "") },
+	          comp.state.tables && comp.state.tables.length > 0 ? comp.renderTableList() : comp.renderNoTables()
+	        ),
+	        _react2.default.createElement(_Loaders.LoadingInline, {
+	          active: !comp.state.loaded
+	        })
+	      );
+	    }
+	  }]);
+	
+	  return ScheduledList;
+	}(_react2.default.Component);
+	
+	exports.default = ScheduledList;
 
 /***/ })
 /******/ ]);

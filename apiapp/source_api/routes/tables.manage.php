@@ -62,6 +62,27 @@ $app->post('/me/plans', function($req, $resp, $args) use ($app)
 });
 
 
+$app->post('/tables/byday', function($req, $resp, $args) use ($app)
+{
+  $body = $req->getParsedBody();
+
+  $token = Auth::checkAuthorization($this->db, $req);
+  if( is_error($token) ){
+    return $resp->withStatus((int)$token->get_code())->withJson($token->json());
+  }
+  if( empty($body['date']) ){
+    return $resp->withStatus(401)->withJson(array('message'=>'Missing date.'));
+  }
+
+  $tables = Tables::tables_byday($this->db, $token->data->uid, $body['date']);
+  if( is_error($tables) ){
+    return $resp->withStatus((int)$tables->get_code())->withJson($tables->json());
+  }
+
+  return $resp->withJson($tables);
+});
+
+
 $app->post('/tables/list', function($req, $resp, $args) use ($app)
 {
   $body = $req->getParsedBody();

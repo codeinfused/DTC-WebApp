@@ -10,6 +10,30 @@ abstract class Tables
     return $d && $d->format('Y-m-d H:i:s') === $date;
   }
 
+
+  static function tables_byday($pdo, $uid, $date)
+  {
+    $dbCheck = $pdo->prepare(
+      "SELECT db.title, tb.id as table_id, tb.player_id, CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as host_name, tb.table_type, tb.seats, tb.table_location, tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft,
+      COUNT(gs.id) AS signups, tb.allow_signups, tb.status,
+      (SELECT count(id) FROM game_signups WHERE table_id=tb.id AND player_id=:uid) as joined
+      FROM game_tables tb
+      LEFT JOIN game_signups gs ON gs.table_id = tb.id
+      JOIN bgg_game_db db ON tb.bgg_id = db.bgg_id
+      LEFT JOIN users u ON u.id = tb.player_id
+      WHERE tb.table_type='future'
+      AND tb.start_datetime LIKE :date
+      AND tb.start_datetime > NOW() - INTERVAL 20 MINUTE
+      AND tb.status='ready'
+      GROUP BY tb.id
+      ORDER BY tb.start_datetime ASC"
+    );
+    $dbCheck->execute(array(':uid' => $uid, ':date'=>$date.'%'));
+    $tables = $dbCheck->fetchAll();
+    return array('tables'=>$tables);
+  }
+
+
   static function get_all_table_data_by_id($pdo, $table_id)
   {
     $dbCheck = $pdo->prepare(

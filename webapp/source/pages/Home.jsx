@@ -32,6 +32,8 @@ class Home extends React.Component
           <div id="app-logo"><img src="images/dtc-logo-transp-full.png" /></div>
           <h1>Dashboard Coming Soon</h1>
           <p>Snapshots of player data and games being played, to be determined as the con goes on!</p>
+          <p style={{fontSize: '1.6rem', marginTop: '80px'}}>Use the button at the bottom of this app to open the menu for more options.</p>
+
         </div>
 
         <LoadingInline
