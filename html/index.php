@@ -66,6 +66,6 @@
   <div id="toasts-wrapper"></div>
 
   <script defer src="/vendors/axios.js"></script>
-  <script defer src='<?php if(APP_ENV==='LOCAL'){ echo "/app/app.js"; }else{ echo "/app/app.min.js?v=1"; } ?>'></script>
+  <script defer src='<?php if(APP_ENV==='LOCAL'){ echo "/app/app.js"; }else{ echo "/app/app.min.js?v=002"; } ?>'></script>
 </body>
 </html>
