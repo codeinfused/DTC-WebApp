@@ -62,6 +62,9 @@ abstract class Auth
       }
     }
 
+    $req = $pdo->prepare('UPDATE users SET last_active=NOW() WHERE id=:uid');
+    $req->execute(array(':uid'=>$decoded->data->uid));
+    $req->closeCursor();
     return $decoded;
   }
 
