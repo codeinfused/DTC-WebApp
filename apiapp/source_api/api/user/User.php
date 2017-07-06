@@ -4,6 +4,16 @@ namespace api\user;
 abstract class User
 {
 
+  static function getMyAlertSettings($pdo, $uid)
+  {
+    $req = $pdo->prepare("SELECT gw.bgg_id, db.title AS game_title, notify_flag FROM game_wtp gw JOIN bgg_game_db db ON db.bgg_id=gw.bgg_id WHERE player_id=:uid ORDER BY db.title");
+    $req->execute(array(":uid"=>$uid));
+    $wtps = $req->fetchAll();
+    $req->closeCursor();
+
+    return array('wtp' => $wtps);
+  }
+
   static function getNotifications($pdo, $uid)
   {
     $req = $pdo->prepare("SELECT nt.id, nt.title, db.title as game_title, nt.message, nt.reference_id, nt.created_date, gt.start_datetime, gt.table_type, nt.link, CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as host_name

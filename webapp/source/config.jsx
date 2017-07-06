@@ -22,6 +22,7 @@ const CONFIG = {
     wtp: baseAPI+"user/me/wtp",
     notify: baseAPI+"user/me/notify",
     getAlerts: baseAPI+"user/getalerts",
+    myAlertSettings: baseAPI+"user/myalertgames",
 
     tableFullData: baseAPI+"table_data/",
     tableList: baseAPI+"tables/list",

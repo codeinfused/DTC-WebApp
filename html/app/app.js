@@ -56970,6 +56970,7 @@
 	    wtp: baseAPI + "user/me/wtp",
 	    notify: baseAPI + "user/me/notify",
 	    getAlerts: baseAPI + "user/getalerts",
+	    myAlertSettings: baseAPI + "user/myalertgames",
 	
 	    tableFullData: baseAPI + "table_data/",
 	    tableList: baseAPI + "tables/list",
@@ -81264,12 +81265,17 @@
 	      var comp = this;
 	      var maxPage = Math.floor((+comp.state.currentResultCount - 1) / comp.state.perGamePage);
 	
+	      function replacer(match, p1) {
+	        return "_md" + p1;
+	      }
+	
 	      return _react2.default.createElement(
 	        'div',
 	        { className: 'game-search-list' },
 	        comp.state.games.map(function (game, i) {
 	          var notifyActive = _config2.default.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
 	          var wtpActive = _config2.default.state.user.wtp.indexOf(game.bgg_id) > -1 ? " active" : "";
+	          var image = game.image ? game.image.replace(/(\.[a-zA-Z]+)$/, replacer) : false;
 	
 	          return _react2.default.createElement(
 	            'div',
@@ -81279,7 +81285,7 @@
 	              { className: 'game-item-top-wrap', onClick: comp.handleOpenGameResult.bind(comp, game) },
 	              _react2.default.createElement(
 	                'div',
-	                { className: 'game-bg', style: game.image ? { backgroundImage: "url(" + game.image + ")" } : {} },
+	                { className: 'game-bg', style: image ? { backgroundImage: "url(" + image + ")" } : {} },
 	                _react2.default.createElement('div', { className: 'game-bg-olay' }),
 	                _react2.default.createElement('div', { className: 'game-bg-olay2' })
 	              ),
@@ -99360,6 +99366,7 @@
 	
 	    _this.state = {
 	      loaded: true,
+	      wtp: [],
 	      allow_notifications: !!+_config2.default.state.user.allow_notifications
 	    };
 	
@@ -99367,12 +99374,15 @@
 	    _this.googleResponse = _this.googleResponse.bind(_this);
 	    _this.googleDenied = _this.googleDenied.bind(_this);
 	    _this.setAuthData = _this.setAuthData.bind(_this);
+	    _this.getMyAlertSettings = _this.getMyAlertSettings.bind(_this);
 	    return _this;
 	  }
 	
 	  _createClass(MySettings, [{
 	    key: 'componentDidMount',
-	    value: function componentDidMount() {}
+	    value: function componentDidMount() {
+	      this.getMyAlertSettings();
+	    }
 	  }, {
 	    key: 'componentWillReceiveProps',
 	    value: function componentWillReceiveProps(nextProps) {}
@@ -99384,6 +99394,23 @@
 	        this.setState({ loaded: true });
 	        this.forceUpdate();
 	      }
+	    }
+	  }, {
+	    key: 'getMyAlertSettings',
+	    value: function getMyAlertSettings() {
+	      var comp = this;
+	      _axios2.default.post(_config2.default.api.myAlertSettings, {
+	        t: new Date().getTime()
+	      }, {
+	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
+	      }).then(function (json) {
+	        comp.setState({
+	          loaded: true,
+	          wtp: json.data.wtp
+	        });
+	      }).catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, 'Failed to get some settings.', { timeOut: 6000 });
+	      });
 	    }
 	  }, {
 	    key: 'facebookResponse',
@@ -99463,6 +99490,102 @@
 	      comp.setState({ allow_notifications: val });
 	    }
 	  }, {
+	    key: 'handleToggleWTP',
+	    value: function handleToggleWTP(bgg_id) {
+	      var comp = this;
+	      if (_config2.default.state.user.wtp.indexOf(bgg_id) < 0) {
+	        comp.addWTP(bgg_id);
+	      } else {
+	        comp.deleteWTP(bgg_id);
+	      }
+	    }
+	  }, {
+	    key: 'handleToggleNotify',
+	    value: function handleToggleNotify(bgg_id) {
+	      var comp = this;
+	      if (_config2.default.state.user.notify.indexOf(bgg_id) < 0) {
+	        comp.addNotify(bgg_id);
+	      } else {
+	        comp.deleteNotify(bgg_id);
+	      }
+	    }
+	  }, {
+	    key: 'addWTP',
+	    value: function addWTP(bgg_id) {
+	      var comp = this;
+	      _config2.default.state.user.wtp.push(bgg_id);
+	      _config2.default.state.user.wtp = _.uniq(_config2.default.state.user.wtp);
+	
+	      _axios2.default.post(_config2.default.api.wtp, {
+	        bgg_id: bgg_id,
+	        t: new Date().getTime()
+	      }, {
+	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
+	      }).catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, 'Failed to set.', { timeOut: 6000 });
+	      });
+	      this.forceUpdate();
+	    }
+	  }, {
+	    key: 'deleteWTP',
+	    value: function deleteWTP(bgg_id) {
+	      var comp = this;
+	      var ind = _config2.default.state.user.wtp.indexOf(bgg_id);
+	      _config2.default.state.user.wtp.splice(ind, 1);
+	      var ind2 = _config2.default.state.user.notify.indexOf(bgg_id);
+	      _config2.default.state.user.notify.splice(ind2, 1);
+	
+	      _axios2.default.post(_config2.default.api.wtp + '/delete', {
+	        bgg_id: bgg_id,
+	        t: new Date().getTime()
+	      }, {
+	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
+	      }).catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, 'Failed to set.', { timeOut: 6000 });
+	      });
+	      this.forceUpdate();
+	    }
+	  }, {
+	    key: 'addNotify',
+	    value: function addNotify(bgg_id) {
+	      var comp = this;
+	      var wtp_ind = _config2.default.state.user.wtp.indexOf(bgg_id);
+	      if (wtp_ind < 0) {
+	        _config2.default.state.user.wtp.push(bgg_id);
+	      }
+	      _config2.default.state.user.notify.push(bgg_id);
+	      _config2.default.state.user.notify = _.uniq(_config2.default.state.user.notify);
+	
+	      _axios2.default.post(_config2.default.api.notify, {
+	        bgg_id: bgg_id,
+	        t: new Date().getTime()
+	      }, {
+	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
+	      }).then(function () {
+	        _ToastsAPI2.default.toast('success', null, 'You will be notified of tables for this game.', { timeOut: 6000 });
+	      }).catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, 'Failed to set.', { timeOut: 6000 });
+	      });
+	      this.forceUpdate();
+	    }
+	  }, {
+	    key: 'deleteNotify',
+	    value: function deleteNotify(bgg_id) {
+	      var comp = this;
+	      var ind = _config2.default.state.user.notify.indexOf(bgg_id);
+	      _config2.default.state.user.notify.splice(ind, 1);
+	
+	      _axios2.default.post(_config2.default.api.notify + '/delete', {
+	        bgg_id: bgg_id,
+	        t: new Date().getTime()
+	      }, {
+	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
+	      }).catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, 'Failed to set.', { timeOut: 6000 });
+	      });
+	      this.forceUpdate();
+	    }
+	  }, {
 	    key: 'render',
 	    value: function render() {
 	      var comp = this;
@@ -99534,8 +99657,61 @@
 	                className: 'btn-login btn-login-google'
 	              })
 	            )
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'my-settings-item' },
+	            _react2.default.createElement(
+	              'h3',
+	              null,
+	              'My Game Settings'
+	            ),
+	            _react2.default.createElement(
+	              'p',
+	              null,
+	              _react2.default.createElement(
+	                'em',
+	                null,
+	                'Your "want to play" and alert settings on games.'
+	              )
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'my-wtp-list' },
+	              comp.state.wtp.map(function (game) {
+	                //var notifyActive = CONFIG.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
+	                //var wtpActive = CONFIG.state.user.wtp.indexOf(game.bgg_id) > -1 ? " active" : "";
+	                var notifyActive = _config2.default.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
+	                var wtpActive = _config2.default.state.user.wtp.indexOf(game.bgg_id) > -1 ? " active" : "";
+	                return _react2.default.createElement(
+	                  'div',
+	                  { className: 'game-item-action', key: 'alert-settings-' + game.bgg_id },
+	                  _react2.default.createElement(
+	                    'div',
+	                    { className: 'game-item-action-line' },
+	                    _react2.default.createElement(
+	                      'div',
+	                      { className: 'game-item-action-title' },
+	                      game.game_title
+	                    ),
+	                    _react2.default.createElement(
+	                      'div',
+	                      { className: "game-item-action-btn action-notify-btn" + notifyActive },
+	                      _react2.default.createElement(_button.IconButton, { icon: 'notifications', onClick: comp.handleToggleNotify.bind(comp, game.bgg_id) })
+	                    ),
+	                    ' ',
+	                    _react2.default.createElement(
+	                      'div',
+	                      { className: "game-item-action-btn action-wtp-btn" + wtpActive },
+	                      _react2.default.createElement(_button.IconButton, { icon: 'check', onClick: comp.handleToggleWTP.bind(comp, game.bgg_id) })
+	                    )
+	                  )
+	                );
+	              })
+	            )
 	          )
 	        ),
+	        ' ',
 	        _react2.default.createElement(_Loaders.LoadingInline, {
 	          active: !comp.state.loaded
 	        })

@@ -198,9 +198,9 @@ button, button:focus, button:visited{ outline: none !important; cursor: pointer;
 }
 .bm-menu nav.bm-item-list button {
   width: 100%;
-  height: 3.8rem;
+  height: 3.98rem;
   padding: 0.2rem 0;
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   text-align: left;
   color: rgba(255,255,255,0.8) !important;
   text-transform: none;

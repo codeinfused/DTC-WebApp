@@ -380,17 +380,20 @@ class SearchGames extends React.Component
     var comp = this;
     var maxPage = Math.floor((+comp.state.currentResultCount-1) / comp.state.perGamePage);
 
+    function replacer(match, p1){ return "_md" + p1; }
+
     return (
       <div className="game-search-list">
         {comp.state.games.map(function(game, i)
         {
           var notifyActive = CONFIG.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
           var wtpActive = CONFIG.state.user.wtp.indexOf(game.bgg_id) > -1 ? " active" : "";
+          var image = game.image ? game.image.replace(/(\.[a-zA-Z]+)$/, replacer) : false;
 
           return (
             <div key={"game-item-"+game.bgg_id+"-"+i} className={"game-item" + (comp.state.activeGameId==game.bgg_id ? " full-view" : "")} >
               <div className="game-item-top-wrap" onClick={comp.handleOpenGameResult.bind(comp, game)}>
-                <div className="game-bg" style={game.image ? {backgroundImage: "url("+game.image+")"} : {}}>
+                <div className="game-bg" style={image ? {backgroundImage: "url("+image+")"} : {}}>
                   <div className="game-bg-olay"></div>
                   <div className="game-bg-olay2"></div>
                 </div>

@@ -21,6 +21,7 @@ class MySettings extends React.Component
 
     this.state = {
       loaded: true,
+      wtp: [],
       allow_notifications: !!+(CONFIG.state.user.allow_notifications)
     };
 
@@ -28,10 +29,12 @@ class MySettings extends React.Component
     this.googleResponse = this.googleResponse.bind(this);
     this.googleDenied = this.googleDenied.bind(this);
     this.setAuthData = this.setAuthData.bind(this);
+    this.getMyAlertSettings = this.getMyAlertSettings.bind(this);
   }
 
   componentDidMount()
   {
+    this.getMyAlertSettings();
   }
 
   componentWillReceiveProps(nextProps)
@@ -45,6 +48,23 @@ class MySettings extends React.Component
       this.setState({loaded: true});
       this.forceUpdate();
     }
+  }
+
+  getMyAlertSettings()
+  {
+    var comp = this;
+    axios.post(CONFIG.api.myAlertSettings, {
+      t: (new Date()).getTime()
+    }, {
+      headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
+    }).then(function(json){
+      comp.setState({
+        loaded: true,
+        wtp: json.data.wtp
+      });
+    }).catch(function(json){
+      ToastsAPI.toast('error', null, 'Failed to get some settings.', {timeOut:6000});
+    });
   }
 
   facebookResponse(response)
@@ -129,6 +149,103 @@ class MySettings extends React.Component
     comp.setState({allow_notifications: val});
   }
 
+  handleToggleWTP(bgg_id)
+  {
+    var comp = this;
+    if(CONFIG.state.user.wtp.indexOf(bgg_id) < 0){
+      comp.addWTP(bgg_id);
+    }else{
+      comp.deleteWTP(bgg_id);
+    }
+  }
+
+  handleToggleNotify(bgg_id)
+  {
+    var comp = this;
+    if(CONFIG.state.user.notify.indexOf(bgg_id) < 0){
+      comp.addNotify(bgg_id);
+    }else{
+      comp.deleteNotify(bgg_id);
+    }
+  }
+
+
+  addWTP(bgg_id)
+  {
+    var comp = this;
+    CONFIG.state.user.wtp.push(bgg_id);
+    CONFIG.state.user.wtp = _.uniq(CONFIG.state.user.wtp);
+
+    axios.post(CONFIG.api.wtp, {
+      bgg_id: bgg_id,
+      t: (new Date()).getTime()
+    }, {
+      headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
+    }).catch(function(json){
+      ToastsAPI.toast('error', null, 'Failed to set.', {timeOut:6000});
+    });
+    this.forceUpdate();
+  }
+
+  deleteWTP(bgg_id)
+  {
+    var comp = this;
+    var ind = CONFIG.state.user.wtp.indexOf(bgg_id);
+    CONFIG.state.user.wtp.splice(ind, 1);
+    var ind2 = CONFIG.state.user.notify.indexOf(bgg_id);
+    CONFIG.state.user.notify.splice(ind2, 1);
+
+    axios.post(CONFIG.api.wtp+'/delete', {
+      bgg_id: bgg_id,
+      t: (new Date()).getTime()
+    }, {
+      headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
+    }).catch(function(json){
+      ToastsAPI.toast('error', null, 'Failed to set.', {timeOut:6000});
+    });
+    this.forceUpdate();
+  }
+
+  addNotify(bgg_id)
+  {
+    var comp = this;
+    var wtp_ind = CONFIG.state.user.wtp.indexOf(bgg_id);
+    if(wtp_ind < 0){
+      CONFIG.state.user.wtp.push(bgg_id);
+    }
+    CONFIG.state.user.notify.push(bgg_id);
+    CONFIG.state.user.notify = _.uniq(CONFIG.state.user.notify);
+
+    axios.post(CONFIG.api.notify, {
+      bgg_id: bgg_id,
+      t: (new Date()).getTime()
+    }, {
+      headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
+    }).then(function(){
+      ToastsAPI.toast('success', null, 'You will be notified of tables for this game.', {timeOut:6000});
+    }).catch(function(json){
+      ToastsAPI.toast('error', null, 'Failed to set.', {timeOut:6000});
+    });
+    this.forceUpdate();
+  }
+
+  deleteNotify(bgg_id)
+  {
+    var comp = this;
+    var ind = CONFIG.state.user.notify.indexOf(bgg_id);
+    CONFIG.state.user.notify.splice(ind, 1);
+
+    axios.post(CONFIG.api.notify+'/delete', {
+      bgg_id: bgg_id,
+      t: (new Date()).getTime()
+    }, {
+      headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
+    }).catch(function(json){
+      ToastsAPI.toast('error', null, 'Failed to set.', {timeOut:6000});
+    });
+    this.forceUpdate();
+  }
+
 
   render()
   {
@@ -173,7 +290,30 @@ class MySettings extends React.Component
               />
             </div>
           </div>
-        </div>
+
+          <div className="my-settings-item">
+            <h3>My Game Settings</h3>
+            <p><em>Your "want to play" and alert settings on games.</em></p>
+            <div className="my-wtp-list">
+              {comp.state.wtp.map(function(game){
+                //var notifyActive = CONFIG.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
+                //var wtpActive = CONFIG.state.user.wtp.indexOf(game.bgg_id) > -1 ? " active" : "";
+                var notifyActive = CONFIG.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
+                var wtpActive = CONFIG.state.user.wtp.indexOf(game.bgg_id) > -1 ? " active" : "";
+                return (
+                  <div className="game-item-action" key={'alert-settings-'+game.bgg_id}>
+                    <div className="game-item-action-line">
+                      <div className="game-item-action-title">{game.game_title}</div>
+                      <div className={"game-item-action-btn action-notify-btn" + notifyActive}><IconButton icon='notifications' onClick={comp.handleToggleNotify.bind(comp, game.bgg_id)} /></div> {/* Detect support for notifications before displaying */}
+                      <div className={"game-item-action-btn action-wtp-btn" + wtpActive}><IconButton icon='check' onClick={comp.handleToggleWTP.bind(comp, game.bgg_id)} /></div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+        </div> {/* <!-- /wrap --> */}
 
         <LoadingInline
           active={!comp.state.loaded}
