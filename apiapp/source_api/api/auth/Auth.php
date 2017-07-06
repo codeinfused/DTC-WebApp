@@ -15,14 +15,14 @@ abstract class Auth
     * Verifies authorization header and JWT token
     * @RETURN decoded-jwt OR ApiError
   ***/
-  static function checkAuthorization($pdo, $request)
+  static function checkAuthorization($pdo, $request, $ignoreTrack=false)
   {
     $jwt = self::parseAuthorization($request);
     if( is_error($jwt) ){
       return $jwt;
     }
 
-    $token = self::checkToken($pdo, $jwt);
+    $token = self::checkToken($pdo, $jwt, $ignoreTrack);
     return $token;
   }
 
@@ -49,7 +49,7 @@ abstract class Auth
     * Decodes JWT for expiration check
     * @RETURN decoded-jwt OR ApiError
   ***/
-  static function checkToken($pdo, $jwt)
+  static function checkToken($pdo, $jwt, $ignoreTrack=false)
   {
     try {
       $decoded = JWT::decode($jwt, JWT_APP_KEY, array('HS256'));
@@ -62,9 +62,11 @@ abstract class Auth
       }
     }
 
-    $req = $pdo->prepare('UPDATE users SET last_active=NOW() WHERE id=:uid');
-    $req->execute(array(':uid'=>$decoded->data->uid));
-    $req->closeCursor();
+    if($ignoreTrack!==true){
+      $req = $pdo->prepare('UPDATE users SET last_active=NOW() WHERE id=:uid');
+      $req->execute(array(':uid'=>$decoded->data->uid));
+      $req->closeCursor();
+    }
     return $decoded;
   }
 

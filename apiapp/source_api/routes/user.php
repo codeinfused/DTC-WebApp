@@ -8,7 +8,7 @@ $app->post('/user/getalerts', function($req, $resp, $args) use ($app)
 {
   $body = $req->getParsedBody();
 
-  $token = Auth::checkAuthorization($this->db, $req);
+  $token = Auth::checkAuthorization($this->db, $req, true);
   if( is_error($token) ){
     return $resp->withStatus((int)$token->get_code())->withJson($token->json());
   }
