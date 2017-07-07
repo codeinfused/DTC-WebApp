@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Route, IndexRoute, Router, browserHistory } from 'react-router';
-import { Layout, NavDrawer, Panel, Sidebar, FontIcon, Button } from 'react-toolbox';
+import { Layout, NavDrawer, Panel, Sidebar, FontIcon, Button, Dialog } from 'react-toolbox';
 import PageTransition from 'react-router-page-transition';
 import {push as AppMenu} from 'react-burger-menu';
 import MediaQuery from 'react-responsive';
@@ -40,7 +40,10 @@ class AppLayout extends React.Component
       appLoading: false,
       sideMenuOpen: false,
       ignoreLandscape: false,
-      alerts: []
+      alerts: [],
+      tableDialogActive: false,
+      tableDialogData: {},
+      tableDialogLoading: false
     };
 
     this.navButtons = [
@@ -56,6 +59,9 @@ class AppLayout extends React.Component
     ];
 
     this.getNewAlerts = this.getNewAlerts.bind(this);
+    this.openTableDialog = this.openTableDialog.bind(this);
+    this.handleCloseTableDialog = this.handleCloseTableDialog.bind(this);
+    this.renderTableDialog = this.renderTableDialog.bind(this);
   }
 
   componentDidMount()
@@ -121,6 +127,59 @@ class AppLayout extends React.Component
     });
   }
 
+
+  openTableDialog(table_id)
+  {
+    var comp = this;
+    this.setState({tableDialogActive: true, tableDialogLoading: true});
+
+    axios.post(CONFIG.api.tablePlayers, {
+      table_id: table_id,
+      t: (new Date()).getTime()
+    }, {
+      headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
+    }).then(function(json){
+      comp.setState({
+        tableDialogLoading: false,
+        tableDialogData: json.data
+      });
+    }).catch(function(json){
+      comp.setState({tableDialogActive: false});
+      ToastsAPI.toast('error', null, 'Failed to get player data.', {timeOut:6000});
+    });
+  }
+
+  handleCloseTableDialog()
+  {
+    this.setState({tableDialogActive: false, tableDialogLoading: false});
+  }
+
+  renderTableDialog()
+  {
+    var comp = this;
+    var data = comp.state.tableDialogData;
+    if(data.table){
+      return (
+        <div className="table-players-data">
+          <div className="table-host">Host: <span>{data.table.host_name}</span></div>
+          <h3>Players</h3>
+          <div className="table-players-list">
+            {data.players.filter(function(player, i){ return i < data.table.seats; }).map(function(player, i){
+              return (<div key={"table-players-"+i} className="table-player"><span>{+i+1}</span> {player.player_name}</div>);
+            })}
+          </div>
+          <h3>Waitlist</h3>
+          <div className="table-players-waitlist">
+            {data.players.filter(function(player, i){ return i >= data.table.seats; }).map(function(player, i){
+              return (<div key={"table-waits-"+i} className="table-player"><span>{+data.table.seats+i+1}</span> {player.player_name}</div>);
+            })}
+          </div>
+        </div>
+      );
+    }
+  }
+
+
   render()
   {
     var comp = this;
@@ -128,7 +187,6 @@ class AppLayout extends React.Component
     var pathpage = path.split('/')[1] || 'root';
 
     var kids = this.props.children;
-    //var clonekids = React.cloneElement(kids, {key: pathpage});
 
     return (
       <div id="app">
@@ -173,6 +231,23 @@ class AppLayout extends React.Component
           )}
         </div>
         )}
+
+        <Dialog
+          title="Table Players"
+          type="normal"
+          onEscKeyDown={this.handleCloseTableDialog}
+          onOverlayClick={this.handleCloseTableDialog}
+          active={this.state.tableDialogActive}
+          actions={[
+            {label: "Close", onClick: this.handleCloseTableDialog, primary: true, raised: true}
+          ]}
+        >
+          {comp.state.tableDialogLoading ? (
+            <LoadingInline active={comp.state.tableDialogLoading} />
+          ) : (
+            comp.renderTableDialog()
+          )}
+        </Dialog>
 
       </div>
     );

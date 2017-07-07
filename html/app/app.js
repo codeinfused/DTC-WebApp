@@ -170,12 +170,18 @@
 	      appLoading: false,
 	      sideMenuOpen: false,
 	      ignoreLandscape: false,
-	      alerts: []
+	      alerts: [],
+	      tableDialogActive: false,
+	      tableDialogData: {},
+	      tableDialogLoading: false
 	    };
 	
 	    _this.navButtons = [{ label: 'Players Wanted', path: '/lfp', icon: 'video_library' }, { label: 'Scheduled Games', path: '/schedules', icon: 'event_note' }, { label: 'Search By Game', path: '/games', icon: 'library_books', callback: comp.DBLoadBGG }, { label: 'Con Library', path: '/library', icon: 'import_contacts', callback: comp.DBLoadLibrary }, { label: 'Game Alerts', path: '/alerts', icon: 'notifications' }, { label: 'My Plans', path: '/myplans', icon: 'date_range' }, { label: 'My Tables', path: '/mytables', icon: 'playlist_add_check' }, { label: 'My Settings', path: '/me', icon: 'settings_applications' }, { label: 'About', path: '/about', icon: 'info' }];
 	
 	    _this.getNewAlerts = _this.getNewAlerts.bind(_this);
+	    _this.openTableDialog = _this.openTableDialog.bind(_this);
+	    _this.handleCloseTableDialog = _this.handleCloseTableDialog.bind(_this);
+	    _this.renderTableDialog = _this.renderTableDialog.bind(_this);
 	    return _this;
 	  }
 	
@@ -245,6 +251,102 @@
 	      });
 	    }
 	  }, {
+	    key: 'openTableDialog',
+	    value: function openTableDialog(table_id) {
+	      var comp = this;
+	      this.setState({ tableDialogActive: true, tableDialogLoading: true });
+	
+	      _axios2.default.post(_config2.default.api.tablePlayers, {
+	        table_id: table_id,
+	        t: new Date().getTime()
+	      }, {
+	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
+	      }).then(function (json) {
+	        comp.setState({
+	          tableDialogLoading: false,
+	          tableDialogData: json.data
+	        });
+	      }).catch(function (json) {
+	        comp.setState({ tableDialogActive: false });
+	        _ToastsAPI2.default.toast('error', null, 'Failed to get player data.', { timeOut: 6000 });
+	      });
+	    }
+	  }, {
+	    key: 'handleCloseTableDialog',
+	    value: function handleCloseTableDialog() {
+	      this.setState({ tableDialogActive: false, tableDialogLoading: false });
+	    }
+	  }, {
+	    key: 'renderTableDialog',
+	    value: function renderTableDialog() {
+	      var comp = this;
+	      var data = comp.state.tableDialogData;
+	      if (data.table) {
+	        return _react2.default.createElement(
+	          'div',
+	          { className: 'table-players-data' },
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'table-host' },
+	            'Host: ',
+	            _react2.default.createElement(
+	              'span',
+	              null,
+	              data.table.host_name
+	            )
+	          ),
+	          _react2.default.createElement(
+	            'h3',
+	            null,
+	            'Players'
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'table-players-list' },
+	            data.players.filter(function (player, i) {
+	              return i < data.table.seats;
+	            }).map(function (player, i) {
+	              return _react2.default.createElement(
+	                'div',
+	                { key: "table-players-" + i, className: 'table-player' },
+	                _react2.default.createElement(
+	                  'span',
+	                  null,
+	                  +i + 1
+	                ),
+	                ' ',
+	                player.player_name
+	              );
+	            })
+	          ),
+	          _react2.default.createElement(
+	            'h3',
+	            null,
+	            'Waitlist'
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'table-players-waitlist' },
+	            data.players.filter(function (player, i) {
+	              return i >= data.table.seats;
+	            }).map(function (player, i) {
+	              return _react2.default.createElement(
+	                'div',
+	                { key: "table-waits-" + i, className: 'table-player' },
+	                _react2.default.createElement(
+	                  'span',
+	                  null,
+	                  +data.table.seats + i + 1
+	                ),
+	                ' ',
+	                player.player_name
+	              );
+	            })
+	          )
+	        );
+	      }
+	    }
+	  }, {
 	    key: 'render',
 	    value: function render() {
 	      var comp = this;
@@ -252,7 +354,6 @@
 	      var pathpage = path.split('/')[1] || 'root';
 	
 	      var kids = this.props.children;
-	      //var clonekids = React.cloneElement(kids, {key: pathpage});
 	
 	      return _react2.default.createElement(
 	        'div',
@@ -332,6 +433,18 @@
 	              _react2.default.createElement(_reactToolbox.FontIcon, { value: 'menu' })
 	            )
 	          )
+	        ),
+	        _react2.default.createElement(
+	          _reactToolbox.Dialog,
+	          {
+	            title: 'Table Players',
+	            type: 'normal',
+	            onEscKeyDown: this.handleCloseTableDialog,
+	            onOverlayClick: this.handleCloseTableDialog,
+	            active: this.state.tableDialogActive,
+	            actions: [{ label: "Close", onClick: this.handleCloseTableDialog, primary: true, raised: true }]
+	          },
+	          comp.state.tableDialogLoading ? _react2.default.createElement(_Loaders.LoadingInline, { active: comp.state.tableDialogLoading }) : comp.renderTableDialog()
 	        )
 	      );
 	    }
@@ -56977,6 +57090,7 @@
 	    getAlerts: baseAPI + "user/getalerts",
 	    myAlertSettings: baseAPI + "user/myalertgames",
 	
+	    tablePlayers: baseAPI + "tables/players",
 	    getSchedulesByDay: baseAPI + "tables/byday",
 	    tableFullData: baseAPI + "table_data/",
 	    tableList: baseAPI + "tables/list",
@@ -98651,15 +98765,33 @@
 	            table.status === 'cancelled' ? '' : _react2.default.createElement(
 	              'div',
 	              { className: 'table-item-actions' },
-	              table.table_type === 'now' ? _react2.default.createElement('div', null) : table.joined > 0 ? _react2.default.createElement(
+	              table.table_type === 'future' && table.player_id !== _config2.default.state.user.id && table.allow_signups != 1 ? _react2.default.createElement(
 	                'button',
-	                { className: 'leave', onClick: comp.handleLeaveGame.bind(comp, table) },
-	                'Leave this scheduled game'
-	              ) : _react2.default.createElement(
+	                { disabled: true },
+	                'First Come (no sign up)'
+	              ) : '',
+	              table.table_type === 'future' && table.player_id !== _config2.default.state.user.id && table.allow_signups == 1 && table.joined < 1 ? _react2.default.createElement(
 	                'button',
 	                { onClick: comp.handleJoinGame.bind(comp, table) },
-	                'Join This Game!'
-	              )
+	                'Join Game!'
+	              ) : '',
+	              table.table_type === 'future' && table.player_id !== _config2.default.state.user.id && table.allow_signups == 1 && table.joined > 0 ? _react2.default.createElement(
+	                'button',
+	                { className: 'leave', onClick: comp.handleLeaveGame.bind(comp, table) },
+	                'Leave Game'
+	              ) : '',
+	              table.table_type === 'future' && table.allow_signups == 1 ? _react2.default.createElement(
+	                'button',
+	                { className: 'players', onClick: _config2.default.state.index.openTableDialog.bind(_config2.default.state.index, table.table_id) },
+	                'See Players'
+	              ) : '',
+	              table.player_id == _config2.default.state.user.id ? _react2.default.createElement(
+	                'button',
+	                { className: 'edit', onClick: function onClick() {
+	                    _reactRouter.browserHistory.push('/tables/edit/' + table.table_id);
+	                  } },
+	                'Edit'
+	              ) : ''
 	            )
 	          );
 	        })
@@ -100486,20 +100618,27 @@
 	                _react2.default.createElement(
 	                  'div',
 	                  { className: 'plans-btns' },
-	                  table.player_id !== _config2.default.state.user.id ? table.allow_signups == 1 ? table.joined == 1 ? _react2.default.createElement(
-	                    'button',
-	                    { className: 'leave', onClick: comp.handleLeaveGame.bind(comp, table) },
-	                    'Leave Game'
-	                  ) : _react2.default.createElement(
-	                    'button',
-	                    { className: 'join', onClick: comp.handleJoinGame.bind(comp, table) },
-	                    'Join Game'
-	                  ) : _react2.default.createElement(
+	                  table.player_id !== _config2.default.state.user.id && table.allow_signups != 1 ? _react2.default.createElement(
 	                    'button',
 	                    { disabled: true },
 	                    'First Come (no sign up)'
 	                  ) : '',
-	                  table.player_id === _config2.default.state.user.id ? _react2.default.createElement(
+	                  table.player_id !== _config2.default.state.user.id && table.allow_signups == 1 && table.joined == 1 ? _react2.default.createElement(
+	                    'button',
+	                    { className: 'leave', onClick: comp.handleLeaveGame.bind(comp, table) },
+	                    'Leave Game'
+	                  ) : '',
+	                  table.player_id !== _config2.default.state.user.id && table.allow_signups == 1 && table.joined < 1 ? _react2.default.createElement(
+	                    'button',
+	                    { className: 'join', onClick: comp.handleJoinGame.bind(comp, table) },
+	                    table.signups >= table.seats ? 'Join Waitlist' : 'Join Game'
+	                  ) : '',
+	                  table.allow_signups == 1 ? _react2.default.createElement(
+	                    'button',
+	                    { className: 'players', onClick: _config2.default.state.index.openTableDialog.bind(_config2.default.state.index, table.table_id) },
+	                    'See Players'
+	                  ) : '',
+	                  table.player_id == _config2.default.state.user.id ? _react2.default.createElement(
 	                    'button',
 	                    { className: 'edit', onClick: function onClick() {
 	                        _reactRouter.browserHistory.push('/tables/edit/' + table.table_id);

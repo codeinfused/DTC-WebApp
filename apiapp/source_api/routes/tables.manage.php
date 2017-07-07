@@ -3,6 +3,29 @@ use api\auth\Auth;
 use api\games\GamesDB;
 use api\tables\Tables;
 
+// table_player_data
+
+$app->post('/tables/players', function($req, $resp, $args) use ($app)
+{
+  $body = $req->getParsedBody();
+  $table_id = $body['table_id'];
+
+  $token = Auth::checkAuthorization($this->db, $req);
+  if( is_error($token) ){
+    return $resp->withStatus((int)$token->get_code())->withJson($token->json());
+  }
+  if(empty($table_id)){
+    return $resp->withStatus(401)->withJson(array('error'=>'No table found.'));
+  }
+
+  $table = Tables::table_player_data($this->db, $table_id);
+  if( is_error($table) ){
+    return $resp->withStatus((int)$table->get_code())->withJson($table->json());
+  }
+
+  return $resp->withJson($table);
+});
+
 
 $app->get('/table_data/[{table_id}]', function($req, $resp, $args) use ($app)
 {

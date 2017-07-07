@@ -11,6 +11,29 @@ abstract class Tables
   }
 
 
+  static function table_player_data($pdo, $table_id)
+  {
+    $req = $pdo->prepare(
+      "SELECT tb.seats, tb.start_datetime, tb.lft, tb.table_location, tb.table_sublocation_alpha, tb.table_sublocation_num, CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as host_name
+      FROM game_tables tb
+      LEFT JOIN users u ON u.id = tb.player_id
+      WHERE tb.id = :table_id LIMIT 1");
+    $req->execute(array(':table_id'=>$table_id));
+    $table = $req->fetch();
+    $req->closeCursor();
+
+    $req = $pdo->prepare(
+      "SELECT player_id, CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as player_name
+      FROM game_signups gs
+      LEFT JOIN users u ON u.id = player_id
+      WHERE table_id = :table_id ORDER BY gs.id");
+    $req->execute(array(':table_id'=>$table_id));
+    $users = $req->fetchAll();
+
+    return array('table'=>$table, 'players'=>$users);
+  }
+
+
   static function tables_byday($pdo, $uid, $date)
   {
     $dbCheck = $pdo->prepare(

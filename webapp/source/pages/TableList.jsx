@@ -152,15 +152,11 @@ class TableList extends React.Component
                 </div>
                 {table.status === 'cancelled' ? '' : (
                   <div className="table-item-actions">
-                    {table.table_type==='now' ? (
-                      <div></div>
-                    ) :
-                      (table.joined>0 ? (
-                        <button className='leave' onClick={comp.handleLeaveGame.bind(comp, table)}>Leave this scheduled game</button>
-                      ) : (
-                        <button onClick={comp.handleJoinGame.bind(comp, table)}>Join This Game!</button>
-                      ))
-                    }
+                    {table.table_type==='future' && table.player_id !== CONFIG.state.user.id && table.allow_signups!=1 ? (<button disabled>First Come (no sign up)</button>) : ''}
+                    {table.table_type==='future' && table.player_id !== CONFIG.state.user.id && table.allow_signups==1 && table.joined<1 ? (<button onClick={comp.handleJoinGame.bind(comp, table)}>Join Game!</button>) : ''}
+                    {table.table_type==='future' && table.player_id !== CONFIG.state.user.id && table.allow_signups==1 && table.joined>0 ? (<button className='leave' onClick={comp.handleLeaveGame.bind(comp, table)}>Leave Game</button>) : ''}
+                    {table.table_type==='future' && table.allow_signups==1 ? (<button className="players" onClick={CONFIG.state.index.openTableDialog.bind(CONFIG.state.index, table.table_id)}>See Players</button>) : ''}
+                    {table.player_id == CONFIG.state.user.id ? (<button className='edit' onClick={()=>{browserHistory.push('/tables/edit/'+table.table_id)}}>Edit</button>) : ''}
                   </div>
                 )}
               </div>

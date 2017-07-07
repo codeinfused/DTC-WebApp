@@ -173,14 +173,12 @@ class ScheduledList extends React.Component
                       {table.allow_signups==1 ? (<span className="plan-tag">{table.signups} of {table.seats} seats taken</span>) : ''}
                     </div>
                     <div className="plans-btns">
-                      {table.player_id !== CONFIG.state.user.id ? table.allow_signups==1 ? (table.joined==1 ? (
-                        <button className='leave' onClick={comp.handleLeaveGame.bind(comp, table)}>Leave Game</button>
-                      ) : (
-                        <button className='join' onClick={comp.handleJoinGame.bind(comp, table)}>Join Game</button>
-                      )) : (<button disabled>First Come (no sign up)</button>) : ''}
-                      {table.player_id === CONFIG.state.user.id ? (
-                        <button className='edit' onClick={()=>{browserHistory.push('/tables/edit/'+table.table_id)}}>Edit</button>
-                      ) : ''}
+                      {/* leave game, join game, see players, first come, edit */}
+                      {table.player_id !== CONFIG.state.user.id && table.allow_signups!=1 ? (<button disabled>First Come (no sign up)</button>) : ''}
+                      {table.player_id !== CONFIG.state.user.id && table.allow_signups==1 && table.joined==1 ? (<button className='leave' onClick={comp.handleLeaveGame.bind(comp, table)}>Leave Game</button>) : ''}
+                      {table.player_id !== CONFIG.state.user.id && table.allow_signups==1 && table.joined<1 ? (<button className='join' onClick={comp.handleJoinGame.bind(comp, table)}>{table.signups >= table.seats ? 'Join Waitlist' : 'Join Game'}</button>) : ''}
+                      {table.allow_signups==1 ? (<button className="players" onClick={CONFIG.state.index.openTableDialog.bind(CONFIG.state.index, table.table_id)}>See Players</button>) : ''}
+                      {table.player_id == CONFIG.state.user.id ? (<button className='edit' onClick={()=>{browserHistory.push('/tables/edit/'+table.table_id)}}>Edit</button>) : ''}
                     </div>
                   </div>
                 </li>
