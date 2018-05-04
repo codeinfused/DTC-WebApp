@@ -82559,7 +82559,7 @@
 	        if (json.data.table) {
 	          var newState = Object.assign({}, curState, json.data.table);
 	          newState.loaded = true;
-	          console.log(newState);
+	
 	          comp.setState(newState);
 	        }
 	      }).catch(function (json) {
