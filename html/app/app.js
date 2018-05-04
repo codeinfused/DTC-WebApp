@@ -166,6 +166,7 @@
 	    var _this = _possibleConstructorReturn(this, (AppLayout.__proto__ || Object.getPrototypeOf(AppLayout)).call(this, props));
 	
 	    var comp = _this;
+	    var test = _this;
 	    _config2.default.state.index = comp;
 	
 	    _this.state = {

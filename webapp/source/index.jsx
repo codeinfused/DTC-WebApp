@@ -33,6 +33,7 @@ class AppLayout extends React.Component
   {
     super(props);
     var comp = this;
+    var test = this;
     CONFIG.state.index = comp;
 
     this.state = {
