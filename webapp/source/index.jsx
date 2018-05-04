@@ -25,6 +25,7 @@ import MySettings from './pages/MySettings.jsx';
 import MyAlerts from './pages/MyAlerts.jsx';
 import PlayersWanted from './pages/PlayersWanted.jsx';
 import ScheduledList from './pages/ScheduledList.jsx';
+import Privacy from './pages/Privacy.jsx';
 
 class AppLayout extends React.Component
 {
@@ -271,6 +272,7 @@ ReactDOM.render(
       <Route path="alerts" component={MyAlerts} />
       <Route path="lfp" component={PlayersWanted} />
       <Route path="schedules" component={ScheduledList} />
+      <Route path="privacy" component={Privacy} />
     </Route>
   </Router>,
   document.getElementById('app-wrapper')
