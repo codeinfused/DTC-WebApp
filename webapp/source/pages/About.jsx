@@ -42,7 +42,7 @@ class About extends React.Component
         <p><br />If you're reading this, you must be extra crazy. Just schedule some games on the app already.</p>
         <p><a className="dbox-donation-button" href="https://donorbox.org/dtcapp?amount=5" target="_donate">Buy Mike a Beer</a></p>
 
-        <p><a href="/privacy" style="color:#fff;">View Privacy Policy</a></p>
+        <p><a href="/privacy" style={{color:'#fff'}}>View Privacy Policy</a></p>
 
         <LoadingInline
           active={comp.state.loader}

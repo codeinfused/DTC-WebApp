@@ -43,7 +43,7 @@
   <link rel="stylesheet" href="/css/font-awesome.min.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
   <link rel="stylesheet" href="/app/app.css">
-  <link rel="stylesheet" href="/css/main.css?v=003">
+  <link rel="stylesheet" href="/css/main.css?v=004">
 
   <script>
     const baseAPI = '<?php echo "/api/"; ?>';
@@ -66,6 +66,6 @@
   <div id="toasts-wrapper"></div>
 
   <script defer src="/vendors/axios.js"></script>
-  <script defer src='<?php if(APP_ENV==='LOCAL'){ echo "/app/app.js"; }else{ echo "/app/app.min.js?v=003"; } ?>'></script>
+  <script defer src='<?php if(APP_ENV==='LOCAL'){ echo "/app/app.js"; }else{ echo "/app/app.min.js?v=004"; } ?>'></script>
 </body>
 </html>

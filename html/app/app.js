@@ -82375,7 +82375,7 @@
 	          null,
 	          _react2.default.createElement(
 	            'a',
-	            { href: '/privacy', style: 'color:#fff;' },
+	            { href: '/privacy', style: { color: '#fff' } },
 	            'View Privacy Policy'
 	          )
 	        ),
