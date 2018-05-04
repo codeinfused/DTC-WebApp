@@ -21,7 +21,7 @@ class Privacy extends React.Component
     var comp = this;
 
     return (
-      <div id="page-privacy" className="transition-item page-privacy page-wrap">
+      <div id="page-privacy" className="transition-item page-privacy page-wrap page-basic">
         <h2>DTC App Privacy Policy</h2>
         <p>Last updated: 5/4/2018</p>
 

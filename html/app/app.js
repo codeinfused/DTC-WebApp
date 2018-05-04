@@ -82275,7 +82275,7 @@
 	
 	      return _react2.default.createElement(
 	        'div',
-	        { id: 'page-about', className: 'transition-item page-about page-wrap' },
+	        { id: 'page-about', className: 'transition-item page-about page-wrap page-basic' },
 	        _react2.default.createElement(
 	          'h2',
 	          null,
@@ -82368,6 +82368,15 @@
 	            'a',
 	            { className: 'dbox-donation-button', href: 'https://donorbox.org/dtcapp?amount=5', target: '_donate' },
 	            'Buy Mike a Beer'
+	          )
+	        ),
+	        _react2.default.createElement(
+	          'p',
+	          null,
+	          _react2.default.createElement(
+	            'a',
+	            { href: '/privacy', style: 'color:#fff;' },
+	            'View Privacy Policy'
 	          )
 	        ),
 	        _react2.default.createElement(_Loaders.LoadingInline, {
@@ -82471,7 +82480,7 @@
 	      allow_signups: false
 	    };
 	
-	    _this.dateRange = ['2017-07-04', '2017-07-09'];
+	    _this.dateRange = ['2018-07-03', '2018-07-08'];
 	
 	    _this.sublocs_alpha = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q'];
 	    _this.sublocs_num = Array.apply(null, { length: 36 }).map(Number.call, Number);
@@ -99248,7 +99257,7 @@
 	      tables: []
 	    };
 	
-	    _this.conDays = [{ full: '2017-07-04', date: '4', name: 'Tue' }, { full: '2017-07-05', date: '5', name: 'Wed' }, { full: '2017-07-06', date: '6', name: 'Thu' }, { full: '2017-07-07', date: '7', name: 'Fri' }, { full: '2017-07-08', date: '8', name: 'Sat' }, { full: '2017-07-09', date: '9', name: 'Sun' }];
+	    _this.conDays = [{ full: '2018-07-03', date: '3', name: 'Tue' }, { full: '2018-07-04', date: '4', name: 'Wed' }, { full: '2018-07-05', date: '5', name: 'Thu' }, { full: '2018-07-06', date: '6', name: 'Fri' }, { full: '2018-07-07', date: '7', name: 'Sat' }, { full: '2018-07-08', date: '8', name: 'Sun' }];
 	
 	    _this.renderTableList = _this.renderTableList.bind(_this);
 	    _this.renderNoTables = _this.renderNoTables.bind(_this);
@@ -100457,7 +100466,7 @@
 	      tables: []
 	    };
 	
-	    _this.conDays = [{ full: '2017-07-04', date: '4', name: 'Tue' }, { full: '2017-07-05', date: '5', name: 'Wed' }, { full: '2017-07-06', date: '6', name: 'Thu' }, { full: '2017-07-07', date: '7', name: 'Fri' }, { full: '2017-07-08', date: '8', name: 'Sat' }, { full: '2017-07-09', date: '9', name: 'Sun' }];
+	    _this.conDays = [{ full: '2018-07-03', date: '3', name: 'Tue' }, { full: '2018-07-04', date: '4', name: 'Wed' }, { full: '2018-07-05', date: '5', name: 'Thu' }, { full: '2018-07-06', date: '6', name: 'Fri' }, { full: '2018-07-07', date: '7', name: 'Sat' }, { full: '2018-07-08', date: '8', name: 'Sun' }];
 	
 	    _this.renderTableList = _this.renderTableList.bind(_this);
 	    _this.renderNoTables = _this.renderNoTables.bind(_this);
@@ -100789,7 +100798,7 @@
 	
 	      return _react2.default.createElement(
 	        'div',
-	        { id: 'page-privacy', className: 'transition-item page-privacy page-wrap' },
+	        { id: 'page-privacy', className: 'transition-item page-privacy page-wrap page-basic' },
 	        _react2.default.createElement(
 	          'h2',
 	          null,

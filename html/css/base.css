@@ -38,22 +38,22 @@ button, button:focus, button:visited{ outline: none !important; cursor: pointer;
   text-align: center;
 }
 
-#page-about{
+.page-basic{
   padding: 0px 20px 36px;
   color: #cfcfcf;
   font-size: 1.2rem;
 }
-#page-about h2{
+.page-basic h2{
   color: #fff;
   margin: 40px 0 10px;
   font-size: 2.5rem;
   font-weight: 100;
 }
-#page-about ul{
+.page-basic ul{
   padding-left: 20px;
 }
-#page-about li{margin-bottom: 8px;}
-#page-about p, #page-about ul{
+.page-basic li{margin-bottom: 8px;}
+.page-basic p, .page-basic ul{
   color: #a5a5a5;
   font-weight: 400;
 }
