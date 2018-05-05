@@ -181,7 +181,9 @@
 	      tableDialogLoading: false
 	    };
 	
-	    _this.navButtons = [{ label: 'Players Wanted', path: '/lfp', icon: 'video_library' }, { label: 'Scheduled Games', path: '/schedules', icon: 'event_note' }, { label: 'Search By Game', path: '/games', icon: 'library_books', callback: comp.DBLoadBGG }, { label: 'Con Library', path: '/library', icon: 'import_contacts', callback: comp.DBLoadLibrary }, { label: 'Game Alerts', path: '/alerts', icon: 'notifications' }, { label: 'My Plans', path: '/myplans', icon: 'date_range' }, { label: 'My Tables', path: '/mytables', icon: 'playlist_add_check' }, { label: 'My Settings', path: '/me', icon: 'settings_applications' }, { label: 'About', path: '/about', icon: 'info' }];
+	    _this.navButtons = [{ label: 'Tables Right Now', path: '/lfp', icon: 'video_library' }, { label: 'Scheduled Tables', path: '/schedules', icon: 'event_note' }, { label: 'Start a Table', path: '/games', icon: 'library_books', callback: comp.DBLoadBGG },
+	    // {label:'Con Library',         path:'/library', icon:'import_contacts', callback: comp.DBLoadLibrary},
+	    { label: 'Game Alerts', path: '/alerts', icon: 'notifications' }, { label: 'My Plans', path: '/myplans', icon: 'date_range' }, { label: 'My Tables', path: '/mytables', icon: 'playlist_add_check' }, { label: 'My Settings', path: '/me', icon: 'settings_applications' }, { label: 'About', path: '/about', icon: 'info' }];
 	
 	    _this.getNewAlerts = _this.getNewAlerts.bind(_this);
 	    _this.openTableDialog = _this.openTableDialog.bind(_this);
@@ -82559,7 +82561,7 @@
 	        if (json.data.table) {
 	          var newState = Object.assign({}, curState, json.data.table);
 	          newState.loaded = true;
-	
+	          console.log(newState);
 	          comp.setState(newState);
 	        }
 	      }).catch(function (json) {

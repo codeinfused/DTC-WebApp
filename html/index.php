@@ -5,6 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
 <head>
   <?php require_once('../apiapp/conf.php'); ?>
+  <?php $ver = "2.05"; ?>
 
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -42,8 +43,8 @@
   <link rel="stylesheet" href="/css/normalize.css">
   <link rel="stylesheet" href="/css/font-awesome.min.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
-  <link rel="stylesheet" href="/app/app.css">
-  <link rel="stylesheet" href="/css/main.css?v=005">
+  <link rel="stylesheet" href="/app/app.css?v=<?php echo $ver; ?>">
+  <link rel="stylesheet" href="/css/main.css?v=<?php echo $ver; ?>">
 
   <script>
     const baseAPI = '<?php echo "/api/"; ?>';
@@ -66,6 +67,6 @@
   <div id="toasts-wrapper"></div>
 
   <script defer src="/vendors/axios.js"></script>
-  <script defer src='<?php if(APP_ENV==='LOCAL'){ echo "/app/app.js"; }else{ echo "/app/app.min.js?v=005"; } ?>'></script>
+  <script defer src='<?php if(APP_ENV==='LOCAL'){ echo "/app/app.js"; }else{ echo "/app/app.min.js?v=<?php echo $ver; ?>"; } ?>'></script>
 </body>
 </html>
