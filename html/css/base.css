@@ -132,26 +132,43 @@ button, button:focus, button:visited{ outline: none !important; cursor: pointer;
   height: 100%;
 }
 #app-main-body{
-  position: relative;
-  height: calc(100% - 44px);
+  position: fixed;
+  /* height: calc(100% - 52px); */
+  /* margin-top: 52px; */
+  top: 52px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  overflow-y: auto;
 }
 /*#app{
   position:absolute;
   top:0; right:0; bottom:0; left:0;
 }*/
 .page-wrap{
-  position:absolute;
-  top:0; right:0; bottom:0; left:0;
-  overflow:auto;
+  /* position:absolute; */
+  /* top:0px; right:0; bottom:0; left:0; */
+  /* overflow:auto; */
+}
+
+.app-headerbar{
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  height: 52px;
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  background: none !important;
 }
 
 #app-navbar{
   position: fixed;
   z-index: 101;
-  bottom: 0;
+  top: 0;
   left: 0;
   right: 0;
-  height: 46px;
+  height: 46px; /* 52px */
   line-height: 46px;
   background: #fff;
   box-shadow: 0 0 12px rgba(0,0,0,0.2);
@@ -225,6 +242,11 @@ span.alerts-count {
   border: 1px solid #9376ab;
 }
 
+
+.bm-menu-wrap{
+  z-index: 110 !important;
+}
+
 /* Position and sizing of burger button */
 .bm-burger-button {
   position: fixed;
@@ -243,11 +265,13 @@ span.alerts-count {
 .bm-cross-button {
   height: 24px;
   width: 24px;
+  right: 13px !important;
+  top: 13px !important;
 }
 
 /* Color/shape of close button cross */
 .bm-cross {
-  font-size: 2.2rem;
+  font-size: 2.6rem;
   color: rgba(255,255,255,0.7);
 }
 
@@ -258,7 +282,7 @@ span.alerts-count {
   background: -webkit-linear-gradient(to right, #693861, #765296);  /* Chrome 10-25, Safari 5.1-6 */
   background: linear-gradient(to right, #693861, #765296); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 
-  padding: 2em 2em 0;
+  padding: 2em 2em 0 2em;
   font-size: 1.15em;
 }
 

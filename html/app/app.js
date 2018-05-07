@@ -424,22 +424,21 @@
 	              _react2.default.cloneElement(this.props.children, { key: pathpage, appLoading: comp.state.appLoading })
 	            )
 	          ),
-	          pathpage === 'root' ? '' : _react2.default.createElement(
-	            'div',
-	            { id: 'app-navbar' },
-	            _react2.default.createElement(
-	              'button',
-	              { className: 'btn-global-menu app-navbar-btn', onClick: function onClick() {
-	                  _reactRouter.browserHistory.goBack();
-	                } },
-	              _react2.default.createElement(_reactToolbox.FontIcon, { value: 'keyboard_arrow_left' })
-	            ),
-	            _react2.default.createElement(
-	              'button',
-	              { className: 'btn-global-menu app-navbar-btn', onClick: comp.toggleSideMenu.bind(comp) },
-	              _react2.default.createElement(_reactToolbox.FontIcon, { value: 'menu' })
-	            )
-	          )
+	          pathpage === 'root' ? '' : _react2.default.createElement(_reactToolbox.AppBar, {
+	            className: 'app-headerbar',
+	            title: 'Dice Tower Con',
+	            leftIcon: 'menu',
+	            rightIcon: _react2.default.createElement(_reactToolbox.FontIcon, { value: 'keyboard_arrow_left' }),
+	            onLeftIconClick: comp.toggleSideMenu.bind(comp),
+	            onRightIconClick: function onRightIconClick() {
+	              _reactRouter.browserHistory.goBack();
+	            }
+	          })
+	          // <div id="app-navbar">
+	          //   <button className="btn-global-menu app-navbar-btn" onClick={()=>{browserHistory.goBack();}}><FontIcon value='keyboard_arrow_left' /></button>
+	          //   <button className="btn-global-menu app-navbar-btn" onClick={comp.toggleSideMenu.bind(comp)}><FontIcon value='menu' /></button>
+	          // </div>
+	
 	        ),
 	        _react2.default.createElement(
 	          _reactToolbox.Dialog,
@@ -57148,6 +57147,7 @@
 	
 	      comp.state.index.getNewAlerts();
 	    }).catch(function (json) {
+	      console.log(json);
 	      _ToastsAPI2.default.toast('error', null, json.response.data.message, { timeOut: 6000 });
 	      comp.state.authenticated = false;
 	      context.setState({ appLoaded: true });
@@ -81398,8 +81398,16 @@
 	      var comp = this;
 	      var maxPage = Math.floor((+comp.state.currentResultCount - 1) / comp.state.perGamePage);
 	
-	      function replacer(match, p1) {
-	        return "_md" + p1;
+	      function basic_image_replacer(image) {
+	        return image.replace(/(\.[a-zA-Z]+)$/, function (match, p1) {
+	          return "_md" + p1;
+	        });
+	      }
+	
+	      function filtered_image_replacer(image) {
+	        return image.replace(/original[\w\_\-\=\/]+(pic\d{3,})(\.[a-zA-Z]{2,4})$/, function (match, p1, p2) {
+	          return "images/" + p1 + "_md" + p2;
+	        });
 	      }
 	
 	      return _react2.default.createElement(
@@ -81408,7 +81416,15 @@
 	        comp.state.games.map(function (game, i) {
 	          var notifyActive = _config2.default.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
 	          var wtpActive = _config2.default.state.user.wtp.indexOf(game.bgg_id) > -1 ? " active" : "";
-	          var image = game.image ? game.image.replace(/(\.[a-zA-Z]+)$/, replacer) : false;
+	          var image = false;
+	
+	          if (!!game.image) {
+	            if (game.image.indexOf('original') > -1) {
+	              image = filtered_image_replacer(game.image);
+	            } else {
+	              image = basic_image_replacer(game.image);
+	            }
+	          }
 	
 	          return _react2.default.createElement(
 	            'div',
@@ -81493,7 +81509,7 @@
 	                    _react2.default.createElement(
 	                      'div',
 	                      { className: 'game-item-action-title' },
-	                      'Want to play'
+	                      'Wanting to play'
 	                    ),
 	                    _react2.default.createElement(
 	                      'div',

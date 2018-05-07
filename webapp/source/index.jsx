@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Route, IndexRoute, Router, browserHistory } from 'react-router';
-import { Layout, NavDrawer, Panel, Sidebar, FontIcon, Button, Dialog } from 'react-toolbox';
+import { Layout, AppBar, NavDrawer, Panel, Sidebar, FontIcon, Button, Dialog } from 'react-toolbox';
 import PageTransition from 'react-router-page-transition';
 import {push as AppMenu} from 'react-burger-menu';
 import MediaQuery from 'react-responsive';
@@ -226,10 +226,19 @@ class AppLayout extends React.Component
           </div>
 
           {pathpage==='root' ? '' : (
-            <div id="app-navbar">
-              <button className="btn-global-menu app-navbar-btn" onClick={()=>{browserHistory.goBack();}}><FontIcon value='keyboard_arrow_left' /></button>
-              <button className="btn-global-menu app-navbar-btn" onClick={comp.toggleSideMenu.bind(comp)}><FontIcon value='menu' /></button>
-            </div>
+             <AppBar
+               className="app-headerbar"
+               title="Dice Tower Con"
+               leftIcon="menu"
+               rightIcon={<FontIcon value='keyboard_arrow_left' />}
+               onLeftIconClick={comp.toggleSideMenu.bind(comp)}
+               onRightIconClick={()=>{browserHistory.goBack();}}
+               >
+             </AppBar>
+            // <div id="app-navbar">
+            //   <button className="btn-global-menu app-navbar-btn" onClick={()=>{browserHistory.goBack();}}><FontIcon value='keyboard_arrow_left' /></button>
+            //   <button className="btn-global-menu app-navbar-btn" onClick={comp.toggleSideMenu.bind(comp)}><FontIcon value='menu' /></button>
+            // </div>
           )}
         </div>
         )}

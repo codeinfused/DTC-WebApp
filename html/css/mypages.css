@@ -5,11 +5,12 @@
 .calendar-days{
   display: flex;
   flex-direction: row;
-  width: 100vw;
   position: fixed;
   height: 86px;
-  top: 0;
+  /* top: 52px; */
   left: 0;
+  right: 0;
+  z-index: 5;
 }
 .calendar-day{
   background: #fff;
@@ -19,6 +20,7 @@
   text-align: center;
   border-right: 1px solid #f0f0f0;
   flex-grow: 1;
+  cursor: pointer;
 }
 .calendar-day:last-child{
   border-right: none;
@@ -53,13 +55,15 @@
 
 
 .table-list-wrap{
-  position: fixed;
-  top: 86px;
+  /* position: fixed;
+  top: 138px;
   left: 0;
   right: 0;
-  bottom: 44px;
+  bottom: 0px;
   padding: 0px 0;
-  overflow: auto;
+  overflow-y: auto; */
+  position: relative;
+  padding-top: 86px;
 }
 
 

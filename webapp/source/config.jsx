@@ -77,6 +77,7 @@ const CONFIG = {
       comp.state.index.getNewAlerts();
 
     }).catch(function(json){
+      console.log(json);
       ToastsAPI.toast('error', null, json.response.data.message, {timeOut:6000});
       comp.state.authenticated = false;
       context.setState({appLoaded: true});

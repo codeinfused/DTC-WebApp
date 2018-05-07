@@ -6,7 +6,9 @@ abstract class Games
 
   static function check_default($val, $def=null)
   {
-    if(!empty($val) || $val==='0' || $val===0){
+    if(is_object($val)){
+      return $def;
+    }else if(!empty($val) || $val==='0' || $val===0){
       return $val;
     }else{
       return $def;
@@ -27,28 +29,47 @@ abstract class Games
     set_time_limit(0);
 
     $iter++;
-    if($iter > 50 || $iter===0){
-      $dbCheck = $context->db->query("SELECT max(bgg_id) FROM bgg_game_db WHERE title IS NOT NULL");
-      $game_max_unset = $dbCheck->fetchColumn();
+    //if($iter > 1000){  // || $iter===0){
 
+      //$dbCheck = $context->db->query("SELECT max(bgg_id) FROM bgg_game_db WHERE update_queue=0");
+      //$game_max_unset = $dbCheck->fetchColumn();
+      /*
       $dbCheck = $context->db->query("UPDATE bgg_game_db SET title='EXPANSION' WHERE title IS NULL AND bgg_id < ".$game_max_unset);
-      die();
-    }
+      */
+      // die('done, ended at ID: '.$game_max_unset);
+    //}
 
-    $dbCheck = $context->db->query("SELECT bgg_id FROM bgg_game_db WHERE title IS NULL LIMIT 99");
+    $dbCheck = $context->db->query("UPDATE bgg_game_db SET update_queue=0 WHERE update_queue=2");
+    $dbCheck->closeCursor();
+
+    $dbCheck = $context->db->query("SELECT bgg_id FROM bgg_game_db WHERE update_queue=1 LIMIT 50");
     $game_rows = $dbCheck->fetchAll();
+    $dbCheck->closeCursor();
+
+    $dbCheck = $context->db->query("UPDATE bgg_game_db SET update_queue=2 WHERE update_queue=1 LIMIT 50");
     $dbCheck->closeCursor();
 
     $game_ids = array();
     foreach($game_rows as $row){ $game_ids[] = $row['bgg_id']; }
 
+    //print_r($game_ids);
+    //echo "\n";
+
     $full_games = self::get_games_by_ids($context, $game_ids);
+
+    //print_r($full_games);
+    //echo "\n";
+
+    if(!$full_games){
+      error_log("Unknown error :: get_games_by_ids return");
+      die();
+    }
 
     foreach($full_games as $game)
     {
       try{
         $dbCheck = $context->db->prepare(
-          "UPDATE bgg_game_db SET title=:title, description=:description, year=:year, thumb=:thumb, image=:image, minplayers=:minplayers, maxplayers=:maxplayers, minplaytime=:minplaytime, maxplaytime=:maxplaytime, rating=:rating, bggrate=:bggrate, tags=:tags WHERE bgg_id=:bgg_id"
+          "UPDATE bgg_game_db SET title=:title, description=:description, year=:year, thumb=:thumb, image=:image, minplayers=:minplayers, maxplayers=:maxplayers, minplaytime=:minplaytime, maxplaytime=:maxplaytime, rating=:rating, bggrate=:bggrate, tags=:tags, update_queue=:update_queue WHERE bgg_id=:bgg_id"
         );
         $dbCheck->execute(array(
           ':title'=> $game['title'],
@@ -63,22 +84,28 @@ abstract class Games
           ':rating'=>self::check_default($game['rating']),
           ':bggrate'=>self::check_default($game['bggrate']),
           ':tags'=> (is_array($game['tags']) ? implode(',', $game['tags']) : ''),
-          ':bgg_id'=>$game['id']
+          ':bgg_id'=>$game['id'],
+          ':update_queue'=>0
         ));
         $dbCheck->closeCursor();
-      }catch(PDOException $e){
+      //}catch(PDOException $e){
+      }catch(Exception $e){
         print_r($e);
       }
     }
 
     sleep(2);
 
+    $full_games = null;
+    $game_ids = null;
+    $game_rows = null;
+
     self::bgg_clone__process_next($context, $iter);
   }
 
   static function bgg_clone__convert_sitemap_page($context, $sitemapurl)
   {
-    return;
+    //return;
 
     $context->curl->get(array(
       "url" => $sitemapurl,
@@ -188,15 +215,24 @@ abstract class Games
       )
     ));
 
-    $listxml = simplexml_load_string($context->curl->html);
-    $listobj = json_decode(json_encode($listxml));
-    $games_list = array();
-    if(!is_array($listobj->item)){ $listobj->item = array($listobj->item); }
+    try{
 
-    foreach($listobj->item as $listgame){
-      $games_list[] = self::game_xml_to_json($listgame);
+      $listxml = simplexml_load_string($context->curl->html);
+      $listobj = json_decode(json_encode($listxml));
+      $games_list = array();
+      if(!is_array($listobj->item)){ $listobj->item = array($listobj->item); }
+
+      foreach($listobj->item as $listgame){
+        $games_list[] = self::game_xml_to_json($listgame);
+      }
+      //$games_list = self::sort_list_by($games_list, 'bggrate');
+
+    }catch(Exception $e){
+      print_r($e);
+      error_log('CURL ERROR :: BGG multi game list');
+      error_log($context->curl->html);
+      die();
     }
-    //$games_list = self::sort_list_by($games_list, 'bggrate');
 
     return $games_list;
   }

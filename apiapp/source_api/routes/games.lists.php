@@ -4,17 +4,17 @@ use api\games\Games;
 use api\games\GamesDB;
 
 
-// $app->get('/import_bgg_process_next', function($req, $resp, $args) use ($app)
-// {
-//   return;
-//   Games::bgg_clone__process_next($this);
-// });
-//
-// $app->get('/import_bgg_sitemap/[{pagenum}]', function($req, $resp, $args) use ($app)
-// {
-//   return;
-//   Games::bgg_clone__convert_sitemap_page($this, "https://boardgamegeek.com/sitemap_geekitems_boardgame_page_".$args['pagenum']);
-// });
+$app->get('/import_bgg_process_next', function($req, $resp, $args) use ($app)
+{
+  //return;
+  Games::bgg_clone__process_next($this);
+});
+
+$app->get('/import_bgg_sitemap/[{pagenum}]', function($req, $resp, $args) use ($app)
+{
+  //return;
+  Games::bgg_clone__convert_sitemap_page($this, "https://boardgamegeek.com/sitemap_geekitems_boardgame_page_".$args['pagenum']);
+});
 
 $app->get('/games/[{bgg_id}]', function($req, $resp, $args) use ($app)
 {

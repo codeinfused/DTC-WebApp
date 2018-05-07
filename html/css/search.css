@@ -1,6 +1,6 @@
 .game-search{
   position: fixed;
-  top: 0;
+  /* top: 46px; */
   left: 0;
   right: 0;
   padding: 10px;
@@ -90,8 +90,8 @@
 }
 
 .game-search-list{
-  position: fixed;
-  top: 92px; left: 0; right: 0; bottom: 44px;
+  position: absolute;
+  top: 100px; left: 0; right: 0; bottom: 0px;
   padding: 0px 0;
   overflow: auto;
 }

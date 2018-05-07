@@ -380,7 +380,18 @@ class SearchGames extends React.Component
     var comp = this;
     var maxPage = Math.floor((+comp.state.currentResultCount-1) / comp.state.perGamePage);
 
-    function replacer(match, p1){ return "_md" + p1; }
+    function basic_image_replacer(image){
+      return image.replace(/(\.[a-zA-Z]+)$/, function(match, p1){
+        return "_md" + p1;
+      });
+    }
+
+    function filtered_image_replacer(image){
+      return image.replace(/original[\w\_\-\=\/]+(pic\d{3,})(\.[a-zA-Z]{2,4})$/, function(match, p1, p2){
+        return "images/"+p1+"_md"+p2;
+      });
+    }
+
 
     return (
       <div className="game-search-list">
@@ -388,7 +399,16 @@ class SearchGames extends React.Component
         {
           var notifyActive = CONFIG.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
           var wtpActive = CONFIG.state.user.wtp.indexOf(game.bgg_id) > -1 ? " active" : "";
-          var image = game.image ? game.image.replace(/(\.[a-zA-Z]+)$/, replacer) : false;
+          var image = false;
+
+          if(!!game.image)
+          {
+            if(game.image.indexOf('original')>-1){
+              image = filtered_image_replacer(game.image);
+            }else{
+              image = basic_image_replacer(game.image);
+            }
+          }
 
           return (
             <div key={"game-item-"+game.bgg_id+"-"+i} className={"game-item" + (comp.state.activeGameId==game.bgg_id ? " full-view" : "")} >
@@ -419,7 +439,7 @@ class SearchGames extends React.Component
                   </div>
                   <div className="game-item-action">
                     <div className="game-item-action-line">
-                      <div className="game-item-action-title">Want to play</div>
+                      <div className="game-item-action-title">Wanting to play</div>
                       <div className={"game-item-action-btn action-notify-btn" + notifyActive}><IconButton icon='notifications' onClick={comp.handleToggleNotify.bind(comp, game.bgg_id)} /></div> {/* Detect support for notifications before displaying */}
                       <div className={"game-item-action-btn action-wtp-btn" + wtpActive}><IconButton icon='check' onClick={comp.handleToggleWTP.bind(comp, game.bgg_id)} /></div>
                       <div className="game-item-action-count">{+game.wtp}</div>
