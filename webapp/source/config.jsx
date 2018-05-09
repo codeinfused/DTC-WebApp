@@ -13,6 +13,15 @@ const CONFIG = {
     game: baseAPI+"games/"
   },
 
+  conDays: [
+    {full:'2018-07-03', date:'3', name:'Tue'},
+    {full:'2018-07-04', date:'4', name:'Wed'},
+    {full:'2018-07-05', date:'5', name:'Thu'},
+    {full:'2018-07-06', date:'6', name:'Fri'},
+    {full:'2018-07-07', date:'7', name:'Sat'},
+    {full:'2018-07-08', date:'8', name:'Sun'}
+  ],
+
   api: {
     url: baseAPI,
     authenticate: baseAPI+"authenticate",

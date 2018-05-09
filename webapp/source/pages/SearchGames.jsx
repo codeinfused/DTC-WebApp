@@ -183,7 +183,7 @@ class SearchGames extends React.Component
     }, {
       headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
     }).catch(function(json){
-      ToastsAPI.toast('error', null, 'Failed to set.', {timeOut:6000});
+      ToastsAPI.toast('error', null, 'Error adding game.', {timeOut:6000});
     });
     this.forceUpdate();
   }
@@ -204,7 +204,7 @@ class SearchGames extends React.Component
     }, {
       headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
     }).catch(function(json){
-      ToastsAPI.toast('error', null, 'Failed to set.', {timeOut:6000});
+      ToastsAPI.toast('error', null, 'Error deleting game.', {timeOut:6000});
     });
     this.forceUpdate();
   }
@@ -228,7 +228,7 @@ class SearchGames extends React.Component
     }).then(function(){
       ToastsAPI.toast('success', null, 'You will be notified of tables for this game.', {timeOut:6000});
     }).catch(function(json){
-      ToastsAPI.toast('error', null, 'Failed to set.', {timeOut:6000});
+      ToastsAPI.toast('error', null, 'Error adding notification.', {timeOut:6000});
     });
     this.forceUpdate();
   }
@@ -245,7 +245,7 @@ class SearchGames extends React.Component
     }, {
       headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
     }).catch(function(json){
-      ToastsAPI.toast('error', null, 'Failed to set.', {timeOut:6000});
+      ToastsAPI.toast('error', null, 'Error deleting notification.', {timeOut:6000});
     });
     this.forceUpdate();
   }

@@ -187,7 +187,7 @@ class MySettings extends React.Component
     }, {
       headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
     }).catch(function(json){
-      ToastsAPI.toast('error', null, 'Failed to set.', {timeOut:6000});
+      ToastsAPI.toast('error', null, 'Error adding your game.', {timeOut:6000});
     });
     this.forceUpdate();
   }
@@ -206,7 +206,7 @@ class MySettings extends React.Component
     }, {
       headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
     }).catch(function(json){
-      ToastsAPI.toast('error', null, 'Failed to set.', {timeOut:6000});
+      ToastsAPI.toast('error', null, 'Failed to delete game.', {timeOut:6000});
     });
     this.forceUpdate();
   }
@@ -229,7 +229,7 @@ class MySettings extends React.Component
     }).then(function(){
       ToastsAPI.toast('success', null, 'You will be notified of tables for this game.', {timeOut:6000});
     }).catch(function(json){
-      ToastsAPI.toast('error', null, 'Failed to set.', {timeOut:6000});
+      ToastsAPI.toast('error', null, 'Failed to add notification.', {timeOut:6000});
     });
     this.forceUpdate();
   }
@@ -246,7 +246,7 @@ class MySettings extends React.Component
     }, {
       headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
     }).catch(function(json){
-      ToastsAPI.toast('error', null, 'Failed to set.', {timeOut:6000});
+      ToastsAPI.toast('error', null, 'Failed to delete notification.', {timeOut:6000});
     });
     this.forceUpdate();
   }

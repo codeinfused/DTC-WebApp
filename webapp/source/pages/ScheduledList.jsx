@@ -17,23 +17,17 @@ class ScheduledList extends React.Component
   {
     super(props);
     var comp = this;
+    var mo = moment();
+    var day = mo.format('YYYY-MM-DD');
 
     this.state = {
       loaded: false,
-      currentDay: moment().date(),
       currentDayObj: {},
-      currentDayFull: '',
+      currentDayFull: day,
       tables: []
     };
 
-    this.conDays = [
-      {full:'2018-07-03', date:'3', name:'Tue'},
-      {full:'2018-07-04', date:'4', name:'Wed'},
-      {full:'2018-07-05', date:'5', name:'Thu'},
-      {full:'2018-07-06', date:'6', name:'Fri'},
-      {full:'2018-07-07', date:'7', name:'Sat'},
-      {full:'2018-07-08', date:'8', name:'Sun'}
-    ];
+    this.conDays = CONFIG.conDays;
 
     this.renderTableList = this.renderTableList.bind(this);
     this.renderNoTables = this.renderNoTables.bind(this);
@@ -43,10 +37,12 @@ class ScheduledList extends React.Component
   componentDidMount()
   {
     var comp = this;
-    var mo = moment();
-    var day = mo.date();
-    var selectedObj = comp.conDays.filter(function(item){ return item.date==day; });
-    this.setState({currentDayFull: selectedObj[0].full});
+    var selectedObj = comp.conDays.filter(function(item){ return item.full==comp.state.currentDayFull; });
+    if(!selectedObj.length){ selectedObj = comp.conDays; }
+
+    this.setState({
+      currentDayFull: selectedObj[0].full
+    });
     this.getTableList(selectedObj[0].full);
   }
 
@@ -70,17 +66,18 @@ class ScheduledList extends React.Component
         tables: json.data.tables
       });
     }).catch(function(json){
-      ToastsAPI.toast('error', null, 'Failed to set.', {timeOut:6000});
+      console.log(json);
+      ToastsAPI.toast('error', null, 'Error getting tables list.', {timeOut:6000});
     });
   }
 
   handleSelectDay(day)
   {
     var comp = this;
-    var selectedObj = comp.conDays.filter(function(item){ return item.date==day; });
+    var selectedObj = comp.conDays.filter(function(item){ return item.full==day; });
     var date = selectedObj[0].full;
 
-    comp.setState({currentDay: day}, function(){
+    comp.setState({currentDayFull: day}, function(){
       comp.getTableList(date);
     });
   }
@@ -133,9 +130,9 @@ class ScheduledList extends React.Component
   {
     var comp = this;
     return comp.conDays.map(function(day, i){
-      var isSel = day.date == comp.state.currentDay ? ' active' : '';
+      var isSel = day.full == comp.state.currentDayFull ? ' active' : '';
       return (
-        <div className={"calendar-day" + isSel} key={"calendar-day-"+day.date} onClick={comp.handleSelectDay.bind(comp, day.date)}>
+        <div className={"calendar-day" + isSel} key={"calendar-day-"+day.date} onClick={comp.handleSelectDay.bind(comp, day.full)}>
           <div className="calendar-day-inner">
             <span className="calendar-day-date">{day.date}</span>
             <span className="calendar-day-name">{day.name}</span>
@@ -149,7 +146,7 @@ class ScheduledList extends React.Component
   renderTableList()
   {
     var comp = this;
-    var selectedObj = comp.conDays.filter(function(item){ return item.date==comp.state.currentDay; });
+    var selectedObj = comp.conDays.filter(function(item){ return item.full==comp.state.currentDayFull; });
 
     var thisDayList = comp.state.tables.filter(function(table, i){
       var isSelected = moment(selectedObj[0].full, 'YYYY-MM-DD').isSame(moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss'), 'day');

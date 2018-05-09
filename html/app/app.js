@@ -57086,6 +57086,8 @@
 	    game: baseAPI + "games/"
 	  },
 	
+	  conDays: [{ full: '2018-07-03', date: '3', name: 'Tue' }, { full: '2018-07-04', date: '4', name: 'Wed' }, { full: '2018-07-05', date: '5', name: 'Thu' }, { full: '2018-07-06', date: '6', name: 'Fri' }, { full: '2018-07-07', date: '7', name: 'Sat' }, { full: '2018-07-08', date: '8', name: 'Sun' }],
+	
 	  api: {
 	    url: baseAPI,
 	    authenticate: baseAPI + "authenticate",
@@ -81190,7 +81192,7 @@
 	      }, {
 	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
 	      }).catch(function (json) {
-	        _ToastsAPI2.default.toast('error', null, 'Failed to set.', { timeOut: 6000 });
+	        _ToastsAPI2.default.toast('error', null, 'Error adding game.', { timeOut: 6000 });
 	      });
 	      this.forceUpdate();
 	    }
@@ -81211,7 +81213,7 @@
 	      }, {
 	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
 	      }).catch(function (json) {
-	        _ToastsAPI2.default.toast('error', null, 'Failed to set.', { timeOut: 6000 });
+	        _ToastsAPI2.default.toast('error', null, 'Error deleting game.', { timeOut: 6000 });
 	      });
 	      this.forceUpdate();
 	    }
@@ -81235,7 +81237,7 @@
 	      }).then(function () {
 	        _ToastsAPI2.default.toast('success', null, 'You will be notified of tables for this game.', { timeOut: 6000 });
 	      }).catch(function (json) {
-	        _ToastsAPI2.default.toast('error', null, 'Failed to set.', { timeOut: 6000 });
+	        _ToastsAPI2.default.toast('error', null, 'Error adding notification.', { timeOut: 6000 });
 	      });
 	      this.forceUpdate();
 	    }
@@ -81252,7 +81254,7 @@
 	      }, {
 	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
 	      }).catch(function (json) {
-	        _ToastsAPI2.default.toast('error', null, 'Failed to set.', { timeOut: 6000 });
+	        _ToastsAPI2.default.toast('error', null, 'Error deleting notification.', { timeOut: 6000 });
 	      });
 	      this.forceUpdate();
 	    }
@@ -99030,7 +99032,7 @@
 	          tables: json.data.tables
 	        });
 	      }).catch(function (json) {
-	        _ToastsAPI2.default.toast('error', null, 'Failed to set.', { timeOut: 6000 });
+	        _ToastsAPI2.default.toast('error', null, 'Error getting tables list.', { timeOut: 6000 });
 	      });
 	    }
 	  }, {
@@ -99291,14 +99293,16 @@
 	    var _this = _possibleConstructorReturn(this, (MyPlans.__proto__ || Object.getPrototypeOf(MyPlans)).call(this, props));
 	
 	    var comp = _this;
+	    var mo = (0, _moment2.default)();
+	    var day = mo.format('YYYY-MM-DD');
 	
 	    _this.state = {
 	      loaded: false,
-	      currentDay: (0, _moment2.default)().date(),
+	      currentDay: day,
 	      tables: []
 	    };
 	
-	    _this.conDays = [{ full: '2018-07-03', date: '3', name: 'Tue' }, { full: '2018-07-04', date: '4', name: 'Wed' }, { full: '2018-07-05', date: '5', name: 'Thu' }, { full: '2018-07-06', date: '6', name: 'Fri' }, { full: '2018-07-07', date: '7', name: 'Sat' }, { full: '2018-07-08', date: '8', name: 'Sun' }];
+	    _this.conDays = _config2.default.conDays;
 	
 	    _this.renderTableList = _this.renderTableList.bind(_this);
 	    _this.renderNoTables = _this.renderNoTables.bind(_this);
@@ -99309,6 +99313,17 @@
 	  _createClass(MyPlans, [{
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
+	      var comp = this;
+	      var selectedObj = comp.conDays.filter(function (item) {
+	        return item.full == comp.state.currentDay;
+	      });
+	      if (!selectedObj.length) {
+	        selectedObj = comp.conDays;
+	      }
+	
+	      this.setState({
+	        currentDay: selectedObj[0].full
+	      });
 	      this.getTableList();
 	    }
 	  }, {
@@ -99328,7 +99343,7 @@
 	          tables: json.data.tables
 	        });
 	      }).catch(function (json) {
-	        _ToastsAPI2.default.toast('error', null, 'Failed to set.', { timeOut: 6000 });
+	        _ToastsAPI2.default.toast('error', null, 'Error getting table list.', { timeOut: 6000 });
 	      });
 	    }
 	  }, {
@@ -99349,7 +99364,7 @@
 	        _ToastsAPI2.default.toast('success', 'Table updated.', null, { timeout: 6000 });
 	        comp.getTableList();
 	      }).catch(function (json) {
-	        _ToastsAPI2.default.toast('error', null, json.response.data.message, { timeOut: 6000 });
+	        _ToastsAPI2.default.toast('error', null, 'Error refreshing table.', { timeOut: 6000 });
 	      });
 	    }
 	  }, {
@@ -99368,7 +99383,7 @@
 	        _ToastsAPI2.default.toast('success', 'Left game table', null, { timeout: 6000 });
 	        comp.getTableList();
 	      }).catch(function (json) {
-	        _ToastsAPI2.default.toast('error', null, json.response.data.message, { timeOut: 6000 });
+	        _ToastsAPI2.default.toast('error', null, 'Error leaving game.', { timeOut: 6000 });
 	      });
 	    }
 	  }, {
@@ -99376,10 +99391,10 @@
 	    value: function renderCalendar() {
 	      var comp = this;
 	      return comp.conDays.map(function (day, i) {
-	        var isSel = day.date == comp.state.currentDay ? ' active' : '';
+	        var isSel = day.full == comp.state.currentDay ? ' active' : '';
 	        return _react2.default.createElement(
 	          'div',
-	          { className: "calendar-day" + isSel, key: "calendar-day-" + day.date, onClick: comp.handleSelectDay.bind(comp, day.date) },
+	          { className: "calendar-day" + isSel, key: "calendar-day-" + day.date, onClick: comp.handleSelectDay.bind(comp, day.full) },
 	          _react2.default.createElement(
 	            'div',
 	            { className: 'calendar-day-inner' },
@@ -99402,7 +99417,7 @@
 	    value: function renderTableList() {
 	      var comp = this;
 	      var selectedObj = comp.conDays.filter(function (item) {
-	        return item.date == comp.state.currentDay;
+	        return item.full == comp.state.currentDay;
 	      });
 	
 	      var thisDayList = comp.state.tables.filter(function (table, i) {
@@ -99760,7 +99775,7 @@
 	      }, {
 	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
 	      }).catch(function (json) {
-	        _ToastsAPI2.default.toast('error', null, 'Failed to set.', { timeOut: 6000 });
+	        _ToastsAPI2.default.toast('error', null, 'Error adding your game.', { timeOut: 6000 });
 	      });
 	      this.forceUpdate();
 	    }
@@ -99779,7 +99794,7 @@
 	      }, {
 	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
 	      }).catch(function (json) {
-	        _ToastsAPI2.default.toast('error', null, 'Failed to set.', { timeOut: 6000 });
+	        _ToastsAPI2.default.toast('error', null, 'Failed to delete game.', { timeOut: 6000 });
 	      });
 	      this.forceUpdate();
 	    }
@@ -99802,7 +99817,7 @@
 	      }).then(function () {
 	        _ToastsAPI2.default.toast('success', null, 'You will be notified of tables for this game.', { timeOut: 6000 });
 	      }).catch(function (json) {
-	        _ToastsAPI2.default.toast('error', null, 'Failed to set.', { timeOut: 6000 });
+	        _ToastsAPI2.default.toast('error', null, 'Failed to add notification.', { timeOut: 6000 });
 	      });
 	      this.forceUpdate();
 	    }
@@ -99819,7 +99834,7 @@
 	      }, {
 	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
 	      }).catch(function (json) {
-	        _ToastsAPI2.default.toast('error', null, 'Failed to set.', { timeOut: 6000 });
+	        _ToastsAPI2.default.toast('error', null, 'Failed to delete notification.', { timeOut: 6000 });
 	      });
 	      this.forceUpdate();
 	    }
@@ -100080,7 +100095,7 @@
 	          tables: json.data.tables
 	        });
 	      }).catch(function (json) {
-	        _ToastsAPI2.default.toast('error', null, 'Failed to set.', { timeOut: 6000 });
+	        _ToastsAPI2.default.toast('error', null, 'Error getting table list.', { timeOut: 6000 });
 	      });
 	    }
 	  }, {
@@ -100353,7 +100368,7 @@
 	          tables: json.data.tables
 	        });
 	      }).catch(function (json) {
-	        _ToastsAPI2.default.toast('error', null, 'Failed to set.', { timeOut: 6000 });
+	        _ToastsAPI2.default.toast('error', null, 'Error getting table list.', { timeOut: 6000 });
 	      });
 	    }
 	  }, {
@@ -100522,16 +100537,17 @@
 	    var _this = _possibleConstructorReturn(this, (ScheduledList.__proto__ || Object.getPrototypeOf(ScheduledList)).call(this, props));
 	
 	    var comp = _this;
+	    var mo = (0, _moment2.default)();
+	    var day = mo.format('YYYY-MM-DD');
 	
 	    _this.state = {
 	      loaded: false,
-	      currentDay: (0, _moment2.default)().date(),
 	      currentDayObj: {},
-	      currentDayFull: '',
+	      currentDayFull: day,
 	      tables: []
 	    };
 	
-	    _this.conDays = [{ full: '2018-07-03', date: '3', name: 'Tue' }, { full: '2018-07-04', date: '4', name: 'Wed' }, { full: '2018-07-05', date: '5', name: 'Thu' }, { full: '2018-07-06', date: '6', name: 'Fri' }, { full: '2018-07-07', date: '7', name: 'Sat' }, { full: '2018-07-08', date: '8', name: 'Sun' }];
+	    _this.conDays = _config2.default.conDays;
 	
 	    _this.renderTableList = _this.renderTableList.bind(_this);
 	    _this.renderNoTables = _this.renderNoTables.bind(_this);
@@ -100543,12 +100559,16 @@
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
 	      var comp = this;
-	      var mo = (0, _moment2.default)();
-	      var day = mo.date();
 	      var selectedObj = comp.conDays.filter(function (item) {
-	        return item.date == day;
+	        return item.full == comp.state.currentDayFull;
 	      });
-	      this.setState({ currentDayFull: selectedObj[0].full });
+	      if (!selectedObj.length) {
+	        selectedObj = comp.conDays;
+	      }
+	
+	      this.setState({
+	        currentDayFull: selectedObj[0].full
+	      });
 	      this.getTableList(selectedObj[0].full);
 	    }
 	  }, {
@@ -100570,7 +100590,8 @@
 	          tables: json.data.tables
 	        });
 	      }).catch(function (json) {
-	        _ToastsAPI2.default.toast('error', null, 'Failed to set.', { timeOut: 6000 });
+	        console.log(json);
+	        _ToastsAPI2.default.toast('error', null, 'Error getting tables list.', { timeOut: 6000 });
 	      });
 	    }
 	  }, {
@@ -100578,11 +100599,11 @@
 	    value: function handleSelectDay(day) {
 	      var comp = this;
 	      var selectedObj = comp.conDays.filter(function (item) {
-	        return item.date == day;
+	        return item.full == day;
 	      });
 	      var date = selectedObj[0].full;
 	
-	      comp.setState({ currentDay: day }, function () {
+	      comp.setState({ currentDayFull: day }, function () {
 	        comp.getTableList(date);
 	      });
 	    }
@@ -100631,10 +100652,10 @@
 	    value: function renderCalendar() {
 	      var comp = this;
 	      return comp.conDays.map(function (day, i) {
-	        var isSel = day.date == comp.state.currentDay ? ' active' : '';
+	        var isSel = day.full == comp.state.currentDayFull ? ' active' : '';
 	        return _react2.default.createElement(
 	          'div',
-	          { className: "calendar-day" + isSel, key: "calendar-day-" + day.date, onClick: comp.handleSelectDay.bind(comp, day.date) },
+	          { className: "calendar-day" + isSel, key: "calendar-day-" + day.date, onClick: comp.handleSelectDay.bind(comp, day.full) },
 	          _react2.default.createElement(
 	            'div',
 	            { className: 'calendar-day-inner' },
@@ -100657,7 +100678,7 @@
 	    value: function renderTableList() {
 	      var comp = this;
 	      var selectedObj = comp.conDays.filter(function (item) {
-	        return item.date == comp.state.currentDay;
+	        return item.full == comp.state.currentDayFull;
 	      });
 	
 	      var thisDayList = comp.state.tables.filter(function (table, i) {

@@ -17,21 +17,16 @@ class MyPlans extends React.Component
   {
     super(props);
     var comp = this;
+    var mo = moment();
+    var day = mo.format('YYYY-MM-DD');
 
     this.state = {
       loaded: false,
-      currentDay: moment().date(),
+      currentDay: day,
       tables: []
     };
 
-    this.conDays = [
-      {full:'2018-07-03', date:'3', name:'Tue'},
-      {full:'2018-07-04', date:'4', name:'Wed'},
-      {full:'2018-07-05', date:'5', name:'Thu'},
-      {full:'2018-07-06', date:'6', name:'Fri'},
-      {full:'2018-07-07', date:'7', name:'Sat'},
-      {full:'2018-07-08', date:'8', name:'Sun'}
-    ];
+    this.conDays = CONFIG.conDays;
 
     this.renderTableList = this.renderTableList.bind(this);
     this.renderNoTables = this.renderNoTables.bind(this);
@@ -40,6 +35,13 @@ class MyPlans extends React.Component
 
   componentDidMount()
   {
+    var comp = this;
+    var selectedObj = comp.conDays.filter(function(item){ return item.full==comp.state.currentDay; });
+    if(!selectedObj.length){ selectedObj = comp.conDays; }
+
+    this.setState({
+      currentDay: selectedObj[0].full
+    });
     this.getTableList();
   }
 
@@ -61,7 +63,7 @@ class MyPlans extends React.Component
         tables: json.data.tables
       });
     }).catch(function(json){
-      ToastsAPI.toast('error', null, 'Failed to set.', {timeOut:6000});
+      ToastsAPI.toast('error', null, 'Error getting table list.', {timeOut:6000});
     });
   }
 
@@ -82,7 +84,7 @@ class MyPlans extends React.Component
       ToastsAPI.toast('success', 'Table updated.', null, {timeout:6000});
       comp.getTableList();
     }).catch(function(json){
-      ToastsAPI.toast('error', null, json.response.data.message, {timeOut:6000});
+      ToastsAPI.toast('error', null, 'Error refreshing table.', {timeOut:6000});
     });
   }
 
@@ -104,7 +106,7 @@ class MyPlans extends React.Component
       ToastsAPI.toast('success', 'Left game table', null, {timeout:6000});
       comp.getTableList();
     }).catch(function(json){
-      ToastsAPI.toast('error', null, json.response.data.message, {timeOut:6000});
+      ToastsAPI.toast('error', null, 'Error leaving game.', {timeOut:6000});
     });
   }
 
@@ -113,9 +115,9 @@ class MyPlans extends React.Component
   {
     var comp = this;
     return comp.conDays.map(function(day, i){
-      var isSel = day.date == comp.state.currentDay ? ' active' : '';
+      var isSel = day.full == comp.state.currentDay ? ' active' : '';
       return (
-        <div className={"calendar-day" + isSel} key={"calendar-day-"+day.date} onClick={comp.handleSelectDay.bind(comp, day.date)}>
+        <div className={"calendar-day" + isSel} key={"calendar-day-"+day.date} onClick={comp.handleSelectDay.bind(comp, day.full)}>
           <div className="calendar-day-inner">
             <span className="calendar-day-date">{day.date}</span>
             <span className="calendar-day-name">{day.name}</span>
@@ -129,7 +131,7 @@ class MyPlans extends React.Component
   renderTableList()
   {
     var comp = this;
-    var selectedObj = comp.conDays.filter(function(item){ return item.date==comp.state.currentDay; });
+    var selectedObj = comp.conDays.filter(function(item){ return item.full==comp.state.currentDay; });
 
     var thisDayList = comp.state.tables.filter(function(table, i){
       var isSelected = moment(selectedObj[0].full, 'YYYY-MM-DD').isSame(moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss'), 'day');

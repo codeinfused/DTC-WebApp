@@ -43,8 +43,9 @@
   font-weight: 100;
   font-size: 2.8rem;
   margin-bottom: 3px;
-  color: #e8e8e8;
+  color: #d8d8d8;
 }
+.calendar-day.active .calendar-day-date{ color: #f0f0f0; }
 .calendar-day-name{
   display: block;
   font-weight: 900;

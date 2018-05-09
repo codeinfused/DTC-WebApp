@@ -51,7 +51,7 @@ class MyTables extends React.Component
         tables: json.data.tables
       });
     }).catch(function(json){
-      ToastsAPI.toast('error', null, 'Failed to set.', {timeOut:6000});
+      ToastsAPI.toast('error', null, 'Error getting table list.', {timeOut:6000});
     });
   }
 
