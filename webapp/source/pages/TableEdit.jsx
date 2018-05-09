@@ -71,7 +71,11 @@ class TableEdit extends React.Component
   componentDidMount()
   {
     var comp = this;
-    if(!CONFIG.state.auth){ browserHistory.push('/home'); return; }
+    if(!CONFIG.state.auth || CONFIG.state.user.grant_type==='guest'){
+      ToastsAPI.toast('error', "Sorry, guests can't create tables.", null, {timeOut:8000});
+      browserHistory.goBack();
+      return;
+    }
     if(this.props.params.bgg_id){
       this.getGameData(this.props.params.bgg_id);
     }else if(this.props.params.table_id){

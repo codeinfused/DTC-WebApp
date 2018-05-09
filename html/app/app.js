@@ -364,7 +364,7 @@
 	
 	      return _react2.default.createElement(
 	        'div',
-	        { id: 'app' },
+	        { id: 'app', className: comp.state.sideMenuOpen ? "menu-open" : "menu-closed" },
 	        _react2.default.createElement(
 	          _reactResponsive2.default,
 	          { minDeviceWidth: 500 },
@@ -57147,8 +57147,8 @@
 	
 	      comp.state.index.getNewAlerts();
 	    }).catch(function (json) {
-	      console.log(json);
-	      _ToastsAPI2.default.toast('error', null, json.response.data.message, { timeOut: 6000 });
+	      var err = json.response ? json.response.data.message : "Could not restore session.";
+	      _ToastsAPI2.default.toast('error', null, err, { timeOut: 6000 });
 	      comp.state.authenticated = false;
 	      context.setState({ appLoaded: true });
 	      _reactRouter.browserHistory.push('/');
@@ -80619,7 +80619,7 @@
 	    key: 'googleDenied',
 	    value: function googleDenied(response) {
 	      if (response.error != 'popup_closed_by_user') {
-	        _ToastsAPI2.default.toast('error', null, 'Error signing in. Please try again.', { timeOut: 8000 });
+	        _ToastsAPI2.default.toast('error', null, 'Google connection error. Please try again.', { timeOut: 8000 });
 	      }
 	    }
 	  }, {
@@ -81366,6 +81366,10 @@
 	    value: function handleCreateGame(game) {
 	      _config2.default.state.currentCreateGame = game;
 	      //CONFIG.transitionOut(this, function(){
+	      if (!_config2.default.state.auth || _config2.default.state.user.grant_type === 'guest') {
+	        _ToastsAPI2.default.toast('error', "Sorry, guests can't create tables.", null, { timeOut: 8000 });
+	        return;
+	      }
 	      _reactRouter.browserHistory.push('/tables/create/' + game.bgg_id);
 	      //});
 	    }
@@ -81491,7 +81495,23 @@
 	              _react2.default.createElement(
 	                'div',
 	                { className: 'game-item-actions' },
-	                _react2.default.createElement(
+	                !_config2.default.state.auth || _config2.default.state.user.grant_type === 'guest' ? _react2.default.createElement(
+	                  'div',
+	                  { className: 'game-item-action' },
+	                  _react2.default.createElement(
+	                    'div',
+	                    { className: 'game-item-action-line' },
+	                    _react2.default.createElement(
+	                      'span',
+	                      null,
+	                      _react2.default.createElement(
+	                        'em',
+	                        null,
+	                        'Sorry, guests cannot create tables.'
+	                      )
+	                    )
+	                  )
+	                ) : _react2.default.createElement(
 	                  'div',
 	                  { className: 'game-item-action' },
 	                  _react2.default.createElement(
@@ -82517,8 +82537,10 @@
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
 	      var comp = this;
-	      if (!_config2.default.state.auth) {
-	        _reactRouter.browserHistory.push('/home');return;
+	      if (!_config2.default.state.auth || _config2.default.state.user.grant_type === 'guest') {
+	        _ToastsAPI2.default.toast('error', "Sorry, guests can't create tables.", null, { timeOut: 8000 });
+	        _reactRouter.browserHistory.goBack();
+	        return;
 	      }
 	      if (this.props.params.bgg_id) {
 	        this.getGameData(this.props.params.bgg_id);
@@ -99126,7 +99148,7 @@
 	                _react2.default.createElement(
 	                  'button',
 	                  { className: 'delete', onClick: comp.handleConfirmCancel.bind(comp, table) },
-	                  _react2.default.createElement(_reactToolbox.FontIcon, { value: 'close' })
+	                  _react2.default.createElement(_reactToolbox.FontIcon, { value: 'delete_forever' })
 	                ),
 	                _react2.default.createElement(
 	                  'button',
@@ -99155,7 +99177,7 @@
 	    value: function renderNoTables() {
 	      return _react2.default.createElement(
 	        'div',
-	        { className: 'game-search-list-empty' },
+	        { className: 'table-search-list-empty' },
 	        _react2.default.createElement(
 	          'h3',
 	          null,
@@ -99465,11 +99487,11 @@
 	    value: function renderNoTables() {
 	      return _react2.default.createElement(
 	        'div',
-	        { className: 'game-search-list-empty' },
+	        { className: 'table-search-list-empty' },
 	        _react2.default.createElement(
 	          'h3',
 	          null,
-	          'No current plans.'
+	          'No plans this day.'
 	        ),
 	        _react2.default.createElement(
 	          'p',
@@ -99601,7 +99623,7 @@
 	    key: 'setAuthData',
 	    value: function setAuthData(json) {
 	      if (json && json.user) {
-	        _config2.default.state.user = json.user;
+	        _config2.default.state.user = Object.assign(_config2.default.state.user, json.user);
 	        this.setState({ loaded: true });
 	        this.forceUpdate();
 	      }
@@ -99644,12 +99666,17 @@
 	        if (json.data && json.data.user) {
 	          comp.setAuthData(json.data);
 	        } else {
-	          _ToastsAPI2.default.toast('error', null, 'Could not connect to app, please refresh.', { timeOut: 8000 });
+	          _ToastsAPI2.default.toast('error', null, "Couldn't connect to app, please refresh.", { timeOut: 8000 });
 	          comp.setState({ loaded: true });
 	        }
 	      }).catch(function (json) {
-	        _ToastsAPI2.default.toast('error', null, json.response.data.message, { timeOut: 8000 });
-	        comp.setState({ loaded: true });
+	        if (json.response) {
+	          _ToastsAPI2.default.toast('error', null, json.response.data.message, { timeOut: 8000 });
+	          comp.setState({ loaded: true });
+	        } else {
+	          _ToastsAPI2.default.toast('error', null, "Couldn't connect to facebook.", { timeOut: 8000 });
+	          comp.setState({ loaded: true });
+	        }
 	      });
 	    }
 	  }, {
@@ -99690,7 +99717,7 @@
 	    key: 'googleDenied',
 	    value: function googleDenied(response) {
 	      if (response.error != 'popup_closed_by_user') {
-	        _ToastsAPI2.default.toast('error', null, 'Error signing in. Please try again.', { timeOut: 8000 });
+	        _ToastsAPI2.default.toast('error', null, 'Error logging in to Google. Please try again.', { timeOut: 8000 });
 	      }
 	    }
 	  }, {
@@ -99813,6 +99840,20 @@
 	          ),
 	          _react2.default.createElement(
 	            'div',
+	            { className: 'my-profile-name' },
+	            _react2.default.createElement(
+	              'span',
+	              null,
+	              _config2.default.state.user && _config2.default.state.user.firstname ? _config2.default.state.user.firstname + " " + _config2.default.state.user.lastname.slice(0, 1) : "Guest"
+	            )
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'my-profile' },
+	            _react2.default.createElement('img', { src: _config2.default.state.user.thumb ? _config2.default.state.user.thumb : '/images/profile-generic.jpg' })
+	          ),
+	          _react2.default.createElement(
+	            'div',
 	            { className: 'my-settings-item' },
 	            _react2.default.createElement(_reactToolbox.Switch, { label: 'Allow Phone Notifications', checked: comp.state.allow_notifications, onChange: comp.handleChangeNotifications.bind(comp) })
 	          ),
@@ -99889,11 +99930,16 @@
 	            _react2.default.createElement(
 	              'div',
 	              { className: 'my-wtp-list' },
+	              function () {
+	                console.log('run', _config2.default.state.user);
+	              }(),
 	              comp.state.wtp.map(function (game) {
 	                //var notifyActive = CONFIG.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
 	                //var wtpActive = CONFIG.state.user.wtp.indexOf(game.bgg_id) > -1 ? " active" : "";
-	                var notifyActive = _config2.default.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
-	                var wtpActive = _config2.default.state.user.wtp.indexOf(game.bgg_id) > -1 ? " active" : "";
+	
+	                // change these to handle empty error state
+	                var notifyActive = _config2.default.state.user.notify && _config2.default.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
+	                var wtpActive = _config2.default.state.user.wtp && _config2.default.state.user.wtp.indexOf(game.bgg_id) > -1 ? " active" : "";
 	                return _react2.default.createElement(
 	                  'div',
 	                  { className: 'game-item-action', key: 'alert-settings-' + game.bgg_id },
@@ -100563,6 +100609,11 @@
 	    key: 'handleJoinGame',
 	    value: function handleJoinGame(table) {
 	      var comp = this;
+	      if (!_config2.default.state.auth || _config2.default.state.user.grant_type === 'guest') {
+	        _ToastsAPI2.default.toast('error', "Sorry, guests can't reserve table spots.", null, { timeOut: 8000 });
+	        return;
+	      }
+	
 	      _axios2.default.post(_config2.default.api.joinTable, {
 	        table_id: table.table_id,
 	        t: new Date().getTime()
@@ -100714,7 +100765,7 @@
 	    value: function renderNoTables() {
 	      return _react2.default.createElement(
 	        'div',
-	        { className: 'game-search-list-empty' },
+	        { className: 'table-search-list-empty' },
 	        _react2.default.createElement(
 	          'h3',
 	          null,

@@ -353,7 +353,11 @@ class SearchGames extends React.Component
   {
     CONFIG.state.currentCreateGame = game;
     //CONFIG.transitionOut(this, function(){
-      browserHistory.push('/tables/create/'+game.bgg_id);
+    if(!CONFIG.state.auth || CONFIG.state.user.grant_type==='guest'){
+      ToastsAPI.toast('error', "Sorry, guests can't create tables.", null, {timeOut:8000});
+      return;
+    }
+    browserHistory.push('/tables/create/'+game.bgg_id);
     //});
   }
 
@@ -434,9 +438,15 @@ class SearchGames extends React.Component
               <div className="game-item-bottom-wrap">
                 <div className={"game-item-description"+(comp.state.activeGameOpenDesc ? " open" : "")} onClick={comp.handleToggleDescription}>{entities.html.decode(entities.xml.decode(game.desc))}<div className="desc-overlay"></div></div>
                 <div className="game-item-actions">
-                  <div className="game-item-action">
-                    <button className="game-item-btn-giant" onClick={comp.handleCreateGame.bind(comp, game)}>Start a new game table!</button>
-                  </div>
+                  {(!CONFIG.state.auth || CONFIG.state.user.grant_type==='guest') ? (
+                    <div className="game-item-action">
+                        <div className="game-item-action-line"><span><em>Sorry, guests cannot create tables.</em></span></div>
+                    </div>
+                  ) : (
+                    <div className="game-item-action">
+                      <button className="game-item-btn-giant" onClick={comp.handleCreateGame.bind(comp, game)}>Start a new game table!</button>
+                    </div>
+                  )}
                   <div className="game-item-action">
                     <div className="game-item-action-line">
                       <div className="game-item-action-title">Wanting to play</div>

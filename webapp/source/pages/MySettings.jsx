@@ -44,7 +44,7 @@ class MySettings extends React.Component
   setAuthData(json)
   {
     if(json && json.user){
-      CONFIG.state.user = json.user;
+      CONFIG.state.user = Object.assign(CONFIG.state.user, json.user);
       this.setState({loaded: true});
       this.forceUpdate();
     }
@@ -88,13 +88,18 @@ class MySettings extends React.Component
       if(json.data && json.data.user){
         comp.setAuthData(json.data);
       }else{
-        ToastsAPI.toast('error', null, 'Could not connect to app, please refresh.', {timeOut:8000});
+        ToastsAPI.toast('error', null, "Couldn't connect to app, please refresh.", {timeOut:8000});
         comp.setState({loaded: true});
       }
 
     }).catch(function(json){
-      ToastsAPI.toast('error', null, json.response.data.message, {timeOut:8000});
-      comp.setState({loaded: true});
+      if(json.response){
+        ToastsAPI.toast('error', null, json.response.data.message, {timeOut:8000});
+        comp.setState({loaded: true});
+      }else{
+        ToastsAPI.toast('error', null, "Couldn't connect to facebook.", {timeOut:8000});
+        comp.setState({loaded: true});
+      }
     });
   }
 
@@ -137,7 +142,7 @@ class MySettings extends React.Component
   googleDenied(response)
   {
     if(response.error != 'popup_closed_by_user'){
-      ToastsAPI.toast('error', null, 'Error signing in. Please try again.', {timeOut:8000});
+      ToastsAPI.toast('error', null, 'Error logging in to Google. Please try again.', {timeOut:8000});
     }
   }
 
@@ -256,6 +261,12 @@ class MySettings extends React.Component
         <div className="my-settings-wrap">
           <h2>My Settings</h2>
 
+          <div className="my-profile-name"><span>{CONFIG.state.user && CONFIG.state.user.firstname ? CONFIG.state.user.firstname + " " + CONFIG.state.user.lastname.slice(0,1) : "Guest"}</span></div>
+
+          <div className="my-profile">
+            <img src={CONFIG.state.user.thumb ? CONFIG.state.user.thumb : '/images/profile-generic.jpg'} />
+          </div>
+
           <div className="my-settings-item">
             <Switch label='Allow Phone Notifications' checked={comp.state.allow_notifications} onChange={comp.handleChangeNotifications.bind(comp)} />
           </div>
@@ -295,11 +306,14 @@ class MySettings extends React.Component
             <h3>My Game Settings</h3>
             <p><em>Your "want to play" and alert settings on games.</em></p>
             <div className="my-wtp-list">
+              {(function(){ console.log('run', CONFIG.state.user); })()}
               {comp.state.wtp.map(function(game){
                 //var notifyActive = CONFIG.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
                 //var wtpActive = CONFIG.state.user.wtp.indexOf(game.bgg_id) > -1 ? " active" : "";
-                var notifyActive = CONFIG.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
-                var wtpActive = CONFIG.state.user.wtp.indexOf(game.bgg_id) > -1 ? " active" : "";
+
+                // change these to handle empty error state
+                var notifyActive = CONFIG.state.user.notify && CONFIG.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
+                var wtpActive = CONFIG.state.user.wtp && CONFIG.state.user.wtp.indexOf(game.bgg_id) > -1 ? " active" : "";
                 return (
                   <div className="game-item-action" key={'alert-settings-'+game.bgg_id}>
                     <div className="game-item-action-line">

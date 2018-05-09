@@ -22,7 +22,7 @@ class MainLayout extends React.Component
 
   render(){
     return (
-      <div id="app-layout">
+      <div id="app-layout" className={this.state.drawerOpened===true?"drawer-open":"drawer-closed"}>
         {this.props.children}
       </div>
     );

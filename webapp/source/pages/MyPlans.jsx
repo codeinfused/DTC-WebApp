@@ -175,7 +175,7 @@ class MyPlans extends React.Component
   renderNoTables()
   {
     return (
-      <div className="game-search-list-empty"><h3>No current plans.</h3><p>Either you don't have plans for this day, or your other games have already happened.</p></div>
+      <div className="table-search-list-empty"><h3>No plans this day.</h3><p>Either you don't have plans for this day, or your other games have already happened.</p></div>
     );
   }
 

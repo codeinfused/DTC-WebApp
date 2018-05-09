@@ -77,8 +77,8 @@ const CONFIG = {
       comp.state.index.getNewAlerts();
 
     }).catch(function(json){
-      console.log(json);
-      ToastsAPI.toast('error', null, json.response.data.message, {timeOut:6000});
+      var err = json.response ? json.response.data.message : "Could not restore session.";
+      ToastsAPI.toast('error', null, err, {timeOut:6000});
       comp.state.authenticated = false;
       context.setState({appLoaded: true});
       browserHistory.push('/');

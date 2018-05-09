@@ -110,6 +110,11 @@ class ScheduledList extends React.Component
   handleJoinGame(table)
   {
     var comp = this;
+    if(!CONFIG.state.auth || CONFIG.state.user.grant_type==='guest'){
+      ToastsAPI.toast('error', "Sorry, guests can't reserve table spots.", null, {timeOut:8000});
+      return;
+    }
+
     axios.post(CONFIG.api.joinTable, {
       table_id: table.table_id,
       t: (new Date()).getTime()
@@ -195,7 +200,7 @@ class ScheduledList extends React.Component
   renderNoTables()
   {
     return (
-      <div className="game-search-list-empty"><h3>No games listed.</h3><p>There are no games left planned for this day.</p></div>
+      <div className="table-search-list-empty"><h3>No games listed.</h3><p>There are no games left planned for this day.</p></div>
     );
   }
 

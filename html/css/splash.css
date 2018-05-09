@@ -1,11 +1,11 @@
 #app-splash-inner{
   width:100%;
-  margin:10vh auto 0;
+  margin:5vh auto 0;
 }
 #app-splash-intro #app-logo{
   width: 65%;
   max-width: 400px;
-  margin:0 auto 22vh;
+  margin:0 auto 12vh;
   text-align: center;
 }
 #app-splash-intro #app-logo img{

@@ -152,7 +152,7 @@ class SplashIntro extends React.Component
   googleDenied(response)
   {
     if(response.error != 'popup_closed_by_user'){
-      ToastsAPI.toast('error', null, 'Error signing in. Please try again.', {timeOut:8000});
+      ToastsAPI.toast('error', null, 'Google connection error. Please try again.', {timeOut:8000});
     }
   }
 

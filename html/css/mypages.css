@@ -66,6 +66,10 @@
   padding-top: 86px;
 }
 
+#page-my-tables .table-list-wrap{
+  padding-top: 10px;
+}
+
 
 ul.plans-timeline{
   position: relative;
@@ -181,6 +185,23 @@ p.plans-time {
 .plans-btns button[disabled]{ background: #9b9b9b; color: #ededed; font-style:italic; }
 .plans-btns button.players{ background: #c47c3f; }
 
+.table-search-list-empty {
+  padding: 30px 26px;
+  margin-top: 10px;
+}
+.table-search-list-empty h3{
+  color: #fff;
+  font-size: 2.4rem;
+  font-weight: 100;
+  margin: 0 0 12px;
+}
+.table-search-list-empty p{
+  color: #f5f5f5;
+  font-weight: 300;
+  font-size: 1.2rem;
+}
+
+
 /* MY SETTINGS */
 
 .my-settings-wrap{
@@ -190,7 +211,12 @@ p.plans-time {
   color: #fff;
   font-size: 2.4rem;
   font-weight: 100;
-  margin: 0 0 20px;
+  margin: 0 0 4px;
+}
+
+.my-profile-name{
+  color: #999;
+  font-size: 1.5rem;
 }
 
 .my-settings-item{

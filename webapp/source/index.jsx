@@ -191,7 +191,7 @@ class AppLayout extends React.Component
     var kids = this.props.children;
 
     return (
-      <div id="app">
+      <div id="app" className={comp.state.sideMenuOpen?"menu-open":"menu-closed"}>
 
 
         <MediaQuery minDeviceWidth={500}>

@@ -138,7 +138,7 @@ class MyTables extends React.Component
                 </div>
                 {table.status === 'cancelled' ? '' : (
                   <div className="table-item-actions">
-                    <button className='delete' onClick={comp.handleConfirmCancel.bind(comp, table)}><FontIcon value='close' /></button>
+                    <button className='delete' onClick={comp.handleConfirmCancel.bind(comp, table)}><FontIcon value='delete_forever' /></button>
                     <button className='edit' onClick={()=>{browserHistory.push('/tables/edit/'+table.table_id)}}>Edit</button>
                     {table.table_type==='now' ? (
                       <button onClick={comp.refreshTable.bind(comp, table)}>Refresh listing</button>
@@ -158,7 +158,7 @@ class MyTables extends React.Component
   renderNoTables()
   {
     return (
-      <div className="game-search-list-empty"><h3>No hosted tables.</h3><p>Either you haven't made any tables yet, or your other games have already happened.</p></div>
+      <div className="table-search-list-empty"><h3>No hosted tables.</h3><p>Either you haven't made any tables yet, or your other games have already happened.</p></div>
     );
   }
 

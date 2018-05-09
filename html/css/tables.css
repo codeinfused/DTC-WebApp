@@ -217,10 +217,12 @@ span.table-item-when.cancelled {
 }
 .table-item-actions button.delete{
   background: #773333;
+  padding: 0 6px;
 }
 .table-item-actions .delete .material-icons{
-  font-size: 1rem;
-  font-weight: 900;
+  font-size: 2.2rem;
+  font-weight: normal;
+  vertical-align: middle;
 }
 .table-item-actions button.leave{
   font-style: italic;
