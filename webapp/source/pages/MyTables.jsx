@@ -143,7 +143,7 @@ class MyTables extends React.Component
                     {table.table_type==='now' ? (
                       <button onClick={comp.refreshTable.bind(comp, table)}>Refresh listing</button>
                     ) : (
-                      <button onClick={comp.viewPlayers.bind(comp, table)}>View players</button>
+                      table.allow_signups==1 ? (<button className="players" onClick={CONFIG.state.index.openTableDialog.bind(CONFIG.state.index, table.table_id)}>See Players</button>) : ''
                     )}
                   </div>
                 )}

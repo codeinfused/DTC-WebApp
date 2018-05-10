@@ -108,8 +108,14 @@ ul.plans-timeline li > .fa{
   left: 16px;
   top: 2px;
 }
+ul.plans-timeline li.mytable > .fa {
+  background: #48af5c;
+}
 ul.plans-timeline li > .fa.cancelled{
   background: #c74646;
+}
+ul.plans-timeline li > .fa-graduation-cap{
+  top: 34px;
 }
 ul.plans-timeline .plans-item{
   box-shadow: 0 1px 1px rgba(0,0,0,0.3);

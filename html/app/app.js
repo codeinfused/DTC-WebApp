@@ -99163,11 +99163,11 @@
 	                  'button',
 	                  { onClick: comp.refreshTable.bind(comp, table) },
 	                  'Refresh listing'
-	                ) : _react2.default.createElement(
+	                ) : table.allow_signups == 1 ? _react2.default.createElement(
 	                  'button',
-	                  { onClick: comp.viewPlayers.bind(comp, table) },
-	                  'View players'
-	                )
+	                  { className: 'players', onClick: _config2.default.state.index.openTableDialog.bind(_config2.default.state.index, table.table_id) },
+	                  'See Players'
+	                ) : ''
 	              )
 	            );
 	          })
@@ -99432,13 +99432,15 @@
 	          'ul',
 	          { className: 'plans-timeline' },
 	          thisDayList.map(function (table, i) {
+	            var isMyTable = table.player_id === _config2.default.state.user.id;
+	            var calIcon = table.joined == 1 ? "fa-calendar-check-o" : "fa-calendar-o";
 	            //var isSelected = moment(selectedObj[0].full, 'YYYY-MM-DD').isSame(moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss'), 'day');
 	            //if(isSelected){
 	            return _react2.default.createElement(
 	              'li',
-	              { key: "table-item-" + table.table_id, className: table.status },
-	              _react2.default.createElement('i', { className: table.status === 'cancelled' ? "fa fa-calendar-times-o cancelled" : "fa fa-calendar-check-o" }),
-	              ' ',
+	              { key: "table-item-" + table.table_id, className: table.status + " " + (isMyTable ? "mytable" : "") },
+	              _react2.default.createElement('i', { className: table.status === 'cancelled' ? "fa fa-calendar-times-o cancelled" : "fa " + calIcon }),
+	              table.lft == '1' ? _react2.default.createElement('i', { className: 'fa fa-graduation-cap' }) : '',
 	              _react2.default.createElement(
 	                'div',
 	                { className: 'plans-item' },
@@ -99467,9 +99469,9 @@
 	                  ),
 	                  _react2.default.createElement(
 	                    'span',
-	                    { className: "plan-tag" + (table.player_id === _config2.default.state.user.id ? " hosting" : "") },
+	                    { className: "plan-tag" + (isMyTable ? " hosting" : "") },
 	                    'Host: ',
-	                    table.host_name
+	                    isMyTable ? "Me" : table.host_name
 	                  )
 	                ),
 	                _react2.default.createElement(
@@ -99479,6 +99481,11 @@
 	                    'button',
 	                    { onClick: comp.handleLeaveGame.bind(comp, table) },
 	                    'Leave Game'
+	                  ) : '',
+	                  table.allow_signups == 1 ? _react2.default.createElement(
+	                    'button',
+	                    { className: 'players', onClick: _config2.default.state.index.openTableDialog.bind(_config2.default.state.index, table.table_id) },
+	                    'See Players'
 	                  ) : '',
 	                  table.player_id === _config2.default.state.user.id ? _react2.default.createElement(
 	                    'button',
@@ -100694,13 +100701,15 @@
 	          'ul',
 	          { className: 'plans-timeline' },
 	          thisDayList.map(function (table, i) {
+	            var isMyTable = table.player_id === _config2.default.state.user.id;
+	            var calIcon = table.joined == 1 ? "fa-calendar-check-o" : "fa-calendar-o";
 	            //var isSelected = moment(selectedObj[0].full, 'YYYY-MM-DD').isSame(moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss'), 'day');
 	            //if(isSelected){
 	            return _react2.default.createElement(
 	              'li',
-	              { key: "table-item-" + table.table_id, className: table.status },
-	              _react2.default.createElement('i', { className: table.status === 'cancelled' ? "fa fa-calendar-times-o cancelled" : "fa fa-calendar-check-o" }),
-	              ' ',
+	              { key: "table-item-" + table.table_id, className: table.status + " " + (isMyTable ? "mytable" : "") },
+	              _react2.default.createElement('i', { className: table.status === 'cancelled' ? "fa fa-calendar-times-o cancelled" : "fa " + calIcon }),
+	              table.lft == '1' ? _react2.default.createElement('i', { className: 'fa fa-graduation-cap' }) : '',
 	              _react2.default.createElement(
 	                'div',
 	                { className: 'plans-item' },
@@ -100729,9 +100738,9 @@
 	                  ),
 	                  _react2.default.createElement(
 	                    'span',
-	                    { className: "plan-tag" + (table.player_id === _config2.default.state.user.id ? " hosting" : "") },
+	                    { className: "plan-tag" + (isMyTable ? " hosting" : "") },
 	                    'Host: ',
-	                    table.host_name
+	                    isMyTable ? "Me" : table.host_name
 	                  ),
 	                  table.allow_signups == 1 ? _react2.default.createElement(
 	                    'span',

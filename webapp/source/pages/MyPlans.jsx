@@ -145,21 +145,25 @@ class MyPlans extends React.Component
         <ul className="plans-timeline">
           {thisDayList.map(function(table, i)
           {
+            var isMyTable = table.player_id === CONFIG.state.user.id;
+            var calIcon = table.joined==1 ? "fa-calendar-check-o" : "fa-calendar-o";
             //var isSelected = moment(selectedObj[0].full, 'YYYY-MM-DD').isSame(moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss'), 'day');
             //if(isSelected){
               return (
-                <li key={"table-item-"+table.table_id} className={table.status}>
-                  <i className={table.status==='cancelled' ? "fa fa-calendar-times-o cancelled" : "fa fa-calendar-check-o"}></i> {/*  */}
+                <li key={"table-item-"+table.table_id} className={table.status+" "+(isMyTable?"mytable":"")}>
+                  <i className={table.status==='cancelled' ? "fa fa-calendar-times-o cancelled" : "fa "+calIcon}></i>
+                  {table.lft=='1' ? (<i className="fa fa-graduation-cap"></i>) : ''}
                   <div className="plans-item">
                     <div className="plans-item-head">{table.title}</div>
                     <div className="plans-item-body">
                       <p className="plans-time">{table.status==='cancelled' ? 'Cancelled' : moment(table.start_datetime).fromNow()}</p>
                       <span className="plan-tag">{moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, MMM Do YYYY, h:mm a')}</span>
                       <span className="plan-tag">{table.table_location +' '+ (table.table_sublocation_alpha||'') + '-' + (table.table_sublocation_num||'')}</span>
-                      <span className={"plan-tag" + (table.player_id === CONFIG.state.user.id ? " hosting" : "")}>Host: {table.host_name}</span>
+                      <span className={"plan-tag" + (isMyTable ? " hosting" : "")}>Host: {(isMyTable ? "Me" : table.host_name)}</span>
                     </div>
                     <div className="plans-btns">
                       {table.player_id !== CONFIG.state.user.id ? (<button onClick={comp.handleLeaveGame.bind(comp, table)}>Leave Game</button>) : ''}
+                      {table.allow_signups==1 ? (<button className="players" onClick={CONFIG.state.index.openTableDialog.bind(CONFIG.state.index, table.table_id)}>See Players</button>) : ''}
                       {table.player_id === CONFIG.state.user.id ? (<button className='edit' onClick={()=>{browserHistory.push('/tables/edit/'+table.table_id)}}>Edit</button>) : ''}
                     </div>
                   </div>
