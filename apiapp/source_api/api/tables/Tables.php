@@ -57,20 +57,22 @@ abstract class Tables
   }
 
 
-  static function get_all_table_data_by_id($pdo, $table_id)
+  static function get_all_table_data_by_id($pdo, $table_id, $uid)
   {
     $dbCheck = $pdo->prepare(
-      "SELECT db.title, db.minplayers, db.maxplayers, tb.bgg_id, tb.id as table_id, tb.player_id, tb.table_type, tb.seats, tb.table_location, tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft, tb.allow_signups, tb.status
+      "SELECT db.title, db.minplayers, db.maxplayers, tb.bgg_id, tb.id as table_id, tb.player_id, tb.table_type, tb.seats, tb.table_location, tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft, tb.allow_signups, tb.status,
+      (SELECT count(id) FROM game_signups gs WHERE gs.table_id=tb.id AND gs.player_id=:uid) as joined
       FROM game_tables tb
       JOIN bgg_game_db db ON tb.bgg_id = db.bgg_id
       WHERE tb.id=:table_id"
     );
-    $dbCheck->execute(array(':table_id' => $table_id));
+    $dbCheck->execute(array(':table_id' => $table_id, ':uid' => $uid));
     $table = $dbCheck->fetch();
     if($table){
       $table['game'] = array('title'=>$table['title'], 'players'=>[$table['minplayers'], $table['maxplayers']]);
       $table['allow_signups'] = (boolean) $table['allow_signups'];
       $table['lft'] = (boolean) $table['lft'];
+      $table['joined'] = (boolean) $table['joined'];
     }
     return array('table'=>$table);
   }
@@ -155,6 +157,7 @@ abstract class Tables
 
   static function edit_table($pdo, $uid, $data)
   {
+    $data['joined'] = $data['joined'] ? 1 : 0;
     $exec_params = array(
       ':uid' => $uid,
       ':bid' => $data['bgg_id'],
@@ -163,6 +166,7 @@ abstract class Tables
       ':table_location' => $data['table_location'],
       ':start_datetime' => $data['start_datetime'],
       ':lft' => $data['lft'] ? 1 : 0,
+      //':joined' => $data['joined'] ? 1 : 0,
       ':allow_signups' => $data['allow_signups'] ? 1 : 0,
       ':subloc_alpha' => $data['table_sublocation_alpha'],
       ':subloc_num' => $data['table_sublocation_num']
@@ -171,6 +175,7 @@ abstract class Tables
     if($data['table_type']==='now'){
       $exec_params[':start_datetime'] = date('Y-m-d H:i:s');
       $exec_params[':allow_signups'] = 0;
+      $data['joined'] = 0;
     }else{
       if( self::validate_date($data['start_datetime']) === false ){
         return new \ApiError('422', 'Invalid schedule data.');
@@ -191,9 +196,20 @@ abstract class Tables
     }
     $dbCheck->execute($exec_params);
 
-    if($inserting === true){
+    if($inserting === true)
+    {
       $new_table_id = $pdo->lastInsertId();
 
+      // if host has signups and wants to join their own game
+      if($data['joined']===1){
+        self::join_table($pdo, $uid, array(
+          'table_id' => $new_table_id
+        ));
+      }
+
+      // --------------------
+      // unfinished notification system for newly created tables (notify players with WTP)
+      // --------------------
       $gamereq = $pdo->prepare("SELECT title, start_datetime FROM bgg_game_db WHERE bgg_id=:bgg_id LIMIT 1");
       $gamereq->execute(array(':bgg_id'=>$data['bgg_id']));
       $game_title = $gamereq->fetchColumn();

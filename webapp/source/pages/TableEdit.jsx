@@ -38,7 +38,8 @@ class TableEdit extends React.Component
       start_time: new Date(),
       lfp: true,
       lft: false,
-      allow_signups: false
+      joined: true,
+      allow_signups: true
     };
 
     this.dateRange = [
@@ -182,6 +183,7 @@ class TableEdit extends React.Component
       table_location: comp.state.table_location,
       table_type: comp.state.table_type,
       lft: comp.state.lft,
+      joined: comp.state.joined,
       allow_signups: comp.state.allow_signups,
       table_sublocation_alpha: comp.state.table_sublocation_alpha,
       table_sublocation_num: comp.state.table_sublocation_num
@@ -256,8 +258,9 @@ class TableEdit extends React.Component
                 <Slider pinned snaps min={2} max={12} step={1} editable value={comp.state.seats} onChange={comp.handleChangeInput.bind(comp, 'seats')} />
               </div>
               <div className="table-form-item">
+                {comp.state.table_type==='now' ? '' : (<Switch label="Allow Sign-ups" checked={comp.state.allow_signups} onChange={comp.handleChangeInput.bind(comp, 'allow_signups')} /> )}
+                {comp.state.table_type==='now' ? '' : (<Switch label="Join Your Own Table?" checked={comp.state.joined} onChange={comp.handleChangeInput.bind(comp, 'joined')} /> )}
                 <Switch label="Looking For Teacher" checked={comp.state.lft} onChange={comp.handleChangeInput.bind(comp, 'lft')} />
-                {comp.state.table_type==='now' ? '' : (<Switch label="Allow Sign-ups" checked={comp.state.allow_signups} onChange={comp.handleChangeInput.bind(comp, 'allow_signups')} />)}
               </div>
               <div className="table-form-item">
                 <button type="submit" className="submit">Set Table!</button>

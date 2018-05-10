@@ -82518,7 +82518,8 @@
 	      start_time: new Date(),
 	      lfp: true,
 	      lft: false,
-	      allow_signups: false
+	      joined: true,
+	      allow_signups: true
 	    };
 	
 	    _this.dateRange = ['2018-07-03', '2018-07-08'];
@@ -82647,6 +82648,7 @@
 	        table_location: comp.state.table_location,
 	        table_type: comp.state.table_type,
 	        lft: comp.state.lft,
+	        joined: comp.state.joined,
 	        allow_signups: comp.state.allow_signups,
 	        table_sublocation_alpha: comp.state.table_sublocation_alpha,
 	        table_sublocation_num: comp.state.table_sublocation_num
@@ -82763,8 +82765,9 @@
 	            _react2.default.createElement(
 	              'div',
 	              { className: 'table-form-item' },
-	              _react2.default.createElement(_reactToolbox.Switch, { label: 'Looking For Teacher', checked: comp.state.lft, onChange: comp.handleChangeInput.bind(comp, 'lft') }),
-	              comp.state.table_type === 'now' ? '' : _react2.default.createElement(_reactToolbox.Switch, { label: 'Allow Sign-ups', checked: comp.state.allow_signups, onChange: comp.handleChangeInput.bind(comp, 'allow_signups') })
+	              comp.state.table_type === 'now' ? '' : _react2.default.createElement(_reactToolbox.Switch, { label: 'Allow Sign-ups', checked: comp.state.allow_signups, onChange: comp.handleChangeInput.bind(comp, 'allow_signups') }),
+	              comp.state.table_type === 'now' ? '' : _react2.default.createElement(_reactToolbox.Switch, { label: 'Join Your Own Table?', checked: comp.state.joined, onChange: comp.handleChangeInput.bind(comp, 'joined') }),
+	              _react2.default.createElement(_reactToolbox.Switch, { label: 'Looking For Teacher', checked: comp.state.lft, onChange: comp.handleChangeInput.bind(comp, 'lft') })
 	            ),
 	            _react2.default.createElement(
 	              'div',

@@ -40,7 +40,7 @@ $app->get('/table_data/[{table_id}]', function($req, $resp, $args) use ($app)
     return $resp->withStatus(401)->withJson(array('error'=>'No table found.'));
   }
 
-  $table = Tables::get_all_table_data_by_id($this->db, $table_id);
+  $table = Tables::get_all_table_data_by_id($this->db, $table_id, $token->data->uid);
   if( is_error($game) ){
     return $resp->withStatus((int)$table->get_code())->withJson($table->json());
   }
