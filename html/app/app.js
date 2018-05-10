@@ -99784,9 +99784,13 @@
 	    value: function deleteWTP(bgg_id) {
 	      var comp = this;
 	      var ind = _config2.default.state.user.wtp.indexOf(bgg_id);
-	      _config2.default.state.user.wtp.splice(ind, 1);
-	      var ind2 = _config2.default.state.user.notify.indexOf(bgg_id);
-	      _config2.default.state.user.notify.splice(ind2, 1);
+	      if (ind > -1) {
+	        _config2.default.state.user.wtp.splice(ind, 1);
+	        var ind2 = _config2.default.state.user.notify.indexOf(bgg_id);
+	        if (ind2 > -1) {
+	          _config2.default.state.user.notify.splice(ind2, 1);
+	        }
+	      }
 	
 	      _axios2.default.post(_config2.default.api.wtp + '/delete', {
 	        bgg_id: bgg_id,
@@ -99945,16 +99949,13 @@
 	            _react2.default.createElement(
 	              'div',
 	              { className: 'my-wtp-list' },
-	              function () {
-	                console.log('run', _config2.default.state.user);
-	              }(),
 	              comp.state.wtp.map(function (game) {
 	                //var notifyActive = CONFIG.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
 	                //var wtpActive = CONFIG.state.user.wtp.indexOf(game.bgg_id) > -1 ? " active" : "";
 	
-	                // change these to handle empty error state
-	                var notifyActive = _config2.default.state.user.notify && _config2.default.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
-	                var wtpActive = _config2.default.state.user.wtp && _config2.default.state.user.wtp.indexOf(game.bgg_id) > -1 ? " active" : "";
+	                // change these to handle empty error state // CONFIG.state.user.notify &&
+	                var notifyActive = _config2.default.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
+	                var wtpActive = _config2.default.state.user.wtp.indexOf(game.bgg_id) > -1 ? " active" : "";
 	                return _react2.default.createElement(
 	                  'div',
 	                  { className: 'game-item-action', key: 'alert-settings-' + game.bgg_id },

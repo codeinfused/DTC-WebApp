@@ -196,9 +196,13 @@ class MySettings extends React.Component
   {
     var comp = this;
     var ind = CONFIG.state.user.wtp.indexOf(bgg_id);
-    CONFIG.state.user.wtp.splice(ind, 1);
-    var ind2 = CONFIG.state.user.notify.indexOf(bgg_id);
-    CONFIG.state.user.notify.splice(ind2, 1);
+    if(ind > -1){
+      CONFIG.state.user.wtp.splice(ind, 1);
+      var ind2 = CONFIG.state.user.notify.indexOf(bgg_id);
+      if(ind2 > -1){
+        CONFIG.state.user.notify.splice(ind2, 1);
+      }
+    }
 
     axios.post(CONFIG.api.wtp+'/delete', {
       bgg_id: bgg_id,
@@ -306,14 +310,13 @@ class MySettings extends React.Component
             <h3>My Game Settings</h3>
             <p><em>Your "want to play" and alert settings on games.</em></p>
             <div className="my-wtp-list">
-              {(function(){ console.log('run', CONFIG.state.user); })()}
               {comp.state.wtp.map(function(game){
                 //var notifyActive = CONFIG.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
                 //var wtpActive = CONFIG.state.user.wtp.indexOf(game.bgg_id) > -1 ? " active" : "";
 
-                // change these to handle empty error state
-                var notifyActive = CONFIG.state.user.notify && CONFIG.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
-                var wtpActive = CONFIG.state.user.wtp && CONFIG.state.user.wtp.indexOf(game.bgg_id) > -1 ? " active" : "";
+                // change these to handle empty error state // CONFIG.state.user.notify &&
+                var notifyActive = CONFIG.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
+                var wtpActive = CONFIG.state.user.wtp.indexOf(game.bgg_id) > -1 ? " active" : "";
                 return (
                   <div className="game-item-action" key={'alert-settings-'+game.bgg_id}>
                     <div className="game-item-action-line">
