@@ -2,6 +2,7 @@
 use api\auth\Auth;
 use api\games\Games;
 use api\games\GamesDB;
+use api\tables\Tables;
 
 
 $app->get('/import_bgg_process_next', function($req, $resp, $args) use ($app)
@@ -60,6 +61,39 @@ $app->post('/games/search/', function($req, $resp, $args) use ($app)
 
   if(empty($games_list['games'])){ return $resp->withStatus(401)->withJson(array('message'=>'No games found for search '.$term.'.')); }
   return $resp->withJson($games_list);
+});
+
+
+$app->get('/lists/top_wtp', function($req, $resp, $args) use ($app)
+{
+  $body = $req->getParsedBody();;
+
+  $token = Auth::checkAuthorization($this->db, $req);
+  if( is_error($token) ){
+    return $resp->withStatus((int)$token->get_code())->withJson($token->json());
+  }
+
+  $games = GamesDB::get_top_wtp($this->db);
+  if(empty($games['games'])){ return $resp->withStatus(401)->withJson(array('message'=>'No games found for search '.$term.'.')); }
+  return $resp->withJson($games);
+});
+
+
+$app->post('/lists/top_home', function($req, $resp, $args) use ($app)
+{
+  $body = $req->getParsedBody();;
+
+  $token = Auth::checkAuthorization($this->db, $req);
+  if( is_error($token) ){
+    return $resp->withStatus((int)$token->get_code())->withJson($token->json());
+  }
+
+  $wtp = GamesDB::get_top_wtp($this);
+  $played = GamesDB::get_top_played($this);
+  $plans = Tables::my_soonest_plans($this->db, $token->data->uid);
+
+  //if(empty($wtp['games'])){ return $resp->withStatus(401)->withJson(array('message'=>'No games found for search '.$term.'.')); }
+  return $resp->withJson(array("wtp"=>$wtp, "played"=>$played, "plans"=>$plans));
 });
 
 

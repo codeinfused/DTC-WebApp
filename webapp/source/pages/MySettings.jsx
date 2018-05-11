@@ -283,7 +283,7 @@ class MySettings extends React.Component
                 appId="202475036823066"
                 textButton="Sign in with Facebook"
                 autoLoad={false}
-                fields="first_name,last_name,email,picture"
+                fields="first_name,last_name,email,picture.type(normal)"
                 callback={this.facebookResponse}
                 onClick={()=>{comp.setState({appLoading:true});}}
                 icon={false}

@@ -130,7 +130,7 @@ class TableList extends React.Component
 
     return (
       <div className="table-list">
-        <h2>Closest Tables</h2>
+        <h2>Tables By Soonest</h2>
           {comp.state.tables.map(function(table, i)
           {
             return (

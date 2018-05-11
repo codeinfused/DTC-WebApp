@@ -44,7 +44,8 @@ const CONFIG = {
     refreshTable: baseAPI+"tables/refresh",
     joinTable: baseAPI+"tables/join",
     leaveTable: baseAPI+"tables/leave",
-    lfp: baseAPI+"lfp"
+    lfp: baseAPI+"lfp",
+    homeLists: baseAPI+"lists/top_home"
   },
 
   checkAuth: function(context, loadVar)
@@ -65,7 +66,7 @@ const CONFIG = {
       return;
     }
 
-    this.getRequest = axios.post(this.api.verify, {
+    return axios.post(this.api.verify, {
       auth: auth,
       t: (new Date()).getTime()
     }).then(function(json)
@@ -207,6 +208,7 @@ const CONFIG = {
     transitionTime: 300,
     authenticated: false,
     auth: '',
+    authPromise: false,
     user: {},
     searchAction: '',
     searchDB: 'bgg',

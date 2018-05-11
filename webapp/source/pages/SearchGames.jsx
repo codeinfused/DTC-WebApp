@@ -278,6 +278,7 @@ class SearchGames extends React.Component
   {
     var comp = this;
     comp.scrollListToTop();
+    CONFIG.state.last_searchText = comp.state.searchText.trim();
 
     // NOT NEEDED WITH LOCALIZED DB?
     // if(comp.state.searchText.length < 4){
@@ -285,11 +286,10 @@ class SearchGames extends React.Component
     //   comp.setState({loader: false});
     //   return;
     // }
-
     comp.searchInput.blur();
 
     axios.post(CONFIG.bgg.search, {
-      term: comp.state.searchText,
+      term: comp.state.searchText.trim(),
       db: CONFIG.state.searchDB,
       page: comp.state.currentGamePage,
       sort: comp.state.sortBy,
@@ -315,7 +315,7 @@ class SearchGames extends React.Component
   handleSearchChange(event)
   {
     CONFIG.state.last_searchText = event.target.value;
-    this.setState({searchText: event.target.value});
+    this.setState({searchText: CONFIG.state.last_searchText});
   }
 
   handleOpenGameResult(game, event, another)

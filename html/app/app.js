@@ -195,7 +195,13 @@
 	  _createClass(AppLayout, [{
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
-	      _config2.default.checkAuth(this, 'appLoaded');
+	      var _this2 = this;
+	
+	      _config2.default.authPromise = new Promise(function (resolve, reject) {
+	        var checkPromise = _config2.default.checkAuth(_this2, 'appLoaded');
+	        checkPromise.then(resolve);
+	        checkPromise.catch(reject);
+	      });
 	    }
 	  }, {
 	    key: 'DBLoadBGG',
@@ -367,14 +373,14 @@
 	        { id: 'app', className: comp.state.sideMenuOpen ? "menu-open" : "menu-closed" },
 	        _react2.default.createElement(
 	          _reactResponsive2.default,
-	          { minDeviceWidth: 500 },
+	          { minDeviceWidth: 900 },
 	          comp.state.ignoreLandscape ? '' : _react2.default.createElement(
 	            'div',
 	            { id: 'landscape-warning' },
 	            _react2.default.createElement(
 	              'span',
 	              null,
-	              'For the best experience, view in portrait on a mobile device.'
+	              'For the best experience, view on a mobile device.'
 	            ),
 	            _react2.default.createElement(
 	              'button',
@@ -57110,7 +57116,8 @@
 	    refreshTable: baseAPI + "tables/refresh",
 	    joinTable: baseAPI + "tables/join",
 	    leaveTable: baseAPI + "tables/leave",
-	    lfp: baseAPI + "lfp"
+	    lfp: baseAPI + "lfp",
+	    homeLists: baseAPI + "lists/top_home"
 	  },
 	
 	  checkAuth: function checkAuth(context, loadVar) {
@@ -57130,7 +57137,7 @@
 	      return;
 	    }
 	
-	    this.getRequest = _axios2.default.post(this.api.verify, {
+	    return _axios2.default.post(this.api.verify, {
 	      auth: auth,
 	      t: new Date().getTime()
 	    }).then(function (json) {
@@ -57255,6 +57262,7 @@
 	    transitionTime: 300,
 	    authenticated: false,
 	    auth: '',
+	    authPromise: false,
 	    user: {},
 	    searchAction: '',
 	    searchDB: 'bgg',
@@ -80658,7 +80666,7 @@
 	                  appId: '202475036823066',
 	                  textButton: 'Sign in with Facebook',
 	                  autoLoad: false,
-	                  fields: 'first_name,last_name,email,picture',
+	                  fields: 'first_name,last_name,email,picture.type(normal)',
 	                  callback: this.facebookResponse,
 	                  onClick: function onClick() {
 	                    comp.setState({ appLoading: true });
@@ -80719,7 +80727,12 @@
 	          _react2.default.createElement(
 	            'p',
 	            null,
-	            'You don\'t have to use an account to find games while at the convention. However, if you would like to reserve spots at tables, using an account login like Facebook helps hosts verify their players.'
+	            'As a guest, you can still see games needing players! However, if you would like to reserve spots at tables or create your own table, you must use an account.'
+	          ),
+	          _react2.default.createElement(
+	            'p',
+	            null,
+	            'Logging in helps hosts verify their players, and reduces system abuse.'
 	          )
 	        )
 	      );
@@ -80778,6 +80791,10 @@
 	
 	var _Loaders = __webpack_require__(715);
 	
+	var _moment = __webpack_require__(728);
+	
+	var _moment2 = _interopRequireDefault(_moment);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -80800,13 +80817,125 @@
 	          url: _config2.default.bgg.url + _config2.default.bgg.hot
 	        }
 	      },
-	      games: [],
+	      top_wtp: [],
+	      top_played: [],
+	      my_plans: [],
 	      loader: false
 	    };
 	    return _this;
 	  }
 	
 	  _createClass(Home, [{
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      var comp = this;
+	      _config2.default.authPromise.then(function () {
+	        setTimeout(function () {
+	          comp.getHomeLists();
+	        }, 30);
+	      });
+	    }
+	  }, {
+	    key: 'getHomeLists',
+	    value: function getHomeLists() {
+	      var comp = this;
+	      _axios2.default.post(_config2.default.api.homeLists, {
+	        t: new Date().getTime()
+	      }, {
+	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
+	      }).then(function (json) {
+	        comp.setState({
+	          loaded: true,
+	          top_wtp: json.data.wtp.games,
+	          top_played: json.data.played.games,
+	          my_plans: json.data.plans.tables
+	        });
+	      }).catch(function (json) {
+	        //ToastsAPI.toast('error', null, 'Error getting dashboard.', {timeOut:6000});
+	      });
+	    }
+	  }, {
+	    key: 'openSearchPage',
+	    value: function openSearchPage() {
+	      _config2.default.state.searchDB = 'bgg';
+	      _reactRouter.browserHistory.push('/games');
+	    }
+	  }, {
+	    key: 'openPlansPage',
+	    value: function openPlansPage() {
+	      _reactRouter.browserHistory.push('/myplans');
+	    }
+	  }, {
+	    key: 'renderNoPlans',
+	    value: function renderNoPlans() {
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'table-search-list-empty' },
+	        _react2.default.createElement(
+	          'h3',
+	          null,
+	          'No plans yet.'
+	        ),
+	        _react2.default.createElement(
+	          'p',
+	          null,
+	          'You can schedule games to play at the convention, and reserve a space at other player\'s tables! Go get started!'
+	        )
+	      );
+	    }
+	  }, {
+	    key: 'renderPlansList',
+	    value: function renderPlansList() {
+	      var comp = this;
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'home-plans-list' },
+	        comp.state.my_plans.map(function (table, i) {
+	          return _react2.default.createElement(
+	            'div',
+	            { className: 'table-item', key: "table-item-" + table.table_id },
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'table-item-header' },
+	              _react2.default.createElement(
+	                'span',
+	                { className: 'table-item-title' },
+	                table.title
+	              ),
+	              _react2.default.createElement(
+	                'span',
+	                { className: "table-item-when " + table.status },
+	                table.status === 'cancelled' ? 'Cancelled' : (0, _moment2.default)(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').fromNow()
+	              )
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'table-item-details' },
+	              table.table_type === 'future' ? _react2.default.createElement(
+	                'span',
+	                { className: 'table-item-tag' },
+	                table.signups,
+	                ' of ',
+	                table.seats,
+	                ' seats taken'
+	              ) : '',
+	              _react2.default.createElement(
+	                'span',
+	                { className: 'table-item-tag' },
+	                table.table_location + ' ' + (table.table_sublocation_alpha || '') + '-' + (table.table_sublocation_num || '')
+	              )
+	            )
+	          );
+	        }),
+	        _react2.default.createElement(
+	          'button',
+	          { className: 'home-plans-btn', onClick: comp.openPlansPage.bind(comp) },
+	          _react2.default.createElement(_reactToolbox.FontIcon, { value: 'date_range' }),
+	          'View the rest of your plans'
+	        )
+	      );
+	    }
+	  }, {
 	    key: 'render',
 	    value: function render() {
 	      var comp = this;
@@ -80823,19 +80952,80 @@
 	            _react2.default.createElement('img', { src: 'images/dtc-logo-transp-full.png' })
 	          ),
 	          _react2.default.createElement(
-	            'h1',
-	            null,
-	            'Dashboard Coming Soon'
+	            'div',
+	            { className: 'my-profile' },
+	            _react2.default.createElement('img', { src: _config2.default.state.user && _config2.default.state.user.thumb ? _config2.default.state.user.thumb : '/images/profile-generic.jpg' })
 	          ),
 	          _react2.default.createElement(
-	            'p',
-	            null,
-	            'Snapshots of player data and games being played, to be determined as the con goes on!'
+	            'div',
+	            { className: 'home-plans' },
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'home-plans-title' },
+	              _react2.default.createElement(
+	                'h2',
+	                null,
+	                'My Plans ',
+	                _react2.default.createElement(
+	                  'span',
+	                  null,
+	                  'Quick Look'
+	                )
+	              )
+	            ),
+	            comp.state.my_plans && comp.state.my_plans.length > 0 ? comp.renderPlansList() : comp.renderNoPlans()
 	          ),
 	          _react2.default.createElement(
-	            'p',
-	            { style: { fontSize: '1.6rem', marginTop: '80px' } },
-	            'Use the button at the bottom of this app to open the menu for more options.'
+	            'div',
+	            { className: 'clearfix' },
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'home-top-list home-top-wtp' },
+	              _react2.default.createElement(
+	                'h2',
+	                null,
+	                'Top Wanted Tables'
+	              ),
+	              _react2.default.createElement(
+	                'ol',
+	                null,
+	                comp.state.top_wtp.map(function (game, i) {
+	                  return _react2.default.createElement(
+	                    'li',
+	                    { className: 'home-list-item', key: "home-wtp-item-" + game.bgg_id },
+	                    _react2.default.createElement(
+	                      'span',
+	                      { className: 'home-list-item-title' },
+	                      game.title
+	                    )
+	                  );
+	                })
+	              )
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'home-top-list home-top-played' },
+	              _react2.default.createElement(
+	                'h2',
+	                null,
+	                'Top Games Played'
+	              ),
+	              _react2.default.createElement(
+	                'ol',
+	                null,
+	                comp.state.top_played.map(function (game, i) {
+	                  return _react2.default.createElement(
+	                    'li',
+	                    { className: 'home-list-item', key: "home-wtp-item-" + game.bgg_id },
+	                    _react2.default.createElement(
+	                      'span',
+	                      { className: 'home-list-item-title' },
+	                      game.title
+	                    )
+	                  );
+	                })
+	              )
+	            )
 	          )
 	        ),
 	        _react2.default.createElement(_Loaders.LoadingInline, {
@@ -81287,6 +81477,7 @@
 	    value: function searchGames() {
 	      var comp = this;
 	      comp.scrollListToTop();
+	      _config2.default.state.last_searchText = comp.state.searchText.trim();
 	
 	      // NOT NEEDED WITH LOCALIZED DB?
 	      // if(comp.state.searchText.length < 4){
@@ -81294,11 +81485,10 @@
 	      //   comp.setState({loader: false});
 	      //   return;
 	      // }
-	
 	      comp.searchInput.blur();
 	
 	      _axios2.default.post(_config2.default.bgg.search, {
-	        term: comp.state.searchText,
+	        term: comp.state.searchText.trim(),
 	        db: _config2.default.state.searchDB,
 	        page: comp.state.currentGamePage,
 	        sort: comp.state.sortBy,
@@ -81326,7 +81516,7 @@
 	    key: 'handleSearchChange',
 	    value: function handleSearchChange(event) {
 	      _config2.default.state.last_searchText = event.target.value;
-	      this.setState({ searchText: event.target.value });
+	      this.setState({ searchText: _config2.default.state.last_searchText });
 	    }
 	  }, {
 	    key: 'handleOpenGameResult',
@@ -82509,6 +82699,7 @@
 	      bgg_id: _this.props.params.bgg_id,
 	      game: {},
 	      seats: 2,
+	      //game_type: 'normal',
 	      table_type: 'now',
 	      table_location: 'Caribbean Ballroom',
 	      table_sublocation_alpha: 'A',
@@ -82647,6 +82838,7 @@
 	        seats: comp.state.seats,
 	        table_location: comp.state.table_location,
 	        table_type: comp.state.table_type,
+	        //game_type: comp.state.game_type,
 	        lft: comp.state.lft,
 	        joined: comp.state.joined,
 	        allow_signups: comp.state.allow_signups,
@@ -98796,7 +98988,7 @@
 	        _react2.default.createElement(
 	          'h2',
 	          null,
-	          'Closest Tables'
+	          'Tables By Soonest'
 	        ),
 	        comp.state.tables.map(function (table, i) {
 	          return _react2.default.createElement(
@@ -99475,7 +99667,15 @@
 	                    { className: "plan-tag" + (isMyTable ? " hosting" : "") },
 	                    'Host: ',
 	                    isMyTable ? "Me" : table.host_name
-	                  )
+	                  ),
+	                  table.allow_signups == 1 ? _react2.default.createElement(
+	                    'span',
+	                    { className: 'plan-tag' },
+	                    table.signups,
+	                    ' of ',
+	                    table.seats,
+	                    ' seats taken'
+	                  ) : ''
 	                ),
 	                _react2.default.createElement(
 	                  'div',
@@ -99911,7 +100111,7 @@
 	                appId: '202475036823066',
 	                textButton: 'Sign in with Facebook',
 	                autoLoad: false,
-	                fields: 'first_name,last_name,email,picture',
+	                fields: 'first_name,last_name,email,picture.type(normal)',
 	                callback: this.facebookResponse,
 	                onClick: function onClick() {
 	                  comp.setState({ appLoading: true });

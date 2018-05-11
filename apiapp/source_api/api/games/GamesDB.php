@@ -70,6 +70,44 @@ abstract class GamesDB
   }
 
 
+  static function get_top_wtp($context)
+  {
+    $exec_params = array();
+
+    $dbCheck = $context->db->prepare(
+      "SELECT COUNT(w.id) AS wtp, w.bgg_id, db.*
+        FROM game_wtp w
+        LEFT JOIN bgg_game_db db ON db.bgg_id = w.bgg_id
+        GROUP BY w.bgg_id
+        ORDER BY wtp DESC LIMIT 10"
+    );
+    $dbCheck->execute($exec_params);
+    $games_list = $dbCheck->fetchAll();
+    $games_list = self::parse_game_result($games_list);
+
+    return array('games'=>$games_list);
+  }
+
+
+  static function get_top_played($context)
+  {
+    $exec_params = array();
+
+    $dbCheck = $context->db->prepare(
+      "SELECT COUNT(gt.id) AS games, gt.bgg_id, db.*
+        FROM game_tables gt
+        LEFT JOIN bgg_game_db db ON db.bgg_id = gt.bgg_id
+        GROUP BY gt.bgg_id
+        ORDER BY games DESC LIMIT 10"
+    );
+    $dbCheck->execute($exec_params);
+    $games_list = $dbCheck->fetchAll();
+    $games_list = self::parse_game_result($games_list);
+
+    return array('games'=>$games_list);
+  }
+
+
   static function search_games_by_term($context, $options)
   {
     $opts = array_merge(self::$search_defaults, $options);

@@ -80,7 +80,8 @@ abstract class Tables
   static function my_tables($pdo, $uid)
   {
     $dbCheck = $pdo->prepare(
-      "SELECT db.title, tb.id as table_id, tb.table_type, tb.seats, tb.table_location, tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft, tb.allow_signups, tb.status, COUNT(gs.id) AS signups
+      "SELECT db.title, tb.id as table_id, tb.table_type, tb.seats, tb.table_location, tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft, tb.allow_signups, tb.status, COUNT(gs.id) AS signups,
+      (SELECT count(id) FROM game_signups WHERE table_id=tb.id AND player_id=:uid) as joined
       FROM game_tables tb JOIN bgg_game_db db ON tb.bgg_id = db.bgg_id
       LEFT JOIN game_signups gs ON gs.table_id = tb.id
       WHERE tb.player_id=:uid AND tb.start_datetime > NOW() - INTERVAL 20 MINUTE
@@ -96,14 +97,38 @@ abstract class Tables
   {
     $dbCheck = $pdo->prepare(
       "SELECT db.title, tb.id as table_id, tb.player_id, tb.table_type, tb.seats, tb.table_location, tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft, tb.allow_signups, tb.status,
-      CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as host_name
+      CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as host_name,
+      (SELECT count(id) FROM game_signups WHERE table_id=tb.id AND player_id=:uid) as joined,
+      COUNT(gs.id) AS signups
       FROM game_tables tb
       LEFT JOIN game_signups gs ON gs.table_id = tb.id
       JOIN bgg_game_db db ON tb.bgg_id = db.bgg_id
       LEFT JOIN users u ON u.id = tb.player_id
       WHERE (tb.player_id=:uid OR gs.player_id=:uid)
       AND tb.start_datetime > NOW() - INTERVAL 20 MINUTE
+      GROUP BY tb.id
       ORDER BY tb.start_datetime ASC"
+    );
+    $dbCheck->execute(array(':uid' => $uid));
+    $tables = $dbCheck->fetchAll();
+    return array('tables'=>$tables);
+  }
+
+  static function my_soonest_plans($pdo, $uid)
+  {
+    $dbCheck = $pdo->prepare(
+      "SELECT db.title, tb.id as table_id, tb.player_id, tb.table_type, tb.seats, tb.table_location, tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft, tb.allow_signups, tb.status,
+      CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as host_name,
+      (SELECT count(id) FROM game_signups WHERE table_id=tb.id AND player_id=:uid) as joined,
+      COUNT(gs.id) AS signups
+      FROM game_tables tb
+      LEFT JOIN game_signups gs ON gs.table_id = tb.id
+      JOIN bgg_game_db db ON tb.bgg_id = db.bgg_id
+      LEFT JOIN users u ON u.id = tb.player_id
+      WHERE (tb.player_id=:uid OR gs.player_id=:uid)
+      AND tb.start_datetime > NOW() - INTERVAL 20 MINUTE
+      GROUP BY tb.id
+      ORDER BY tb.start_datetime ASC LIMIT 10"
     );
     $dbCheck->execute(array(':uid' => $uid));
     $tables = $dbCheck->fetchAll();

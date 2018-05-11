@@ -97,8 +97,12 @@
 }
 
 .game-search-list-empty{
+  position: absolute;
+  top: 100px;
+  left: 0;
+  right: 0;
   padding: 30px 26px;
-  margin-top: 94px;
+  margin: 0px;
 }
 .game-search-list-empty h3{
   color: #fff;

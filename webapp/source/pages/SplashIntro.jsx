@@ -178,7 +178,7 @@ class SplashIntro extends React.Component
                   appId="202475036823066"
                   textButton="Sign in with Facebook"
                   autoLoad={false}
-                  fields="first_name,last_name,email,picture"
+                  fields="first_name,last_name,email,picture.type(normal)"
                   callback={this.facebookResponse}
                   onClick={()=>{comp.setState({appLoading:true});}}
                   icon={false}
@@ -217,7 +217,8 @@ class SplashIntro extends React.Component
             {label: "Close", onClick: this.handleToggleAskDialog, primary: true, raised: true}
           ]}
         >
-          <p>You don't have to use an account to find games while at the convention. However, if you would like to reserve spots at tables, using an account login like Facebook helps hosts verify their players.</p>
+          <p>As a guest, you can still see games needing players! However, if you would like to reserve spots at tables or create your own table, you must use an account.</p>
+          <p>Logging in helps hosts verify their players, and reduces system abuse.</p>
         </Dialog>
       </div>
     );

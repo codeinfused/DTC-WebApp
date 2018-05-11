@@ -6,8 +6,8 @@
 .page-table-edit-wrap h1{
   padding: 30px 20px 16px 20px;
   margin:0 auto 0px;
-  background: #2e539c;
-  color: rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.25);
+  color: rgba(255,255,255,0.75);
   font-size: 2.1rem;
   font-weight: 100;
 }
@@ -18,8 +18,8 @@
   right: 20px;
   z-index: 10;
   display: block;
-  width: 70px;
-  height: 70px;
+  width: 75px;
+  height: 75px;
   margin: 0;
   -webkit-border-radius: 70px;
   border-radius: 70px;
@@ -28,8 +28,8 @@
 }
 .my-profile img{
   position: relative;
-  height: 70px;
-  width: 70px;
+  height: 75px;
+  width: 75px;
 }
 
 .table-game-details{
@@ -136,21 +136,21 @@ label[data-react-toolbox="switch"]{
   color: #fff;
   font-size: 2.4rem;
   font-weight: 100;
-  margin: 0 0 20px;
+  margin: 0 0 16px;
 }
 
 .table-item{
   position: relative;
   font-size: 1.1rem;
   font-weight: 400;
-  margin-bottom: 28px;
+  margin-bottom: 15px;
 }
 .table-item-header{
-    background: #365e8c;
+    background: rgba(186, 133, 206, 0.45); /* #a176b1; */
     padding: 0px 9px;
     text-align: right;
-    height: 44px;
-    line-height: 44px;
+    height: 38px;
+    line-height: 38px;
     text-align: right;
 }
 .table-item-title{
@@ -166,14 +166,14 @@ label[data-react-toolbox="switch"]{
 }
 .table-item-when{
   position: absolute;
-  top: -15px;
-  right: -8px;
+  top: 6px;
+  right: -5px;
   display: inline-block;
   border-radius: 4px;
   background: #fff;
   color: #222;
   font-weight: 900;
-  padding: 8px 9px;
+  padding: 6px 8px;
   line-height: 1;
   box-shadow: 0 0 10px rgba(0,0,0,0.4);
   z-index: 20;

@@ -160,6 +160,7 @@ class MyPlans extends React.Component
                       <span className="plan-tag">{moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, MMM Do YYYY, h:mm a')}</span>
                       <span className="plan-tag">{table.table_location +' '+ (table.table_sublocation_alpha||'') + '-' + (table.table_sublocation_num||'')}</span>
                       <span className={"plan-tag" + (isMyTable ? " hosting" : "")}>Host: {(isMyTable ? "Me" : table.host_name)}</span>
+                      {table.allow_signups==1 ? (<span className="plan-tag">{table.signups} of {table.seats} seats taken</span>) : ''}
                     </div>
                     <div className="plans-btns">
                       {table.player_id !== CONFIG.state.user.id ? (<button onClick={comp.handleLeaveGame.bind(comp, table)}>Leave Game</button>) : ''}

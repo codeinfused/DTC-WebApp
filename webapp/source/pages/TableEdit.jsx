@@ -2,7 +2,7 @@ import CONFIG from '../config.jsx';
 import axios from 'axios';
 import React from 'react';
 import {browserHistory} from 'react-router';
-import {Dialog, FontIcon, Input, DatePicker, TimePicker, Slider, Switch, Dropdown, RadioGroup, RadioButton} from 'react-toolbox';
+import {Dialog, FontIcon, Input, DatePicker, TimePicker, Slider, Switch, Dropdown, RadioGroup, RadioButton, Tab, Tabs} from 'react-toolbox';
 import {Button, IconButton} from 'react-toolbox/lib/button';
 import {cloneDeep, slice} from 'lodash';
 import {XmlEntities, AllHtmlEntities} from 'html-entities';
@@ -29,6 +29,7 @@ class TableEdit extends React.Component
       bgg_id: this.props.params.bgg_id,
       game: {},
       seats: 2,
+      //game_type: 'normal',
       table_type: 'now',
       table_location: 'Caribbean Ballroom',
       table_sublocation_alpha: 'A',
@@ -182,6 +183,7 @@ class TableEdit extends React.Component
       seats: comp.state.seats,
       table_location: comp.state.table_location,
       table_type: comp.state.table_type,
+      //game_type: comp.state.game_type,
       lft: comp.state.lft,
       joined: comp.state.joined,
       allow_signups: comp.state.allow_signups,
