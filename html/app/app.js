@@ -397,7 +397,9 @@
 	            { width: 280, pageWrapId: "app-main-body", outerContainerId: "app-wrap", isOpen: comp.state.sideMenuOpen, onStateChange: comp.isMenuOpen.bind(comp), customBurgerIcon: false, customCrossIcon: _react2.default.createElement(_reactToolbox.FontIcon, { value: 'close' }) },
 	            _react2.default.createElement(
 	              'h2',
-	              { className: 'app-menu-head' },
+	              { className: 'app-menu-head', onClick: function onClick() {
+	                  comp.toggleSideMenu();_reactRouter.browserHistory.push('/home');
+	                } },
 	              _react2.default.createElement('img', { src: '/images/dtc-logo-transp-full.png' })
 	            ),
 	            comp.navButtons.map(function (item, i) {

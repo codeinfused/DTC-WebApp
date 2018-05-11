@@ -209,7 +209,7 @@ class AppLayout extends React.Component
         {!comp.state.appLoaded ? <LoadingInline active={true} /> : (
         <div id="app-wrap">
           <AppMenu width={280} pageWrapId={"app-main-body"} outerContainerId={"app-wrap"} isOpen={comp.state.sideMenuOpen} onStateChange={comp.isMenuOpen.bind(comp)} customBurgerIcon={false} customCrossIcon={<FontIcon value='close' />}>
-            <h2 className="app-menu-head"><img src="/images/dtc-logo-transp-full.png" /></h2>
+            <h2 className="app-menu-head" onClick={()=>{comp.toggleSideMenu(); browserHistory.push('/home');}}><img src="/images/dtc-logo-transp-full.png" /></h2>
             {comp.navButtons.map(function(item, i){
               return (<Button
                 onClick={comp.handleAppNav.bind(comp, item)}
