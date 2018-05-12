@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Route, IndexRoute, Router, browserHistory } from 'react-router';
-import { Layout, AppBar, NavDrawer, Panel, Sidebar, FontIcon, Button, Dialog } from 'react-toolbox';
+import { Layout, AppBar, NavDrawer, Panel, Sidebar, FontIcon, Button, Dialog, Navigation } from 'react-toolbox';
 import PageTransition from 'react-router-page-transition';
 import {push as AppMenu} from 'react-burger-menu';
 import MediaQuery from 'react-responsive';
@@ -49,9 +49,10 @@ class AppLayout extends React.Component
     };
 
     this.navButtons = [
-      {label:'Tables Right Now',      path:'/lfp', icon:'video_library'},
-      {label:'Scheduled Tables',     path:'/schedules', icon:'event_note'},
-      {label:'Start a Table',      path:'/games', icon:'library_books', callback: comp.DBLoadBGG},
+      {label:'Home',                path:'/home', icon:'home'},
+      {label:'Tables Right Now',    path:'/lfp', icon:'video_library'},
+      {label:'Scheduled Tables',    path:'/schedules', icon:'event_note'},
+      {label:'Start a Table',       path:'/games', icon:'library_books', callback: comp.DBLoadBGG},
       // {label:'Con Library',         path:'/library', icon:'import_contacts', callback: comp.DBLoadLibrary},
       {label:'Game Alerts',         path:'/alerts', icon:'notifications'},
       {label:'My Plans',            path:'/myplans', icon:'date_range'},
@@ -234,7 +235,7 @@ class AppLayout extends React.Component
                className="app-headerbar"
                title="Dice Tower Con"
                leftIcon="menu"
-               rightIcon={<FontIcon value='keyboard_arrow_left' />}
+               rightIcon={<FontIcon value='arrow_back' />}
                onLeftIconClick={comp.toggleSideMenu.bind(comp)}
                onRightIconClick={()=>{browserHistory.goBack();}}
                >

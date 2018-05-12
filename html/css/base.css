@@ -21,6 +21,12 @@ body{
   }
 }
 
+.clearfix:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
 button, button:focus, button:visited{ outline: none !important; cursor: pointer; }
 
 

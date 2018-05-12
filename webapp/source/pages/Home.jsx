@@ -123,7 +123,7 @@ class Home extends React.Component
             {(comp.state.my_plans && comp.state.my_plans.length > 0) ? comp.renderPlansList() : comp.renderNoPlans()}
           </div>
 
-          <div className="clearfix">
+          <div className="clearfix" style={{paddingBottom:'40px'}}>
 
             <div className="home-top-list home-top-wtp">
               <h2>Top Wanted Tables</h2>

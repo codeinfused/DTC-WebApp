@@ -181,7 +181,7 @@
 	      tableDialogLoading: false
 	    };
 	
-	    _this.navButtons = [{ label: 'Tables Right Now', path: '/lfp', icon: 'video_library' }, { label: 'Scheduled Tables', path: '/schedules', icon: 'event_note' }, { label: 'Start a Table', path: '/games', icon: 'library_books', callback: comp.DBLoadBGG },
+	    _this.navButtons = [{ label: 'Home', path: '/home', icon: 'home' }, { label: 'Tables Right Now', path: '/lfp', icon: 'video_library' }, { label: 'Scheduled Tables', path: '/schedules', icon: 'event_note' }, { label: 'Start a Table', path: '/games', icon: 'library_books', callback: comp.DBLoadBGG },
 	    // {label:'Con Library',         path:'/library', icon:'import_contacts', callback: comp.DBLoadLibrary},
 	    { label: 'Game Alerts', path: '/alerts', icon: 'notifications' }, { label: 'My Plans', path: '/myplans', icon: 'date_range' }, { label: 'My Tables', path: '/mytables', icon: 'playlist_add_check' }, { label: 'My Settings', path: '/me', icon: 'settings_applications' }, { label: 'About', path: '/about', icon: 'info' }];
 	
@@ -436,7 +436,7 @@
 	            className: 'app-headerbar',
 	            title: 'Dice Tower Con',
 	            leftIcon: 'menu',
-	            rightIcon: _react2.default.createElement(_reactToolbox.FontIcon, { value: 'keyboard_arrow_left' }),
+	            rightIcon: _react2.default.createElement(_reactToolbox.FontIcon, { value: 'arrow_back' }),
 	            onLeftIconClick: comp.toggleSideMenu.bind(comp),
 	            onRightIconClick: function onRightIconClick() {
 	              _reactRouter.browserHistory.goBack();
@@ -80979,7 +80979,7 @@
 	          ),
 	          _react2.default.createElement(
 	            'div',
-	            { className: 'clearfix' },
+	            { className: 'clearfix', style: { paddingBottom: '40px' } },
 	            _react2.default.createElement(
 	              'div',
 	              { className: 'home-top-list home-top-wtp' },
