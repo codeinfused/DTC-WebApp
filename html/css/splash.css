@@ -111,6 +111,7 @@ button.btn-home-start-table::before { content: "\f145"; font-size: 1.7rem; }
 }
 #page-home #app-logo img{
   width: 45%;
+  max-width: 300px;
 }
 
 .home-action-wrap{
