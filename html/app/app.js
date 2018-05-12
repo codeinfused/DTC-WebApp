@@ -371,24 +371,6 @@
 	      return _react2.default.createElement(
 	        'div',
 	        { id: 'app', className: comp.state.sideMenuOpen ? "menu-open" : "menu-closed" },
-	        _react2.default.createElement(
-	          _reactResponsive2.default,
-	          { minDeviceWidth: 900 },
-	          comp.state.ignoreLandscape ? '' : _react2.default.createElement(
-	            'div',
-	            { id: 'landscape-warning' },
-	            _react2.default.createElement(
-	              'span',
-	              null,
-	              'For the best experience, view on a mobile device.'
-	            ),
-	            _react2.default.createElement(
-	              'button',
-	              { onClick: comp.handleIgnoreLandscape.bind(comp) },
-	              _react2.default.createElement(_reactToolbox.FontIcon, { value: 'remove_circle' })
-	            )
-	          )
-	        ),
 	        !comp.state.appLoaded ? _react2.default.createElement(_Loaders.LoadingInline, { active: true }) : _react2.default.createElement(
 	          'div',
 	          { id: 'app-wrap' },
@@ -81257,7 +81239,7 @@
 	      activeGameOpenDesc: false,
 	      sortBy: 'bggrate',
 	      tag: '',
-	      loader: false,
+	      loader: true,
 	      source: props.route.source
 	    };
 	
@@ -100082,11 +100064,6 @@
 	            'div',
 	            { className: 'my-profile' },
 	            _react2.default.createElement('img', { src: _config2.default.state.user.thumb ? _config2.default.state.user.thumb : '/images/profile-generic.jpg' })
-	          ),
-	          _react2.default.createElement(
-	            'div',
-	            { className: 'my-settings-item' },
-	            _react2.default.createElement(_reactToolbox.Switch, { label: 'Allow Phone Notifications', checked: comp.state.allow_notifications, onChange: comp.handleChangeNotifications.bind(comp) })
 	          ),
 	          _react2.default.createElement(
 	            'div',

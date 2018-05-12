@@ -271,9 +271,9 @@ class MySettings extends React.Component
             <img src={CONFIG.state.user.thumb ? CONFIG.state.user.thumb : '/images/profile-generic.jpg'} />
           </div>
 
-          <div className="my-settings-item">
+          {/* <div className="my-settings-item">
             <Switch label='Allow Phone Notifications' checked={comp.state.allow_notifications} onChange={comp.handleChangeNotifications.bind(comp)} />
-          </div>
+          </div> */}
 
           <div className="my-settings-item">
             <h3>Account Login</h3>

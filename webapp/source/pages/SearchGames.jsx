@@ -32,7 +32,7 @@ class SearchGames extends React.Component
       activeGameOpenDesc: false,
       sortBy: 'bggrate',
       tag: '',
-      loader: false,
+      loader: true,
       source: props.route.source
     };
 

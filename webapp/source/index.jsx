@@ -199,13 +199,13 @@ class AppLayout extends React.Component
       <div id="app" className={comp.state.sideMenuOpen?"menu-open":"menu-closed"}>
 
 
-        <MediaQuery minDeviceWidth={900}>
+        {/* <MediaQuery minDeviceWidth={900}>
           {comp.state.ignoreLandscape ? '' : (
             <div id="landscape-warning">
               <span>For the best experience, view on a mobile device.</span><button onClick={comp.handleIgnoreLandscape.bind(comp)}><FontIcon value='remove_circle' /></button>
             </div>
           )}
-        </MediaQuery>
+        </MediaQuery> */}
 
         {!comp.state.appLoaded ? <LoadingInline active={true} /> : (
         <div id="app-wrap">

@@ -133,7 +133,7 @@
   position: relative;
   margin: 10px 13px;
   width: calc(100% - 42px);
-  border: 8px solid #575757;
+  border: 8px solid #333333;
   height: auto;
   overflow: hidden;
   /*box-shadow: 0 0 30px rgba(0,0,0,0.4);*/
