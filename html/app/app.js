@@ -99329,7 +99329,7 @@
 	                _react2.default.createElement(
 	                  'button',
 	                  { className: 'delete', onClick: comp.handleConfirmCancel.bind(comp, table) },
-	                  _react2.default.createElement(_reactToolbox.FontIcon, { value: 'delete_forever' })
+	                  _react2.default.createElement(_reactToolbox.FontIcon, { value: 'close' })
 	                ),
 	                _react2.default.createElement(
 	                  'button',
@@ -99478,6 +99478,8 @@
 	    _this.state = {
 	      loaded: false,
 	      currentDay: day,
+	      cancelDialogActive: false,
+	      currentTableId: -1,
 	      tables: []
 	    };
 	
@@ -99486,6 +99488,8 @@
 	    _this.renderTableList = _this.renderTableList.bind(_this);
 	    _this.renderNoTables = _this.renderNoTables.bind(_this);
 	    _this.getTableList = _this.getTableList.bind(_this);
+	    _this.handleToggleCancel = _this.handleToggleCancel.bind(_this);
+	    _this.deleteTable = _this.deleteTable.bind(_this);
 	    return _this;
 	  }
 	
@@ -99563,6 +99567,36 @@
 	        comp.getTableList();
 	      }).catch(function (json) {
 	        _ToastsAPI2.default.toast('error', null, 'Error leaving game.', { timeOut: 6000 });
+	      });
+	    }
+	  }, {
+	    key: 'handleConfirmCancel',
+	    value: function handleConfirmCancel(table) {
+	      this.setState({
+	        currentTableId: table.table_id,
+	        cancelDialogActive: true
+	      });
+	    }
+	  }, {
+	    key: 'handleToggleCancel',
+	    value: function handleToggleCancel() {
+	      this.setState({ cancelDialogActive: false });
+	    }
+	  }, {
+	    key: 'deleteTable',
+	    value: function deleteTable() {
+	      var comp = this;
+	      _axios2.default.post(_config2.default.api.cancelTable, {
+	        table_id: comp.state.currentTableId,
+	        t: new Date().getTime()
+	      }, {
+	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
+	      }).then(function (json) {
+	        _ToastsAPI2.default.toast('success', 'Table cancelled.', null, { timeout: 6000 });
+	        comp.setState({ cancelDialogActive: false });
+	        comp.getTableList();
+	      }).catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, json.response.data.message, { timeOut: 6000 });
 	      });
 	    }
 	  }, {
@@ -99664,6 +99698,11 @@
 	                _react2.default.createElement(
 	                  'div',
 	                  { className: 'plans-btns' },
+	                  table.player_id === _config2.default.state.user.id ? _react2.default.createElement(
+	                    'button',
+	                    { className: 'delete', onClick: comp.handleConfirmCancel.bind(comp, table) },
+	                    _react2.default.createElement(_reactToolbox.FontIcon, { value: 'close' })
+	                  ) : '',
 	                  table.player_id !== _config2.default.state.user.id ? _react2.default.createElement(
 	                    'button',
 	                    { onClick: comp.handleLeaveGame.bind(comp, table) },
@@ -99728,7 +99767,23 @@
 	        ),
 	        _react2.default.createElement(_Loaders.LoadingInline, {
 	          active: !comp.state.loaded
-	        })
+	        }),
+	        _react2.default.createElement(
+	          _reactToolbox.Dialog,
+	          {
+	            title: 'Cancel This Table?',
+	            type: 'small',
+	            onEscKeyDown: this.handleToggleCancel,
+	            onOverlayClick: this.handleToggleCancel,
+	            active: this.state.cancelDialogActive,
+	            actions: [{ label: "Nevermind", onClick: this.handleToggleCancel, raised: true }, { label: "Cancel It", onClick: this.deleteTable, primary: true, raised: true }]
+	          },
+	          _react2.default.createElement(
+	            'p',
+	            null,
+	            'You cannot undo this action if you cancel this table. If players have signed up, they will see a status change.'
+	          )
+	        )
 	      );
 	    }
 	  }]);

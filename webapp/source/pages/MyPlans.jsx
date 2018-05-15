@@ -23,6 +23,8 @@ class MyPlans extends React.Component
     this.state = {
       loaded: false,
       currentDay: day,
+      cancelDialogActive: false,
+      currentTableId: -1,
       tables: []
     };
 
@@ -31,6 +33,8 @@ class MyPlans extends React.Component
     this.renderTableList = this.renderTableList.bind(this);
     this.renderNoTables = this.renderNoTables.bind(this);
     this.getTableList = this.getTableList.bind(this);
+    this.handleToggleCancel = this.handleToggleCancel.bind(this);
+    this.deleteTable = this.deleteTable.bind(this);
   }
 
   componentDidMount()
@@ -110,6 +114,33 @@ class MyPlans extends React.Component
     });
   }
 
+  handleConfirmCancel(table)
+  {
+    this.setState({
+      currentTableId: table.table_id,
+      cancelDialogActive: true
+    })
+  }
+
+  handleToggleCancel(){ this.setState({cancelDialogActive: false}); }
+
+  deleteTable()
+  {
+    var comp = this;
+    axios.post(CONFIG.api.cancelTable, {
+      table_id: comp.state.currentTableId,
+      t: (new Date()).getTime()
+    }, {
+      headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
+    }).then(function(json){
+      ToastsAPI.toast('success', 'Table cancelled.', null, {timeout:6000});
+      comp.setState({cancelDialogActive: false});
+      comp.getTableList();
+    }).catch(function(json){
+      ToastsAPI.toast('error', null, json.response.data.message, {timeOut:6000});
+    });
+  }
+
 
   renderCalendar()
   {
@@ -163,6 +194,7 @@ class MyPlans extends React.Component
                       {table.allow_signups==1 ? (<span className="plan-tag">{table.signups} of {table.seats} seats taken</span>) : ''}
                     </div>
                     <div className="plans-btns">
+                      {table.player_id === CONFIG.state.user.id ? (<button className='delete' onClick={comp.handleConfirmCancel.bind(comp, table)}><FontIcon value='close' /></button>) : ''}
                       {table.player_id !== CONFIG.state.user.id ? (<button onClick={comp.handleLeaveGame.bind(comp, table)}>Leave Game</button>) : ''}
                       {table.allow_signups==1 ? (<button className="players" onClick={CONFIG.state.index.openTableDialog.bind(CONFIG.state.index, table.table_id)}>See Players</button>) : ''}
                       {table.player_id === CONFIG.state.user.id ? (<button className='edit' onClick={()=>{browserHistory.push('/tables/edit/'+table.table_id)}}>Edit</button>) : ''}
@@ -200,6 +232,20 @@ class MyPlans extends React.Component
         <LoadingInline
           active={!comp.state.loaded}
         />
+
+        <Dialog
+          title="Cancel This Table?"
+          type="small"
+          onEscKeyDown={this.handleToggleCancel}
+          onOverlayClick={this.handleToggleCancel}
+          active={this.state.cancelDialogActive}
+          actions={[
+            {label: "Nevermind", onClick: this.handleToggleCancel, raised: true},
+            {label: "Cancel It", onClick: this.deleteTable, primary: true, raised: true}
+          ]}
+        >
+          <p>You cannot undo this action if you cancel this table. If players have signed up, they will see a status change.</p>
+        </Dialog>
 
       </div>
     );

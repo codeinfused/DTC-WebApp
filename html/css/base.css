@@ -211,7 +211,7 @@ button, button:focus, button:visited{ outline: none !important; cursor: pointer;
 .app-menu-head{
   display: block;
   outline: none;
-  width: 60%;
+  width: 50%;
   text-align: center;
   margin: 0 0 1rem;
   opacity: 0.2;

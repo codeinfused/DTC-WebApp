@@ -186,11 +186,11 @@ p.plans-time {
   border-radius: 6px;
   margin-right: 8px;
 }
-.plans-btns button.edit{ background: #c47c3f; }
+.plans-btns button.edit{ background: #6C7D96; }
 .plans-btns button.delete, .plans-btns button.leave{ background: #d25555; }
 .plans-btns button.join{ background: #30a734; }
 .plans-btns button[disabled]{ background: #9b9b9b; color: #ededed; font-style:italic; }
-.plans-btns button.players{ background: #c47c3f; }
+.plans-btns button.players{ background: #6C7D96; }
 
 .table-search-list-empty {
   padding: 30px 26px;

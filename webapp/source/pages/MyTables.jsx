@@ -138,7 +138,7 @@ class MyTables extends React.Component
                 </div>
                 {table.status === 'cancelled' ? '' : (
                   <div className="table-item-actions">
-                    <button className='delete' onClick={comp.handleConfirmCancel.bind(comp, table)}><FontIcon value='delete_forever' /></button>
+                    <button className='delete' onClick={comp.handleConfirmCancel.bind(comp, table)}><FontIcon value='close' /></button>
                     <button className='edit' onClick={()=>{browserHistory.push('/tables/edit/'+table.table_id)}}>Edit</button>
                     {table.table_type==='now' ? (
                       <button onClick={comp.refreshTable.bind(comp, table)}>Refresh listing</button>
@@ -167,6 +167,7 @@ class MyTables extends React.Component
     var comp = this;
     return (
       <div id="page-my-tables" className="transition-item page-my-tables page-wrap">
+        
         <div className={"table-list-wrap" + (comp.state.loader ? " loading" : "")}>
           {(comp.state.tables && comp.state.tables.length > 0) ? comp.renderTableList() : comp.renderNoTables()}
         </div>

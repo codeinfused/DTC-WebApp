@@ -208,25 +208,25 @@ span.table-item-when.cancelled {
   padding: 0px 12px;
   display: inline-block;
   /*background: #3a9bcc;*/
-  background: #9b56b3;
+  background: #6C7D96;
   color: #fff;
   cursor: pointer;
   font-size: 1.15rem;
   border-radius: 6px;
   margin-right: 8px;
 }
-.table-item-actions button.delete{
-  background: #773333;
+.table-item-actions button.delete, .plans-btns button.delete{
+  background: #c54a4a;
   padding: 0 6px;
 }
-.table-item-actions .delete .material-icons{
+.table-item-actions button .material-icons, .plans-btns button .material-icons{
   font-size: 2.2rem;
   font-weight: normal;
   vertical-align: middle;
 }
 .table-item-actions button.leave{
   font-style: italic;
-  background: #773333
+  background: #c54a4a;
 }
 
 select.sublocation_alpha{
