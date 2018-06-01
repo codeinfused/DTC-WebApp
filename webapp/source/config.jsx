@@ -14,7 +14,6 @@ const CONFIG = {
   },
 
   conDays: [
-    {full:'2018-07-03', date:'3', name:'Tue'},
     {full:'2018-07-04', date:'4', name:'Wed'},
     {full:'2018-07-05', date:'5', name:'Thu'},
     {full:'2018-07-06', date:'6', name:'Fri'},
