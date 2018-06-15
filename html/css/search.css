@@ -108,6 +108,7 @@
   top: 100px;
 }
 .game-search-list-empty h3{
+  position: relative;
   color: #fff;
   font-size: 2.4rem;
   font-weight: 100;

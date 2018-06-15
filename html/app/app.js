@@ -121,31 +121,31 @@
 	
 	var _TableList2 = _interopRequireDefault(_TableList);
 	
-	var _MyTables = __webpack_require__(846);
+	var _MyTables = __webpack_require__(847);
 	
 	var _MyTables2 = _interopRequireDefault(_MyTables);
 	
-	var _MyPlans = __webpack_require__(847);
+	var _MyPlans = __webpack_require__(848);
 	
 	var _MyPlans2 = _interopRequireDefault(_MyPlans);
 	
-	var _MySettings = __webpack_require__(848);
+	var _MySettings = __webpack_require__(849);
 	
 	var _MySettings2 = _interopRequireDefault(_MySettings);
 	
-	var _MyAlerts = __webpack_require__(849);
+	var _MyAlerts = __webpack_require__(850);
 	
 	var _MyAlerts2 = _interopRequireDefault(_MyAlerts);
 	
-	var _PlayersWanted = __webpack_require__(850);
+	var _PlayersWanted = __webpack_require__(851);
 	
 	var _PlayersWanted2 = _interopRequireDefault(_PlayersWanted);
 	
-	var _ScheduledList = __webpack_require__(851);
+	var _ScheduledList = __webpack_require__(852);
 	
 	var _ScheduledList2 = _interopRequireDefault(_ScheduledList);
 	
-	var _Privacy = __webpack_require__(852);
+	var _Privacy = __webpack_require__(853);
 	
 	var _Privacy2 = _interopRequireDefault(_Privacy);
 	
@@ -98848,7 +98848,7 @@
 	
 	var _ToastsAPI2 = _interopRequireDefault(_ToastsAPI);
 	
-	var _GamePopup = __webpack_require__(853);
+	var _GamePopup = __webpack_require__(846);
 	
 	var _GamePopup2 = _interopRequireDefault(_GamePopup);
 	
@@ -99235,6 +99235,229 @@
 	
 	var _button = __webpack_require__(244);
 	
+	var _lodash = __webpack_require__(554);
+	
+	var _htmlEntities = __webpack_require__(839);
+	
+	var _Loaders = __webpack_require__(715);
+	
+	var _ToastsAPI = __webpack_require__(556);
+	
+	var _ToastsAPI2 = _interopRequireDefault(_ToastsAPI);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var entities = { xml: new _htmlEntities.XmlEntities(), html: new _htmlEntities.AllHtmlEntities() };
+	
+	var GamePopup = function (_React$Component) {
+	  _inherits(GamePopup, _React$Component);
+	
+	  function GamePopup(props) {
+	    _classCallCheck(this, GamePopup);
+	
+	    var _this = _possibleConstructorReturn(this, (GamePopup.__proto__ || Object.getPrototypeOf(GamePopup)).call(this, props));
+	
+	    var comp = _this;
+	    _this.state = {
+	      bgg_id: props.bgg_id,
+	      game: {},
+	      loaded: false,
+	      show_tags: false
+	    };
+	    return _this;
+	  }
+	
+	  _createClass(GamePopup, [{
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      var comp = this;
+	      comp.searchGame();
+	    }
+	  }, {
+	    key: 'searchGame',
+	    value: function searchGame() {
+	      var comp = this;
+	
+	      _axios2.default.get(_config2.default.bgg.game + comp.state.bgg_id, {
+	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
+	      }).then(function (json) {
+	        comp.setState({ loaded: true, game: json.data.game });
+	      }).catch(function (json) {
+	        //ToastsAPI.toast('error', null, json.response.data.message, {timeOut:6000});
+	        //comp.setState({loaded: true, game: {}});
+	      });
+	    }
+	  }, {
+	    key: 'handleShowTags',
+	    value: function handleShowTags() {
+	      var comp = this;
+	      comp.setState({
+	        show_tags: true
+	      });
+	    }
+	  }, {
+	    key: 'renderGame',
+	    value: function renderGame() {
+	      var comp = this;
+	      var game = comp.state.game;
+	
+	      function basic_image_replacer(image) {
+	        return image.replace(/(\.[a-zA-Z]+)$/, function (match, p1) {
+	          return "_md" + p1;
+	        });
+	      }
+	
+	      function filtered_image_replacer(image) {
+	        return image.replace(/original[\w\_\-\=\/]+(pic\d{3,})(\.[a-zA-Z]{2,4})$/, function (match, p1, p2) {
+	          return "images/" + p1 + "_md" + p2;
+	        });
+	      }
+	
+	      var notifyActive = _config2.default.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
+	      var wtpActive = _config2.default.state.user.wtp.indexOf(game.bgg_id) > -1 ? " active" : "";
+	      var image = false;
+	
+	      if (!!game.image) {
+	        if (game.image.indexOf('original') > -1) {
+	          image = filtered_image_replacer(game.image);
+	        } else {
+	          image = basic_image_replacer(game.image);
+	        }
+	      }
+	
+	      return _react2.default.createElement(
+	        'div',
+	        { key: "game-item-" + game.bgg_id, className: 'game-item full-view' },
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'game-item-top-wrap' },
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'game-bg', style: image ? { backgroundImage: "url(" + image + ")" } : {} },
+	            _react2.default.createElement('div', { className: 'game-bg-olay' }),
+	            _react2.default.createElement('div', { className: 'game-bg-olay2' })
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'game-item-content' },
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'game-item-year' },
+	              game.year
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'game-item-title' },
+	              game.title
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'game-item-subtitle clearfix' },
+	              _react2.default.createElement(
+	                'div',
+	                { className: 'game-item-rating hexagon' },
+	                _react2.default.createElement(
+	                  'span',
+	                  null,
+	                  (+game.rating).toFixed(1)
+	                )
+	              ),
+	              _react2.default.createElement(
+	                'div',
+	                { className: 'game-item-info' },
+	                _react2.default.createElement(
+	                  'p',
+	                  null,
+	                  game.minplayers === game.players[1] ? game.players[0] : game.players[0] + '-' + game.players[1],
+	                  ' players',
+	                  _react2.default.createElement('br', null),
+	                  game.playtime[0] === game.playtime[1] ? game.playtime[0] : game.playtime[0] + '-' + game.playtime[1],
+	                  ' minutes'
+	                )
+	              )
+	            )
+	          )
+	        ),
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'game-item-bottom-wrap' },
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'game-item-tags' },
+	            game.tags.map(function (tag, i) {
+	              return _react2.default.createElement(
+	                'div',
+	                { key: 'bggtag-' + i, className: 'plan-tag' },
+	                tag
+	              );
+	            })
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: "game-item-description" + (comp.state.activeGameOpenDesc ? " open" : "") },
+	            entities.html.decode(entities.xml.decode(game.desc)),
+	            _react2.default.createElement('div', { className: 'desc-overlay' })
+	          )
+	        )
+	      );
+	    } // renderGame
+	
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var comp = this;
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'game-item-wrap' },
+	        comp.state.loaded ? comp.renderGame() : _react2.default.createElement('div', null)
+	      );
+	    }
+	  }]);
+	
+	  return GamePopup;
+	}(_react2.default.Component);
+	
+	// {/* <LoadingInline active={!comp.state.loaded} /> */}
+	
+	
+	exports.default = GamePopup;
+
+/***/ }),
+/* 847 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _config = __webpack_require__(552);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	var _axios = __webpack_require__(525);
+	
+	var _axios2 = _interopRequireDefault(_axios);
+	
+	var _react = __webpack_require__(2);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _reactRouter = __webpack_require__(185);
+	
+	var _reactToolbox = __webpack_require__(243);
+	
+	var _button = __webpack_require__(244);
+	
 	var _reactTransitionGroup = __webpack_require__(551);
 	
 	var _lodash = __webpack_require__(554);
@@ -99249,7 +99472,7 @@
 	
 	var _ToastsAPI2 = _interopRequireDefault(_ToastsAPI);
 	
-	var _GamePopup = __webpack_require__(853);
+	var _GamePopup = __webpack_require__(846);
 	
 	var _GamePopup2 = _interopRequireDefault(_GamePopup);
 	
@@ -99592,7 +99815,7 @@
 	exports.default = MyTables;
 
 /***/ }),
-/* 847 */
+/* 848 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -99635,7 +99858,7 @@
 	
 	var _ToastsAPI2 = _interopRequireDefault(_ToastsAPI);
 	
-	var _GamePopup = __webpack_require__(853);
+	var _GamePopup = __webpack_require__(846);
 	
 	var _GamePopup2 = _interopRequireDefault(_GamePopup);
 	
@@ -100055,7 +100278,7 @@
 	exports.default = MyPlans;
 
 /***/ }),
-/* 848 */
+/* 849 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -100503,7 +100726,7 @@
 	exports.default = MySettings;
 
 /***/ }),
-/* 849 */
+/* 850 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -100780,7 +101003,7 @@
 	exports.default = MyAlerts;
 
 /***/ }),
-/* 850 */
+/* 851 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -100823,7 +101046,7 @@
 	
 	var _ToastsAPI2 = _interopRequireDefault(_ToastsAPI);
 	
-	var _GamePopup = __webpack_require__(853);
+	var _GamePopup = __webpack_require__(846);
 	
 	var _GamePopup2 = _interopRequireDefault(_GamePopup);
 	
@@ -101026,7 +101249,7 @@
 	exports.default = PlayersWanted;
 
 /***/ }),
-/* 851 */
+/* 852 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -101069,7 +101292,7 @@
 	
 	var _ToastsAPI2 = _interopRequireDefault(_ToastsAPI);
 	
-	var _GamePopup = __webpack_require__(853);
+	var _GamePopup = __webpack_require__(846);
 	
 	var _GamePopup2 = _interopRequireDefault(_GamePopup);
 	
@@ -101146,7 +101369,7 @@
 	          game_popup: false
 	        });
 	      }).catch(function (json) {
-	        console.log(json);
+	
 	        _ToastsAPI2.default.toast('error', null, 'Error getting tables list.', { timeOut: 6000 });
 	      });
 	    }
@@ -101463,7 +101686,7 @@
 	exports.default = ScheduledList;
 
 /***/ }),
-/* 852 */
+/* 853 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -101647,229 +101870,6 @@
 	;
 	
 	exports.default = Privacy;
-
-/***/ }),
-/* 853 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _config = __webpack_require__(552);
-	
-	var _config2 = _interopRequireDefault(_config);
-	
-	var _axios = __webpack_require__(525);
-	
-	var _axios2 = _interopRequireDefault(_axios);
-	
-	var _react = __webpack_require__(2);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	var _reactRouter = __webpack_require__(185);
-	
-	var _reactToolbox = __webpack_require__(243);
-	
-	var _button = __webpack_require__(244);
-	
-	var _lodash = __webpack_require__(554);
-	
-	var _htmlEntities = __webpack_require__(839);
-	
-	var _Loaders = __webpack_require__(715);
-	
-	var _ToastsAPI = __webpack_require__(556);
-	
-	var _ToastsAPI2 = _interopRequireDefault(_ToastsAPI);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var entities = { xml: new _htmlEntities.XmlEntities(), html: new _htmlEntities.AllHtmlEntities() };
-	
-	var GamePopup = function (_React$Component) {
-	  _inherits(GamePopup, _React$Component);
-	
-	  function GamePopup(props) {
-	    _classCallCheck(this, GamePopup);
-	
-	    var _this = _possibleConstructorReturn(this, (GamePopup.__proto__ || Object.getPrototypeOf(GamePopup)).call(this, props));
-	
-	    var comp = _this;
-	    _this.state = {
-	      bgg_id: props.bgg_id,
-	      game: {},
-	      loaded: false,
-	      show_tags: false
-	    };
-	    return _this;
-	  }
-	
-	  _createClass(GamePopup, [{
-	    key: 'componentDidMount',
-	    value: function componentDidMount() {
-	      var comp = this;
-	      comp.searchGame();
-	    }
-	  }, {
-	    key: 'searchGame',
-	    value: function searchGame() {
-	      var comp = this;
-	
-	      _axios2.default.get(_config2.default.bgg.game + comp.state.bgg_id, {
-	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
-	      }).then(function (json) {
-	        comp.setState({ loaded: true, game: json.data.game });
-	      }).catch(function (json) {
-	        //ToastsAPI.toast('error', null, json.response.data.message, {timeOut:6000});
-	        //comp.setState({loaded: true, game: {}});
-	      });
-	    }
-	  }, {
-	    key: 'handleShowTags',
-	    value: function handleShowTags() {
-	      var comp = this;
-	      comp.setState({
-	        show_tags: true
-	      });
-	    }
-	  }, {
-	    key: 'renderGame',
-	    value: function renderGame() {
-	      var comp = this;
-	      var game = comp.state.game;
-	
-	      function basic_image_replacer(image) {
-	        return image.replace(/(\.[a-zA-Z]+)$/, function (match, p1) {
-	          return "_md" + p1;
-	        });
-	      }
-	
-	      function filtered_image_replacer(image) {
-	        return image.replace(/original[\w\_\-\=\/]+(pic\d{3,})(\.[a-zA-Z]{2,4})$/, function (match, p1, p2) {
-	          return "images/" + p1 + "_md" + p2;
-	        });
-	      }
-	
-	      var notifyActive = _config2.default.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
-	      var wtpActive = _config2.default.state.user.wtp.indexOf(game.bgg_id) > -1 ? " active" : "";
-	      var image = false;
-	
-	      if (!!game.image) {
-	        if (game.image.indexOf('original') > -1) {
-	          image = filtered_image_replacer(game.image);
-	        } else {
-	          image = basic_image_replacer(game.image);
-	        }
-	      }
-	
-	      return _react2.default.createElement(
-	        'div',
-	        { key: "game-item-" + game.bgg_id, className: 'game-item full-view' },
-	        _react2.default.createElement(
-	          'div',
-	          { className: 'game-item-top-wrap' },
-	          _react2.default.createElement(
-	            'div',
-	            { className: 'game-bg', style: image ? { backgroundImage: "url(" + image + ")" } : {} },
-	            _react2.default.createElement('div', { className: 'game-bg-olay' }),
-	            _react2.default.createElement('div', { className: 'game-bg-olay2' })
-	          ),
-	          _react2.default.createElement(
-	            'div',
-	            { className: 'game-item-content' },
-	            _react2.default.createElement(
-	              'div',
-	              { className: 'game-item-year' },
-	              game.year
-	            ),
-	            _react2.default.createElement(
-	              'div',
-	              { className: 'game-item-title' },
-	              game.title
-	            ),
-	            _react2.default.createElement(
-	              'div',
-	              { className: 'game-item-subtitle clearfix' },
-	              _react2.default.createElement(
-	                'div',
-	                { className: 'game-item-rating hexagon' },
-	                _react2.default.createElement(
-	                  'span',
-	                  null,
-	                  (+game.rating).toFixed(1)
-	                )
-	              ),
-	              _react2.default.createElement(
-	                'div',
-	                { className: 'game-item-info' },
-	                _react2.default.createElement(
-	                  'p',
-	                  null,
-	                  game.minplayers === game.players[1] ? game.players[0] : game.players[0] + '-' + game.players[1],
-	                  ' players',
-	                  _react2.default.createElement('br', null),
-	                  game.playtime[0] === game.playtime[1] ? game.playtime[0] : game.playtime[0] + '-' + game.playtime[1],
-	                  ' minutes'
-	                )
-	              )
-	            )
-	          )
-	        ),
-	        _react2.default.createElement(
-	          'div',
-	          { className: 'game-item-bottom-wrap' },
-	          _react2.default.createElement(
-	            'div',
-	            { className: 'game-item-tags' },
-	            game.tags.map(function (tag, i) {
-	              return _react2.default.createElement(
-	                'div',
-	                { key: 'bggtag-' + i, className: 'plan-tag' },
-	                tag
-	              );
-	            })
-	          ),
-	          _react2.default.createElement(
-	            'div',
-	            { className: "game-item-description" + (comp.state.activeGameOpenDesc ? " open" : "") },
-	            entities.html.decode(entities.xml.decode(game.desc)),
-	            _react2.default.createElement('div', { className: 'desc-overlay' })
-	          )
-	        )
-	      );
-	    } // renderGame
-	
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      var comp = this;
-	      return _react2.default.createElement(
-	        'div',
-	        { className: 'game-item-wrap' },
-	        comp.state.loaded ? comp.renderGame() : _react2.default.createElement('div', null)
-	      );
-	    }
-	  }]);
-	
-	  return GamePopup;
-	}(_react2.default.Component);
-	
-	// {/* <LoadingInline active={!comp.state.loaded} /> */}
-	
-	
-	exports.default = GamePopup;
 
 /***/ })
 /******/ ]);
