@@ -396,7 +396,6 @@ class SearchGames extends React.Component
       });
     }
 
-
     return (
       <div className="game-search-list">
         {comp.state.games.map(function(game, i)

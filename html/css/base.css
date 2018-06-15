@@ -29,6 +29,13 @@ body{
 
 button, button:focus, button:visited{ outline: none !important; cursor: pointer; }
 
+#app-main-body button.has-icon {
+  padding-left: 7px;
+  padding-right: 7px;
+}
+#app-main-body button.has-icon span.material-icons{
+  font-size: 2rem;
+}
 
 #page-home h1{
   color: #adadad;

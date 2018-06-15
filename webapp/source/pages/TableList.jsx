@@ -10,6 +10,7 @@ import moment from 'moment';
 
 import {LoadingInline} from '../components/Loaders.jsx';
 import ToastsAPI from '../components/ToastsAPI.jsx';
+import GamePopup from '../components/GamePopup.jsx';
 
 class TableList extends React.Component
 {
@@ -23,7 +24,9 @@ class TableList extends React.Component
       cancelDialogActive: false,
       bgg_id: this.props.params.bgg_id,
       table_type: this.props.params.type,
-      tables: []
+      tables: [],
+      game_popup: false,
+      link_popup: false
     };
 
     this.renderTableList = this.renderTableList.bind(this);
@@ -42,6 +45,40 @@ class TableList extends React.Component
   {
 
   }
+
+  handleGamePopup(bgg_id)
+  {
+    var comp = this;
+    comp.setState({
+      game_popup: true,
+      game_popup_id: bgg_id
+    });
+  }
+
+  handleCloseGamePopup()
+  {
+    var comp = this;
+    comp.setState({
+      game_popup: false
+    })
+  }
+
+  handleLinkPopup(table_id)
+  {
+    var comp = this;
+    comp.setState({
+      link_popup: window.location.origin+'/list/table/'+table_id
+    });
+  }
+
+  handleCloseLinkPopup()
+  {
+    var comp = this;
+    comp.setState({
+      link_popup: false
+    });
+  }
+
 
   getTableList()
   {
@@ -136,7 +173,7 @@ class TableList extends React.Component
             return (
               <div className="table-item" key={"table-item-"+table.table_id}>
                 <div className="table-item-header">
-                  <span className="table-item-title">{table.title}</span>
+                  <span className="table-item-title"><a href="" onClick={(e)=>{comp.handleGamePopup(table.bgg_id); e.preventDefault();}}>{table.title}</a></span>
                   <span className={"table-item-when " + table.status}>
                     {table.status === 'cancelled' ? 'Cancelled' : moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').fromNow()}
                   </span>
@@ -154,9 +191,10 @@ class TableList extends React.Component
                   <div className="table-item-actions">
                     {table.table_type==='future' && table.player_id !== CONFIG.state.user.id && table.allow_signups!=1 ? (<button disabled>First Come (no sign up)</button>) : ''}
                     {table.table_type==='future' && table.player_id !== CONFIG.state.user.id && table.allow_signups==1 && table.joined<1 ? (<button onClick={comp.handleJoinGame.bind(comp, table)}>Join Game!</button>) : ''}
-                    {table.table_type==='future' && table.player_id !== CONFIG.state.user.id && table.allow_signups==1 && table.joined>0 ? (<button className='leave' onClick={comp.handleLeaveGame.bind(comp, table)}>Leave Game</button>) : ''}
-                    {table.table_type==='future' && table.allow_signups==1 ? (<button className="players" onClick={CONFIG.state.index.openTableDialog.bind(CONFIG.state.index, table.table_id)}>See Players</button>) : ''}
-                    {table.player_id == CONFIG.state.user.id ? (<button className='edit' onClick={()=>{browserHistory.push('/tables/edit/'+table.table_id)}}>Edit</button>) : ''}
+                    {table.table_type==='future' && table.player_id !== CONFIG.state.user.id && table.allow_signups==1 && table.joined>0 ? (<button className='leave' onClick={comp.handleLeaveGame.bind(comp, table)}>Leave</button>) : ''}
+                    {table.table_type==='future' && table.allow_signups==1 ? (<button className="players" onClick={CONFIG.state.index.openTableDialog.bind(CONFIG.state.index, table.table_id)}>Players</button>) : ''}
+                    {table.player_id == CONFIG.state.user.id ? (<button className='edit has-icon' onClick={()=>{browserHistory.push('/tables/edit/'+table.table_id)}}><FontIcon value='edit' /></button>) : ''}
+                    {table.status!=='cancelled' ? <button className="edit has-icon" onClick={comp.handleLinkPopup.bind(comp, table.table_id)}><FontIcon value='link' /></button> : ''}
                   </div>
                 )}
               </div>
@@ -199,6 +237,39 @@ class TableList extends React.Component
         >
           <p>You cannot undo this action if you cancel this table. If players have signed up, they will see a status change.</p>
         </Dialog>
+
+        <Dialog
+          className="game-popup"
+          title=""
+          type="normal"
+          onEscKeyDown={comp.handleCloseGamePopup.bind(comp)}
+          onOverlayClick={comp.handleCloseGamePopup.bind(comp)}
+          active={comp.state.game_popup}
+          actions={[
+            {label: "Close", onClick: comp.handleCloseGamePopup.bind(comp), primary: true, raised: true}
+          ]}
+        >
+          {comp.state.game_popup ?
+            <GamePopup
+              bgg_id={comp.state.game_popup_id}
+            />
+          : <div />}
+        </Dialog>
+
+        <Dialog
+          className="link-popup"
+          title=""
+          type="small"
+          onEscKeyDown={comp.handleCloseLinkPopup.bind(comp)}
+          onOverlayClick={comp.handleCloseLinkPopup.bind(comp)}
+          active={comp.state.link_popup!==false}
+          actions={[
+            {label: "Close", onClick: comp.handleCloseLinkPopup.bind(comp), primary: true, raised: true}
+          ]}
+        >
+          <a href={comp.state.link_popup}>{comp.state.link_popup}</a>
+        </Dialog>
+
       </div>
     );
   }

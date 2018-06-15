@@ -142,10 +142,11 @@ ul.plans-timeline .cancelled .plans-item{ opacity: 0.6; background: #e6b8b8; }
   text-overflow: ellipsis;
   text-align: left;
 }
+.plans-item .plans-item-head a{ color: #fff; text-decoration: underline; }
 .plans-item .plans-item-body{
   padding: 10px 14px 12px;
 }
-.plans-item-body .plan-tag{
+.plan-tag{
   display: inline-block;
   margin: 0 4px 4px 0;
   border-radius: 4px;

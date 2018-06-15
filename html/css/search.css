@@ -98,11 +98,14 @@
 
 .game-search-list-empty{
   position: absolute;
-  top: 100px;
+  top: 0px;
   left: 0;
   right: 0;
   padding: 30px 26px;
   margin: 0px;
+}
+#page-game-search .game-search-list-empty{
+  top: 100px;
 }
 .game-search-list-empty h3{
   color: #fff;
@@ -325,6 +328,9 @@
   width: 100%;
 }
 
+.game-item-tags{
+  padding: 18px 18px 0;
+}
 .game-item-description{
   padding: 0 16px;
   margin: 16px 18px 16px 0px;
@@ -422,3 +428,26 @@
 }
 #app-main-body .game-item-action-btn button > span:not([data-react-toolbox="tooltip"]){ line-height: 44px; }
 #app-main-body .game-item-action-btn.active{ background: #31bf5a; }
+
+div.game-popup[data-react-toolbox="dialog"] section[role="body"] {
+  padding: 0;
+  overflow: auto;
+
+}
+div.game-popup[data-react-toolbox="dialog"] .game-item{
+  margin: 0;
+}
+div.game-popup[data-react-toolbox="dialog"] .game-item-description{
+  overflow: visible;
+  max-height: none;
+  height: auto;
+}
+div.game-popup[data-react-toolbox="dialog"] .game-item-bottom-wrap{
+  height: auto;
+  max-height: none;
+  overflow: visible;
+  background: none;
+}
+div.game-popup[data-react-toolbox="dialog"] .game-item-description .desc-overlay{
+  display: none;
+}

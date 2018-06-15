@@ -40,7 +40,8 @@ class TableEdit extends React.Component
       lfp: true,
       lft: false,
       joined: true,
-      allow_signups: true
+      allow_signups: true,
+      private: false
     };
 
     this.dateRange = [
@@ -135,9 +136,12 @@ class TableEdit extends React.Component
       headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
     }).then(function(json){
       if(json.data.table){
+        if(json.data.table.player_id !== CONFIG.state.user.id){
+          ToastsAPI.toast('error', "You do not own this table.", null, {timeOut:6000});
+          browserHistory.push('/home');
+        }
         var newState = Object.assign({}, curState, json.data.table);
         newState.loaded = true;
-        console.log(newState);
         comp.setState(newState);
       }
     }).catch(function(json){
@@ -185,6 +189,7 @@ class TableEdit extends React.Component
       table_type: comp.state.table_type,
       //game_type: comp.state.game_type,
       lft: comp.state.lft,
+      private: comp.state.private,
       joined: comp.state.joined,
       allow_signups: comp.state.allow_signups,
       table_sublocation_alpha: comp.state.table_sublocation_alpha,
@@ -263,6 +268,7 @@ class TableEdit extends React.Component
                 {comp.state.table_type==='now' ? '' : (<Switch label="Allow Sign-ups" checked={comp.state.allow_signups} onChange={comp.handleChangeInput.bind(comp, 'allow_signups')} /> )}
                 {comp.state.table_type==='now' ? '' : (<Switch label="Join Your Own Table?" checked={comp.state.joined} onChange={comp.handleChangeInput.bind(comp, 'joined')} /> )}
                 <Switch label="Looking For Teacher" checked={comp.state.lft} onChange={comp.handleChangeInput.bind(comp, 'lft')} />
+                {comp.state.table_type==='now' ? '' : (<Switch label="Unlisted (Only visible to you)" checked={comp.state.private} onChange={comp.handleChangeInput.bind(comp, 'private')} /> )}
               </div>
               <div className="table-form-item">
                 <button type="submit" className="submit">Set Table!</button>

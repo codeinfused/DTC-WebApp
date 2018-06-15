@@ -88,7 +88,7 @@ class Home extends React.Component
                 </span>
               </div>
               <div className="table-item-details">
-                {table.table_type==='future' ? (<span className="table-item-tag">{table.signups} of {table.seats} seats taken</span>) : ''}
+                {table.private==1 ? (<span className="table-item-tag">Unlisted</span>) : (table.table_type==='future' ? (<span className="table-item-tag">{table.signups} of {table.seats} seats taken</span>) : '')}
                 <span className="table-item-tag">{table.table_location +' '+ (table.table_sublocation_alpha||'') + '-' + (table.table_sublocation_num||'')}</span>
                 {/* {table.table_type==='future' ? (<span className="table-item-tag">{moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, MMM Do YYYY, h:mm a')}</span>) : ''} */}
               </div>

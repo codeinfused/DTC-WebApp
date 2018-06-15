@@ -181,7 +181,7 @@
 	      tableDialogLoading: false
 	    };
 	
-	    _this.navButtons = [{ label: 'Home', path: '/home', icon: 'home' }, { label: 'Tables Right Now', path: '/lfp', icon: 'video_library' }, { label: 'Scheduled Tables', path: '/schedules', icon: 'event_note' }, { label: 'Start a Table', path: '/games', icon: 'library_books', callback: comp.DBLoadBGG },
+	    _this.navButtons = [{ label: 'Home', path: '/home', icon: 'home' }, { label: 'Tables Right Now', path: '/lfp', icon: 'video_library' }, { label: 'Scheduled Tables', path: '/schedules', icon: 'event_note' }, { label: 'Start/Search Games', path: '/games', icon: 'library_books', callback: comp.DBLoadBGG },
 	    // {label:'Con Library',         path:'/library', icon:'import_contacts', callback: comp.DBLoadLibrary},
 	    { label: 'Game Alerts', path: '/alerts', icon: 'notifications' }, { label: 'My Plans', path: '/myplans', icon: 'date_range' }, { label: 'My Tables', path: '/mytables', icon: 'playlist_add_check' }, { label: 'My Settings', path: '/me', icon: 'settings_applications' }, { label: 'About', path: '/about', icon: 'info' }];
 	
@@ -57076,7 +57076,7 @@
 	    game: baseAPI + "games/"
 	  },
 	
-	  conDays: [{ full: '2018-07-03', date: '3', name: 'Tue' }, { full: '2018-07-04', date: '4', name: 'Wed' }, { full: '2018-07-05', date: '5', name: 'Thu' }, { full: '2018-07-06', date: '6', name: 'Fri' }, { full: '2018-07-07', date: '7', name: 'Sat' }, { full: '2018-07-08', date: '8', name: 'Sun' }],
+	  conDays: [{ full: '2018-07-04', date: '4', name: 'Wed' }, { full: '2018-07-05', date: '5', name: 'Thu' }, { full: '2018-07-06', date: '6', name: 'Fri' }, { full: '2018-07-07', date: '7', name: 'Sat' }, { full: '2018-07-08', date: '8', name: 'Sun' }],
 	
 	  api: {
 	    url: baseAPI,
@@ -57242,6 +57242,7 @@
 	  // },
 	
 	  state: {
+	    baseUrl: window.location.origin,
 	    index: {},
 	    transitionTime: 300,
 	    authenticated: false,
@@ -80895,7 +80896,11 @@
 	            _react2.default.createElement(
 	              'div',
 	              { className: 'table-item-details' },
-	              table.table_type === 'future' ? _react2.default.createElement(
+	              table.private == 1 ? _react2.default.createElement(
+	                'span',
+	                { className: 'table-item-tag' },
+	                'Unlisted'
+	              ) : table.table_type === 'future' ? _react2.default.createElement(
 	                'span',
 	                { className: 'table-item-tag' },
 	                table.signups,
@@ -98494,7 +98499,8 @@
 	      lfp: true,
 	      lft: false,
 	      joined: true,
-	      allow_signups: true
+	      allow_signups: true,
+	      private: false
 	    };
 	
 	    _this.dateRange = ['2018-07-03', '2018-07-08'];
@@ -98575,9 +98581,12 @@
 	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
 	      }).then(function (json) {
 	        if (json.data.table) {
+	          if (json.data.table.player_id !== _config2.default.state.user.id) {
+	            _ToastsAPI2.default.toast('error', "You do not own this table.", null, { timeOut: 6000 });
+	            _reactRouter.browserHistory.push('/home');
+	          }
 	          var newState = Object.assign({}, curState, json.data.table);
 	          newState.loaded = true;
-	          console.log(newState);
 	          comp.setState(newState);
 	        }
 	      }).catch(function (json) {
@@ -98624,6 +98633,7 @@
 	        table_type: comp.state.table_type,
 	        //game_type: comp.state.game_type,
 	        lft: comp.state.lft,
+	        private: comp.state.private,
 	        joined: comp.state.joined,
 	        allow_signups: comp.state.allow_signups,
 	        table_sublocation_alpha: comp.state.table_sublocation_alpha,
@@ -98743,7 +98753,8 @@
 	              { className: 'table-form-item' },
 	              comp.state.table_type === 'now' ? '' : _react2.default.createElement(_reactToolbox.Switch, { label: 'Allow Sign-ups', checked: comp.state.allow_signups, onChange: comp.handleChangeInput.bind(comp, 'allow_signups') }),
 	              comp.state.table_type === 'now' ? '' : _react2.default.createElement(_reactToolbox.Switch, { label: 'Join Your Own Table?', checked: comp.state.joined, onChange: comp.handleChangeInput.bind(comp, 'joined') }),
-	              _react2.default.createElement(_reactToolbox.Switch, { label: 'Looking For Teacher', checked: comp.state.lft, onChange: comp.handleChangeInput.bind(comp, 'lft') })
+	              _react2.default.createElement(_reactToolbox.Switch, { label: 'Looking For Teacher', checked: comp.state.lft, onChange: comp.handleChangeInput.bind(comp, 'lft') }),
+	              comp.state.table_type === 'now' ? '' : _react2.default.createElement(_reactToolbox.Switch, { label: 'Unlisted (Only visible to you)', checked: comp.state.private, onChange: comp.handleChangeInput.bind(comp, 'private') })
 	            ),
 	            _react2.default.createElement(
 	              'div',
@@ -98837,6 +98848,10 @@
 	
 	var _ToastsAPI2 = _interopRequireDefault(_ToastsAPI);
 	
+	var _GamePopup = __webpack_require__(853);
+	
+	var _GamePopup2 = _interopRequireDefault(_GamePopup);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -98860,7 +98875,9 @@
 	      cancelDialogActive: false,
 	      bgg_id: _this.props.params.bgg_id,
 	      table_type: _this.props.params.type,
-	      tables: []
+	      tables: [],
+	      game_popup: false,
+	      link_popup: false
 	    };
 	
 	    _this.renderTableList = _this.renderTableList.bind(_this);
@@ -98879,6 +98896,39 @@
 	  }, {
 	    key: 'componentWillReceiveProps',
 	    value: function componentWillReceiveProps(nextProps) {}
+	  }, {
+	    key: 'handleGamePopup',
+	    value: function handleGamePopup(bgg_id) {
+	      var comp = this;
+	      comp.setState({
+	        game_popup: true,
+	        game_popup_id: bgg_id
+	      });
+	    }
+	  }, {
+	    key: 'handleCloseGamePopup',
+	    value: function handleCloseGamePopup() {
+	      var comp = this;
+	      comp.setState({
+	        game_popup: false
+	      });
+	    }
+	  }, {
+	    key: 'handleLinkPopup',
+	    value: function handleLinkPopup(table_id) {
+	      var comp = this;
+	      comp.setState({
+	        link_popup: window.location.origin + '/list/table/' + table_id
+	      });
+	    }
+	  }, {
+	    key: 'handleCloseLinkPopup',
+	    value: function handleCloseLinkPopup() {
+	      var comp = this;
+	      comp.setState({
+	        link_popup: false
+	      });
+	    }
 	  }, {
 	    key: 'getTableList',
 	    value: function getTableList() {
@@ -98984,7 +99034,13 @@
 	              _react2.default.createElement(
 	                'span',
 	                { className: 'table-item-title' },
-	                table.title
+	                _react2.default.createElement(
+	                  'a',
+	                  { href: '', onClick: function onClick(e) {
+	                      comp.handleGamePopup(table.bgg_id);e.preventDefault();
+	                    } },
+	                  table.title
+	                )
 	              ),
 	              _react2.default.createElement(
 	                'span',
@@ -99035,19 +99091,24 @@
 	              table.table_type === 'future' && table.player_id !== _config2.default.state.user.id && table.allow_signups == 1 && table.joined > 0 ? _react2.default.createElement(
 	                'button',
 	                { className: 'leave', onClick: comp.handleLeaveGame.bind(comp, table) },
-	                'Leave Game'
+	                'Leave'
 	              ) : '',
 	              table.table_type === 'future' && table.allow_signups == 1 ? _react2.default.createElement(
 	                'button',
 	                { className: 'players', onClick: _config2.default.state.index.openTableDialog.bind(_config2.default.state.index, table.table_id) },
-	                'See Players'
+	                'Players'
 	              ) : '',
 	              table.player_id == _config2.default.state.user.id ? _react2.default.createElement(
 	                'button',
-	                { className: 'edit', onClick: function onClick() {
+	                { className: 'edit has-icon', onClick: function onClick() {
 	                    _reactRouter.browserHistory.push('/tables/edit/' + table.table_id);
 	                  } },
-	                'Edit'
+	                _react2.default.createElement(_reactToolbox.FontIcon, { value: 'edit' })
+	              ) : '',
+	              table.status !== 'cancelled' ? _react2.default.createElement(
+	                'button',
+	                { className: 'edit has-icon', onClick: comp.handleLinkPopup.bind(comp, table.table_id) },
+	                _react2.default.createElement(_reactToolbox.FontIcon, { value: 'link' })
 	              ) : ''
 	            )
 	          );
@@ -99101,6 +99162,38 @@
 	            'p',
 	            null,
 	            'You cannot undo this action if you cancel this table. If players have signed up, they will see a status change.'
+	          )
+	        ),
+	        _react2.default.createElement(
+	          _reactToolbox.Dialog,
+	          {
+	            className: 'game-popup',
+	            title: '',
+	            type: 'normal',
+	            onEscKeyDown: comp.handleCloseGamePopup.bind(comp),
+	            onOverlayClick: comp.handleCloseGamePopup.bind(comp),
+	            active: comp.state.game_popup,
+	            actions: [{ label: "Close", onClick: comp.handleCloseGamePopup.bind(comp), primary: true, raised: true }]
+	          },
+	          comp.state.game_popup ? _react2.default.createElement(_GamePopup2.default, {
+	            bgg_id: comp.state.game_popup_id
+	          }) : _react2.default.createElement('div', null)
+	        ),
+	        _react2.default.createElement(
+	          _reactToolbox.Dialog,
+	          {
+	            className: 'link-popup',
+	            title: '',
+	            type: 'small',
+	            onEscKeyDown: comp.handleCloseLinkPopup.bind(comp),
+	            onOverlayClick: comp.handleCloseLinkPopup.bind(comp),
+	            active: comp.state.link_popup !== false,
+	            actions: [{ label: "Close", onClick: comp.handleCloseLinkPopup.bind(comp), primary: true, raised: true }]
+	          },
+	          _react2.default.createElement(
+	            'a',
+	            { href: comp.state.link_popup },
+	            comp.state.link_popup
 	          )
 	        )
 	      );
@@ -99156,6 +99249,10 @@
 	
 	var _ToastsAPI2 = _interopRequireDefault(_ToastsAPI);
 	
+	var _GamePopup = __webpack_require__(853);
+	
+	var _GamePopup2 = _interopRequireDefault(_GamePopup);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -99178,7 +99275,9 @@
 	      loaded: false,
 	      cancelDialogActive: false,
 	      currentTableId: -1,
-	      tables: []
+	      tables: [],
+	      game_popup: false,
+	      link_popup: false
 	    };
 	
 	    _this.renderTableList = _this.renderTableList.bind(_this);
@@ -99197,6 +99296,39 @@
 	  }, {
 	    key: 'componentWillReceiveProps',
 	    value: function componentWillReceiveProps(nextProps) {}
+	  }, {
+	    key: 'handleGamePopup',
+	    value: function handleGamePopup(bgg_id) {
+	      var comp = this;
+	      comp.setState({
+	        game_popup: true,
+	        game_popup_id: bgg_id
+	      });
+	    }
+	  }, {
+	    key: 'handleCloseGamePopup',
+	    value: function handleCloseGamePopup() {
+	      var comp = this;
+	      comp.setState({
+	        game_popup: false
+	      });
+	    }
+	  }, {
+	    key: 'handleLinkPopup',
+	    value: function handleLinkPopup(table_id) {
+	      var comp = this;
+	      comp.setState({
+	        link_popup: window.location.origin + '/list/table/' + table_id
+	      });
+	    }
+	  }, {
+	    key: 'handleCloseLinkPopup',
+	    value: function handleCloseLinkPopup() {
+	      var comp = this;
+	      comp.setState({
+	        link_popup: false
+	      });
+	    }
 	  }, {
 	    key: 'getTableList',
 	    value: function getTableList() {
@@ -99293,7 +99425,13 @@
 	                _react2.default.createElement(
 	                  'span',
 	                  { className: 'table-item-title' },
-	                  table.title
+	                  _react2.default.createElement(
+	                    'a',
+	                    { href: '', onClick: function onClick(e) {
+	                        comp.handleGamePopup(table.bgg_id);e.preventDefault();
+	                      } },
+	                    table.title
+	                  )
 	                ),
 	                _react2.default.createElement(
 	                  'span',
@@ -99304,7 +99442,12 @@
 	              _react2.default.createElement(
 	                'div',
 	                { className: 'table-item-details' },
-	                table.table_type === 'future' ? _react2.default.createElement(
+	                table.private == 1 ? _react2.default.createElement(
+	                  'span',
+	                  { className: 'table-item-tag' },
+	                  'Unlisted Table'
+	                ) : '',
+	                table.table_type === 'future' && table.private != 1 ? _react2.default.createElement(
 	                  'span',
 	                  { className: 'table-item-tag' },
 	                  table.signups,
@@ -99328,24 +99471,29 @@
 	                { className: 'table-item-actions' },
 	                _react2.default.createElement(
 	                  'button',
-	                  { className: 'delete', onClick: comp.handleConfirmCancel.bind(comp, table) },
+	                  { className: 'delete has-icon', onClick: comp.handleConfirmCancel.bind(comp, table) },
 	                  _react2.default.createElement(_reactToolbox.FontIcon, { value: 'close' })
 	                ),
 	                _react2.default.createElement(
 	                  'button',
-	                  { className: 'edit', onClick: function onClick() {
+	                  { className: 'edit has-icon', onClick: function onClick() {
 	                      _reactRouter.browserHistory.push('/tables/edit/' + table.table_id);
 	                    } },
-	                  'Edit'
+	                  _react2.default.createElement(_reactToolbox.FontIcon, { value: 'edit' })
 	                ),
+	                table.status !== 'cancelled' ? _react2.default.createElement(
+	                  'button',
+	                  { className: 'edit has-icon', onClick: comp.handleLinkPopup.bind(comp, table.table_id) },
+	                  _react2.default.createElement(_reactToolbox.FontIcon, { value: 'link' })
+	                ) : '',
 	                table.table_type === 'now' ? _react2.default.createElement(
 	                  'button',
 	                  { onClick: comp.refreshTable.bind(comp, table) },
-	                  'Refresh listing'
+	                  'Renew'
 	                ) : table.allow_signups == 1 ? _react2.default.createElement(
 	                  'button',
 	                  { className: 'players', onClick: _config2.default.state.index.openTableDialog.bind(_config2.default.state.index, table.table_id) },
-	                  'See Players'
+	                  'Players'
 	                ) : ''
 	              )
 	            );
@@ -99401,6 +99549,38 @@
 	            null,
 	            'You cannot undo this action if you cancel this table. If players have signed up, they will see a status change.'
 	          )
+	        ),
+	        _react2.default.createElement(
+	          _reactToolbox.Dialog,
+	          {
+	            className: 'game-popup',
+	            title: '',
+	            type: 'normal',
+	            onEscKeyDown: comp.handleCloseGamePopup.bind(comp),
+	            onOverlayClick: comp.handleCloseGamePopup.bind(comp),
+	            active: comp.state.game_popup,
+	            actions: [{ label: "Close", onClick: comp.handleCloseGamePopup.bind(comp), primary: true, raised: true }]
+	          },
+	          comp.state.game_popup ? _react2.default.createElement(_GamePopup2.default, {
+	            bgg_id: comp.state.game_popup_id
+	          }) : _react2.default.createElement('div', null)
+	        ),
+	        _react2.default.createElement(
+	          _reactToolbox.Dialog,
+	          {
+	            className: 'link-popup',
+	            title: '',
+	            type: 'small',
+	            onEscKeyDown: comp.handleCloseLinkPopup.bind(comp),
+	            onOverlayClick: comp.handleCloseLinkPopup.bind(comp),
+	            active: comp.state.link_popup !== false,
+	            actions: [{ label: "Close", onClick: comp.handleCloseLinkPopup.bind(comp), primary: true, raised: true }]
+	          },
+	          _react2.default.createElement(
+	            'a',
+	            { href: comp.state.link_popup },
+	            comp.state.link_popup
+	          )
 	        )
 	      );
 	    }
@@ -99455,6 +99635,10 @@
 	
 	var _ToastsAPI2 = _interopRequireDefault(_ToastsAPI);
 	
+	var _GamePopup = __webpack_require__(853);
+	
+	var _GamePopup2 = _interopRequireDefault(_GamePopup);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -99480,7 +99664,9 @@
 	      currentDay: day,
 	      cancelDialogActive: false,
 	      currentTableId: -1,
-	      tables: []
+	      tables: [],
+	      game_popup: false,
+	      link_popup: false
 	    };
 	
 	    _this.conDays = _config2.default.conDays;
@@ -99512,6 +99698,39 @@
 	  }, {
 	    key: 'componentWillReceiveProps',
 	    value: function componentWillReceiveProps(nextProps) {}
+	  }, {
+	    key: 'handleGamePopup',
+	    value: function handleGamePopup(bgg_id) {
+	      var comp = this;
+	      comp.setState({
+	        game_popup: true,
+	        game_popup_id: bgg_id
+	      });
+	    }
+	  }, {
+	    key: 'handleCloseGamePopup',
+	    value: function handleCloseGamePopup() {
+	      var comp = this;
+	      comp.setState({
+	        game_popup: false
+	      });
+	    }
+	  }, {
+	    key: 'handleLinkPopup',
+	    value: function handleLinkPopup(table_id) {
+	      var comp = this;
+	      comp.setState({
+	        link_popup: window.location.origin + '/list/table/' + table_id
+	      });
+	    }
+	  }, {
+	    key: 'handleCloseLinkPopup',
+	    value: function handleCloseLinkPopup() {
+	      var comp = this;
+	      comp.setState({
+	        link_popup: false
+	      });
+	    }
 	  }, {
 	    key: 'getTableList',
 	    value: function getTableList() {
@@ -99660,7 +99879,13 @@
 	                _react2.default.createElement(
 	                  'div',
 	                  { className: 'plans-item-head' },
-	                  table.title
+	                  _react2.default.createElement(
+	                    'a',
+	                    { href: '', onClick: function onClick(e) {
+	                        comp.handleGamePopup(table.bgg_id);e.preventDefault();
+	                      } },
+	                    table.title
+	                  )
 	                ),
 	                _react2.default.createElement(
 	                  'div',
@@ -99683,8 +99908,7 @@
 	                  _react2.default.createElement(
 	                    'span',
 	                    { className: "plan-tag" + (isMyTable ? " hosting" : "") },
-	                    'Host: ',
-	                    isMyTable ? "Me" : table.host_name
+	                    isMyTable ? table.private == 1 ? "Unlisted" : "Host: Me" : "Host: " + table.host_name
 	                  ),
 	                  table.allow_signups == 1 ? _react2.default.createElement(
 	                    'span',
@@ -99700,25 +99924,30 @@
 	                  { className: 'plans-btns' },
 	                  table.player_id === _config2.default.state.user.id ? _react2.default.createElement(
 	                    'button',
-	                    { className: 'delete', onClick: comp.handleConfirmCancel.bind(comp, table) },
+	                    { className: 'delete has-icon', onClick: comp.handleConfirmCancel.bind(comp, table) },
 	                    _react2.default.createElement(_reactToolbox.FontIcon, { value: 'close' })
 	                  ) : '',
 	                  table.player_id !== _config2.default.state.user.id ? _react2.default.createElement(
 	                    'button',
 	                    { onClick: comp.handleLeaveGame.bind(comp, table) },
-	                    'Leave Game'
+	                    'Leave'
 	                  ) : '',
 	                  table.allow_signups == 1 ? _react2.default.createElement(
 	                    'button',
 	                    { className: 'players', onClick: _config2.default.state.index.openTableDialog.bind(_config2.default.state.index, table.table_id) },
-	                    'See Players'
+	                    'Players'
 	                  ) : '',
 	                  table.player_id === _config2.default.state.user.id ? _react2.default.createElement(
 	                    'button',
-	                    { className: 'edit', onClick: function onClick() {
+	                    { className: 'edit has-icon', onClick: function onClick() {
 	                        _reactRouter.browserHistory.push('/tables/edit/' + table.table_id);
 	                      } },
-	                    'Edit'
+	                    _react2.default.createElement(_reactToolbox.FontIcon, { value: 'edit' })
+	                  ) : '',
+	                  table.status !== 'cancelled' ? _react2.default.createElement(
+	                    'button',
+	                    { className: 'edit has-icon', onClick: comp.handleLinkPopup.bind(comp, table.table_id) },
+	                    _react2.default.createElement(_reactToolbox.FontIcon, { value: 'link' })
 	                  ) : ''
 	                )
 	              )
@@ -99782,6 +100011,38 @@
 	            'p',
 	            null,
 	            'You cannot undo this action if you cancel this table. If players have signed up, they will see a status change.'
+	          )
+	        ),
+	        _react2.default.createElement(
+	          _reactToolbox.Dialog,
+	          {
+	            className: 'game-popup',
+	            title: '',
+	            type: 'normal',
+	            onEscKeyDown: comp.handleCloseGamePopup.bind(comp),
+	            onOverlayClick: comp.handleCloseGamePopup.bind(comp),
+	            active: comp.state.game_popup,
+	            actions: [{ label: "Close", onClick: comp.handleCloseGamePopup.bind(comp), primary: true, raised: true }]
+	          },
+	          comp.state.game_popup ? _react2.default.createElement(_GamePopup2.default, {
+	            bgg_id: comp.state.game_popup_id
+	          }) : _react2.default.createElement('div', null)
+	        ),
+	        _react2.default.createElement(
+	          _reactToolbox.Dialog,
+	          {
+	            className: 'link-popup',
+	            title: '',
+	            type: 'small',
+	            onEscKeyDown: comp.handleCloseLinkPopup.bind(comp),
+	            onOverlayClick: comp.handleCloseLinkPopup.bind(comp),
+	            active: comp.state.link_popup !== false,
+	            actions: [{ label: "Close", onClick: comp.handleCloseLinkPopup.bind(comp), primary: true, raised: true }]
+	          },
+	          _react2.default.createElement(
+	            'a',
+	            { href: comp.state.link_popup },
+	            comp.state.link_popup
 	          )
 	        )
 	      );
@@ -100562,6 +100823,10 @@
 	
 	var _ToastsAPI2 = _interopRequireDefault(_ToastsAPI);
 	
+	var _GamePopup = __webpack_require__(853);
+	
+	var _GamePopup2 = _interopRequireDefault(_GamePopup);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -100570,19 +100835,20 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var MyTables = function (_React$Component) {
-	  _inherits(MyTables, _React$Component);
+	var PlayersWanted = function (_React$Component) {
+	  _inherits(PlayersWanted, _React$Component);
 	
-	  function MyTables(props) {
-	    _classCallCheck(this, MyTables);
+	  function PlayersWanted(props) {
+	    _classCallCheck(this, PlayersWanted);
 	
-	    var _this = _possibleConstructorReturn(this, (MyTables.__proto__ || Object.getPrototypeOf(MyTables)).call(this, props));
+	    var _this = _possibleConstructorReturn(this, (PlayersWanted.__proto__ || Object.getPrototypeOf(PlayersWanted)).call(this, props));
 	
 	    var comp = _this;
 	
 	    _this.state = {
 	      loaded: false,
-	      tables: []
+	      tables: [],
+	      game_popup: false
 	    };
 	
 	    _this.renderTableList = _this.renderTableList.bind(_this);
@@ -100591,7 +100857,7 @@
 	    return _this;
 	  }
 	
-	  _createClass(MyTables, [{
+	  _createClass(PlayersWanted, [{
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
 	      this.getTableList();
@@ -100599,6 +100865,23 @@
 	  }, {
 	    key: 'componentWillReceiveProps',
 	    value: function componentWillReceiveProps(nextProps) {}
+	  }, {
+	    key: 'handleGamePopup',
+	    value: function handleGamePopup(bgg_id) {
+	      var comp = this;
+	      comp.setState({
+	        game_popup: true,
+	        game_popup_id: bgg_id
+	      });
+	    }
+	  }, {
+	    key: 'handleCloseGamePopup',
+	    value: function handleCloseGamePopup() {
+	      var comp = this;
+	      comp.setState({
+	        game_popup: false
+	      });
+	    }
 	  }, {
 	    key: 'getTableList',
 	    value: function getTableList() {
@@ -100639,7 +100922,13 @@
 	              _react2.default.createElement(
 	                'span',
 	                { className: 'table-item-title' },
-	                table.title
+	                _react2.default.createElement(
+	                  'a',
+	                  { href: '', onClick: function onClick(e) {
+	                      comp.handleGamePopup(table.bgg_id);e.preventDefault();
+	                    } },
+	                  table.title
+	                )
 	              ),
 	              _react2.default.createElement(
 	                'span',
@@ -100711,15 +101000,30 @@
 	        ),
 	        _react2.default.createElement(_Loaders.LoadingInline, {
 	          active: !comp.state.loaded
-	        })
+	        }),
+	        _react2.default.createElement(
+	          _reactToolbox.Dialog,
+	          {
+	            className: 'game-popup',
+	            title: '',
+	            type: 'normal',
+	            onEscKeyDown: comp.handleCloseGamePopup.bind(comp),
+	            onOverlayClick: comp.handleCloseGamePopup.bind(comp),
+	            active: comp.state.game_popup,
+	            actions: [{ label: "Close", onClick: comp.handleCloseGamePopup.bind(comp), primary: true, raised: true }]
+	          },
+	          comp.state.game_popup ? _react2.default.createElement(_GamePopup2.default, {
+	            bgg_id: comp.state.game_popup_id
+	          }) : _react2.default.createElement('div', null)
+	        )
 	      );
 	    }
 	  }]);
 	
-	  return MyTables;
+	  return PlayersWanted;
 	}(_react2.default.Component);
 	
-	exports.default = MyTables;
+	exports.default = PlayersWanted;
 
 /***/ }),
 /* 851 */
@@ -100765,6 +101069,10 @@
 	
 	var _ToastsAPI2 = _interopRequireDefault(_ToastsAPI);
 	
+	var _GamePopup = __webpack_require__(853);
+	
+	var _GamePopup2 = _interopRequireDefault(_GamePopup);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -100789,7 +101097,9 @@
 	      loaded: false,
 	      currentDayObj: {},
 	      currentDayFull: day,
-	      tables: []
+	      tables: [],
+	      game_popup: false,
+	      link_popup: false
 	    };
 	
 	    _this.conDays = _config2.default.conDays;
@@ -100832,7 +101142,8 @@
 	      }).then(function (json) {
 	        comp.setState({
 	          loaded: true,
-	          tables: json.data.tables
+	          tables: json.data.tables,
+	          game_popup: false
 	        });
 	      }).catch(function (json) {
 	        console.log(json);
@@ -100890,6 +101201,39 @@
 	        comp.getTableList(comp.state.currentDayFull);
 	      }).catch(function (json) {
 	        _ToastsAPI2.default.toast('error', null, json.response.data.message, { timeOut: 6000 });
+	      });
+	    }
+	  }, {
+	    key: 'handleGamePopup',
+	    value: function handleGamePopup(bgg_id) {
+	      var comp = this;
+	      comp.setState({
+	        game_popup: true,
+	        game_popup_id: bgg_id
+	      });
+	    }
+	  }, {
+	    key: 'handleCloseGamePopup',
+	    value: function handleCloseGamePopup() {
+	      var comp = this;
+	      comp.setState({
+	        game_popup: false
+	      });
+	    }
+	  }, {
+	    key: 'handleLinkPopup',
+	    value: function handleLinkPopup(table_id) {
+	      var comp = this;
+	      comp.setState({
+	        link_popup: window.location.origin + '/list/table/' + table_id
+	      });
+	    }
+	  }, {
+	    key: 'handleCloseLinkPopup',
+	    value: function handleCloseLinkPopup() {
+	      var comp = this;
+	      comp.setState({
+	        link_popup: false
 	      });
 	    }
 	  }, {
@@ -100953,7 +101297,13 @@
 	                _react2.default.createElement(
 	                  'div',
 	                  { className: 'plans-item-head' },
-	                  table.title
+	                  _react2.default.createElement(
+	                    'a',
+	                    { href: '', onClick: function onClick(e) {
+	                        comp.handleGamePopup(table.bgg_id);e.preventDefault();
+	                      } },
+	                    table.title
+	                  )
 	                ),
 	                _react2.default.createElement(
 	                  'div',
@@ -100999,7 +101349,7 @@
 	                  table.player_id !== _config2.default.state.user.id && table.allow_signups == 1 && table.joined == 1 ? _react2.default.createElement(
 	                    'button',
 	                    { className: 'leave', onClick: comp.handleLeaveGame.bind(comp, table) },
-	                    'Leave Game'
+	                    'Leave'
 	                  ) : '',
 	                  table.player_id !== _config2.default.state.user.id && table.allow_signups == 1 && table.joined < 1 ? _react2.default.createElement(
 	                    'button',
@@ -101009,14 +101359,19 @@
 	                  table.allow_signups == 1 ? _react2.default.createElement(
 	                    'button',
 	                    { className: 'players', onClick: _config2.default.state.index.openTableDialog.bind(_config2.default.state.index, table.table_id) },
-	                    'See Players'
+	                    'Players'
 	                  ) : '',
 	                  table.player_id == _config2.default.state.user.id ? _react2.default.createElement(
 	                    'button',
-	                    { className: 'edit', onClick: function onClick() {
+	                    { className: 'edit has-icon', onClick: function onClick() {
 	                        _reactRouter.browserHistory.push('/tables/edit/' + table.table_id);
 	                      } },
-	                    'Edit'
+	                    _react2.default.createElement(_reactToolbox.FontIcon, { value: 'edit' })
+	                  ) : '',
+	                  table.status !== 'cancelled' ? _react2.default.createElement(
+	                    'button',
+	                    { className: 'edit has-icon', onClick: comp.handleLinkPopup.bind(comp, table.table_id) },
+	                    _react2.default.createElement(_reactToolbox.FontIcon, { value: 'link' })
 	                  ) : ''
 	                )
 	              )
@@ -101065,7 +101420,39 @@
 	        ),
 	        _react2.default.createElement(_Loaders.LoadingInline, {
 	          active: !comp.state.loaded
-	        })
+	        }),
+	        _react2.default.createElement(
+	          _reactToolbox.Dialog,
+	          {
+	            className: 'game-popup',
+	            title: '',
+	            type: 'normal',
+	            onEscKeyDown: comp.handleCloseGamePopup.bind(comp),
+	            onOverlayClick: comp.handleCloseGamePopup.bind(comp),
+	            active: comp.state.game_popup,
+	            actions: [{ label: "Close", onClick: comp.handleCloseGamePopup.bind(comp), primary: true, raised: true }]
+	          },
+	          comp.state.game_popup ? _react2.default.createElement(_GamePopup2.default, {
+	            bgg_id: comp.state.game_popup_id
+	          }) : _react2.default.createElement('div', null)
+	        ),
+	        _react2.default.createElement(
+	          _reactToolbox.Dialog,
+	          {
+	            className: 'link-popup',
+	            title: '',
+	            type: 'small',
+	            onEscKeyDown: comp.handleCloseLinkPopup.bind(comp),
+	            onOverlayClick: comp.handleCloseLinkPopup.bind(comp),
+	            active: comp.state.link_popup !== false,
+	            actions: [{ label: "Close", onClick: comp.handleCloseLinkPopup.bind(comp), primary: true, raised: true }]
+	          },
+	          _react2.default.createElement(
+	            'a',
+	            { href: comp.state.link_popup },
+	            comp.state.link_popup
+	          )
+	        )
 	      );
 	    }
 	  }]);
@@ -101260,6 +101647,229 @@
 	;
 	
 	exports.default = Privacy;
+
+/***/ }),
+/* 853 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _config = __webpack_require__(552);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	var _axios = __webpack_require__(525);
+	
+	var _axios2 = _interopRequireDefault(_axios);
+	
+	var _react = __webpack_require__(2);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _reactRouter = __webpack_require__(185);
+	
+	var _reactToolbox = __webpack_require__(243);
+	
+	var _button = __webpack_require__(244);
+	
+	var _lodash = __webpack_require__(554);
+	
+	var _htmlEntities = __webpack_require__(839);
+	
+	var _Loaders = __webpack_require__(715);
+	
+	var _ToastsAPI = __webpack_require__(556);
+	
+	var _ToastsAPI2 = _interopRequireDefault(_ToastsAPI);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var entities = { xml: new _htmlEntities.XmlEntities(), html: new _htmlEntities.AllHtmlEntities() };
+	
+	var GamePopup = function (_React$Component) {
+	  _inherits(GamePopup, _React$Component);
+	
+	  function GamePopup(props) {
+	    _classCallCheck(this, GamePopup);
+	
+	    var _this = _possibleConstructorReturn(this, (GamePopup.__proto__ || Object.getPrototypeOf(GamePopup)).call(this, props));
+	
+	    var comp = _this;
+	    _this.state = {
+	      bgg_id: props.bgg_id,
+	      game: {},
+	      loaded: false,
+	      show_tags: false
+	    };
+	    return _this;
+	  }
+	
+	  _createClass(GamePopup, [{
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      var comp = this;
+	      comp.searchGame();
+	    }
+	  }, {
+	    key: 'searchGame',
+	    value: function searchGame() {
+	      var comp = this;
+	
+	      _axios2.default.get(_config2.default.bgg.game + comp.state.bgg_id, {
+	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
+	      }).then(function (json) {
+	        comp.setState({ loaded: true, game: json.data.game });
+	      }).catch(function (json) {
+	        //ToastsAPI.toast('error', null, json.response.data.message, {timeOut:6000});
+	        //comp.setState({loaded: true, game: {}});
+	      });
+	    }
+	  }, {
+	    key: 'handleShowTags',
+	    value: function handleShowTags() {
+	      var comp = this;
+	      comp.setState({
+	        show_tags: true
+	      });
+	    }
+	  }, {
+	    key: 'renderGame',
+	    value: function renderGame() {
+	      var comp = this;
+	      var game = comp.state.game;
+	
+	      function basic_image_replacer(image) {
+	        return image.replace(/(\.[a-zA-Z]+)$/, function (match, p1) {
+	          return "_md" + p1;
+	        });
+	      }
+	
+	      function filtered_image_replacer(image) {
+	        return image.replace(/original[\w\_\-\=\/]+(pic\d{3,})(\.[a-zA-Z]{2,4})$/, function (match, p1, p2) {
+	          return "images/" + p1 + "_md" + p2;
+	        });
+	      }
+	
+	      var notifyActive = _config2.default.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
+	      var wtpActive = _config2.default.state.user.wtp.indexOf(game.bgg_id) > -1 ? " active" : "";
+	      var image = false;
+	
+	      if (!!game.image) {
+	        if (game.image.indexOf('original') > -1) {
+	          image = filtered_image_replacer(game.image);
+	        } else {
+	          image = basic_image_replacer(game.image);
+	        }
+	      }
+	
+	      return _react2.default.createElement(
+	        'div',
+	        { key: "game-item-" + game.bgg_id, className: 'game-item full-view' },
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'game-item-top-wrap' },
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'game-bg', style: image ? { backgroundImage: "url(" + image + ")" } : {} },
+	            _react2.default.createElement('div', { className: 'game-bg-olay' }),
+	            _react2.default.createElement('div', { className: 'game-bg-olay2' })
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'game-item-content' },
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'game-item-year' },
+	              game.year
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'game-item-title' },
+	              game.title
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'game-item-subtitle clearfix' },
+	              _react2.default.createElement(
+	                'div',
+	                { className: 'game-item-rating hexagon' },
+	                _react2.default.createElement(
+	                  'span',
+	                  null,
+	                  (+game.rating).toFixed(1)
+	                )
+	              ),
+	              _react2.default.createElement(
+	                'div',
+	                { className: 'game-item-info' },
+	                _react2.default.createElement(
+	                  'p',
+	                  null,
+	                  game.minplayers === game.players[1] ? game.players[0] : game.players[0] + '-' + game.players[1],
+	                  ' players',
+	                  _react2.default.createElement('br', null),
+	                  game.playtime[0] === game.playtime[1] ? game.playtime[0] : game.playtime[0] + '-' + game.playtime[1],
+	                  ' minutes'
+	                )
+	              )
+	            )
+	          )
+	        ),
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'game-item-bottom-wrap' },
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'game-item-tags' },
+	            game.tags.map(function (tag, i) {
+	              return _react2.default.createElement(
+	                'div',
+	                { key: 'bggtag-' + i, className: 'plan-tag' },
+	                tag
+	              );
+	            })
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: "game-item-description" + (comp.state.activeGameOpenDesc ? " open" : "") },
+	            entities.html.decode(entities.xml.decode(game.desc)),
+	            _react2.default.createElement('div', { className: 'desc-overlay' })
+	          )
+	        )
+	      );
+	    } // renderGame
+	
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var comp = this;
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'game-item-wrap' },
+	        comp.state.loaded ? comp.renderGame() : _react2.default.createElement('div', null)
+	      );
+	    }
+	  }]);
+	
+	  return GamePopup;
+	}(_react2.default.Component);
+	
+	// {/* <LoadingInline active={!comp.state.loaded} /> */}
+	
+	
+	exports.default = GamePopup;
 
 /***/ })
 /******/ ]);

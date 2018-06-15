@@ -10,6 +10,7 @@ import moment from 'moment';
 
 import {LoadingInline} from '../components/Loaders.jsx';
 import ToastsAPI from '../components/ToastsAPI.jsx';
+import GamePopup from '../components/GamePopup.jsx';
 
 class MyTables extends React.Component
 {
@@ -22,7 +23,9 @@ class MyTables extends React.Component
       loaded: false,
       cancelDialogActive: false,
       currentTableId: -1,
-      tables: []
+      tables: [],
+      game_popup: false,
+      link_popup: false
     };
 
     this.renderTableList = this.renderTableList.bind(this);
@@ -40,6 +43,39 @@ class MyTables extends React.Component
   componentWillReceiveProps(nextProps)
   {
 
+  }
+
+  handleGamePopup(bgg_id)
+  {
+    var comp = this;
+    comp.setState({
+      game_popup: true,
+      game_popup_id: bgg_id
+    });
+  }
+
+  handleCloseGamePopup()
+  {
+    var comp = this;
+    comp.setState({
+      game_popup: false
+    })
+  }
+
+  handleLinkPopup(table_id)
+  {
+    var comp = this;
+    comp.setState({
+      link_popup: window.location.origin+'/list/table/'+table_id
+    });
+  }
+
+  handleCloseLinkPopup()
+  {
+    var comp = this;
+    comp.setState({
+      link_popup: false
+    });
   }
 
   getTableList()
@@ -126,24 +162,26 @@ class MyTables extends React.Component
             return (
               <div className="table-item" key={"table-item-"+table.table_id}>
                 <div className="table-item-header">
-                  <span className="table-item-title">{table.title}</span>
+                  <span className="table-item-title"><a href="" onClick={(e)=>{comp.handleGamePopup(table.bgg_id); e.preventDefault();}}>{table.title}</a></span>
                   <span className={"table-item-when " + table.status}>
                     {table.status === 'cancelled' ? 'Cancelled' : moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').fromNow()}
                   </span>
                 </div>
                 <div className="table-item-details">
-                  {table.table_type==='future' ? (<span className="table-item-tag">{table.signups} of {table.seats} seats taken</span>) : ''}
+                  {table.private==1 ? (<span className="table-item-tag">Unlisted Table</span>) : ''}
+                  {table.table_type==='future' && table.private!=1 ? (<span className="table-item-tag">{table.signups} of {table.seats} seats taken</span>) : ''}
                   <span className="table-item-tag">{table.table_location +' '+ (table.table_sublocation_alpha||'') + '-' + (table.table_sublocation_num||'')}</span>
                   {table.table_type==='future' ? (<span className="table-item-tag">{moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, MMM Do YYYY, h:mm a')}</span>) : ''}
                 </div>
                 {table.status === 'cancelled' ? '' : (
                   <div className="table-item-actions">
-                    <button className='delete' onClick={comp.handleConfirmCancel.bind(comp, table)}><FontIcon value='close' /></button>
-                    <button className='edit' onClick={()=>{browserHistory.push('/tables/edit/'+table.table_id)}}>Edit</button>
+                    <button className='delete has-icon' onClick={comp.handleConfirmCancel.bind(comp, table)}><FontIcon value='close' /></button>
+                    <button className='edit has-icon' onClick={()=>{browserHistory.push('/tables/edit/'+table.table_id)}}><FontIcon value='edit' /></button>
+                    {table.status!=='cancelled' ? <button className="edit has-icon" onClick={comp.handleLinkPopup.bind(comp, table.table_id)}><FontIcon value='link' /></button> : ''}
                     {table.table_type==='now' ? (
-                      <button onClick={comp.refreshTable.bind(comp, table)}>Refresh listing</button>
+                      <button onClick={comp.refreshTable.bind(comp, table)}>Renew</button>
                     ) : (
-                      table.allow_signups==1 ? (<button className="players" onClick={CONFIG.state.index.openTableDialog.bind(CONFIG.state.index, table.table_id)}>See Players</button>) : ''
+                      table.allow_signups==1 ? (<button className="players" onClick={CONFIG.state.index.openTableDialog.bind(CONFIG.state.index, table.table_id)}>Players</button>) : ''
                     )}
                   </div>
                 )}
@@ -167,7 +205,7 @@ class MyTables extends React.Component
     var comp = this;
     return (
       <div id="page-my-tables" className="transition-item page-my-tables page-wrap">
-        
+
         <div className={"table-list-wrap" + (comp.state.loader ? " loading" : "")}>
           {(comp.state.tables && comp.state.tables.length > 0) ? comp.renderTableList() : comp.renderNoTables()}
         </div>
@@ -189,6 +227,39 @@ class MyTables extends React.Component
         >
           <p>You cannot undo this action if you cancel this table. If players have signed up, they will see a status change.</p>
         </Dialog>
+
+        <Dialog
+          className="game-popup"
+          title=""
+          type="normal"
+          onEscKeyDown={comp.handleCloseGamePopup.bind(comp)}
+          onOverlayClick={comp.handleCloseGamePopup.bind(comp)}
+          active={comp.state.game_popup}
+          actions={[
+            {label: "Close", onClick: comp.handleCloseGamePopup.bind(comp), primary: true, raised: true}
+          ]}
+        >
+          {comp.state.game_popup ?
+            <GamePopup
+              bgg_id={comp.state.game_popup_id}
+            />
+          : <div />}
+        </Dialog>
+
+        <Dialog
+          className="link-popup"
+          title=""
+          type="small"
+          onEscKeyDown={comp.handleCloseLinkPopup.bind(comp)}
+          onOverlayClick={comp.handleCloseLinkPopup.bind(comp)}
+          active={comp.state.link_popup!==false}
+          actions={[
+            {label: "Close", onClick: comp.handleCloseLinkPopup.bind(comp), primary: true, raised: true}
+          ]}
+        >
+          <a href={comp.state.link_popup}>{comp.state.link_popup}</a>
+        </Dialog>
+
       </div>
     );
   }

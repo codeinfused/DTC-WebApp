@@ -70,7 +70,7 @@ div[data-react-toolbox="dropdown"]{
 
 div[data-react-toolbox="overlay"]{
   height: 90vh;
-  top: -10px;
+  top: 10px;
   z-index: 500;
 }
 div[data-react-toolbox="dialog"] h3#months{
@@ -146,7 +146,7 @@ label[data-react-toolbox="switch"]{
   margin-bottom: 15px;
 }
 .table-item-header{
-    background: rgba(186, 133, 206, 0.45); /* #a176b1; */
+    background: rgba(113, 149, 220, 0.45); /* rgba(186, 133, 206, 0.45); #a176b1; */
     padding: 0px 9px;
     text-align: right;
     height: 38px;
@@ -154,7 +154,7 @@ label[data-react-toolbox="switch"]{
     text-align: right;
 }
 .table-item-title{
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   font-weight: 600;
   float: left;
   width: 75%;
@@ -164,6 +164,7 @@ label[data-react-toolbox="switch"]{
   text-align: left;
   color: #fff;
 }
+.table-item-title a{ color: #fff; text-decoration: underline; }
 .table-item-when{
   position: absolute;
   top: 6px;
@@ -216,7 +217,7 @@ span.table-item-when.cancelled {
   margin-right: 8px;
 }
 .table-item-actions button.delete, .plans-btns button.delete{
-  background: #c54a4a;
+  background: #9a4d4d;
   padding: 0 6px;
 }
 .table-item-actions button .material-icons, .plans-btns button .material-icons{
@@ -226,7 +227,7 @@ span.table-item-when.cancelled {
 }
 .table-item-actions button.leave{
   font-style: italic;
-  background: #c54a4a;
+  background: #9a4d4d;
 }
 
 select.sublocation_alpha{

@@ -10,8 +10,9 @@ import moment from 'moment';
 
 import {LoadingInline} from '../components/Loaders.jsx';
 import ToastsAPI from '../components/ToastsAPI.jsx';
+import GamePopup from '../components/GamePopup.jsx';
 
-class MyTables extends React.Component
+class PlayersWanted extends React.Component
 {
   constructor(props)
   {
@@ -20,7 +21,8 @@ class MyTables extends React.Component
 
     this.state = {
       loaded: false,
-      tables: []
+      tables: [],
+      game_popup: false
     };
 
     this.renderTableList = this.renderTableList.bind(this);
@@ -36,6 +38,23 @@ class MyTables extends React.Component
   componentWillReceiveProps(nextProps)
   {
 
+  }
+
+  handleGamePopup(bgg_id)
+  {
+    var comp = this;
+    comp.setState({
+      game_popup: true,
+      game_popup_id: bgg_id
+    });
+  }
+
+  handleCloseGamePopup()
+  {
+    var comp = this;
+    comp.setState({
+      game_popup: false
+    })
   }
 
   getTableList()
@@ -68,7 +87,7 @@ class MyTables extends React.Component
             return (
               <div className="table-item" key={"table-item-"+table.table_id}>
                 <div className="table-item-header">
-                  <span className="table-item-title">{table.title}</span>
+                  <span className="table-item-title"><a href="" onClick={(e)=>{comp.handleGamePopup(table.bgg_id); e.preventDefault();}}>{table.title}</a></span>
                   <span className={"table-item-when " + table.status}>
                     {table.status === 'cancelled' ? 'Cancelled' : moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').fromNow()}
                   </span>
@@ -107,9 +126,28 @@ class MyTables extends React.Component
         <LoadingInline
           active={!comp.state.loaded}
         />
+
+        <Dialog
+          className="game-popup"
+          title=""
+          type="normal"
+          onEscKeyDown={comp.handleCloseGamePopup.bind(comp)}
+          onOverlayClick={comp.handleCloseGamePopup.bind(comp)}
+          active={comp.state.game_popup}
+          actions={[
+            {label: "Close", onClick: comp.handleCloseGamePopup.bind(comp), primary: true, raised: true}
+          ]}
+        >
+          {comp.state.game_popup ?
+            <GamePopup
+              bgg_id={comp.state.game_popup_id}
+            />
+          : <div />}
+        </Dialog>
+
       </div>
     );
   }
 }
 
-export default MyTables;
+export default PlayersWanted;

@@ -203,6 +203,7 @@ const CONFIG = {
   // },
 
   state: {
+    baseUrl: window.location.origin,
     index: {},
     transitionTime: 300,
     authenticated: false,

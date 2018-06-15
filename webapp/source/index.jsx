@@ -52,7 +52,7 @@ class AppLayout extends React.Component
       {label:'Home',                path:'/home', icon:'home'},
       {label:'Tables Right Now',    path:'/lfp', icon:'video_library'},
       {label:'Scheduled Tables',    path:'/schedules', icon:'event_note'},
-      {label:'Start a Table',       path:'/games', icon:'library_books', callback: comp.DBLoadBGG},
+      {label:'Start/Search Games',       path:'/games', icon:'library_books', callback: comp.DBLoadBGG},
       // {label:'Con Library',         path:'/library', icon:'import_contacts', callback: comp.DBLoadLibrary},
       {label:'Game Alerts',         path:'/alerts', icon:'notifications'},
       {label:'My Plans',            path:'/myplans', icon:'date_range'},

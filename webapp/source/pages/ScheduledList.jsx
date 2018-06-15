@@ -10,6 +10,7 @@ import moment from 'moment';
 
 import {LoadingInline} from '../components/Loaders.jsx';
 import ToastsAPI from '../components/ToastsAPI.jsx';
+import GamePopup from '../components/GamePopup.jsx';
 
 class ScheduledList extends React.Component
 {
@@ -24,7 +25,9 @@ class ScheduledList extends React.Component
       loaded: false,
       currentDayObj: {},
       currentDayFull: day,
-      tables: []
+      tables: [],
+      game_popup: false,
+      link_popup: false
     };
 
     this.conDays = CONFIG.conDays;
@@ -63,7 +66,8 @@ class ScheduledList extends React.Component
     }).then(function(json){
       comp.setState({
         loaded: true,
-        tables: json.data.tables
+        tables: json.data.tables,
+        game_popup: false
       });
     }).catch(function(json){
       console.log(json);
@@ -125,6 +129,39 @@ class ScheduledList extends React.Component
     });
   }
 
+  handleGamePopup(bgg_id)
+  {
+    var comp = this;
+    comp.setState({
+      game_popup: true,
+      game_popup_id: bgg_id
+    });
+  }
+
+  handleCloseGamePopup()
+  {
+    var comp = this;
+    comp.setState({
+      game_popup: false
+    });
+  }
+
+  handleLinkPopup(table_id)
+  {
+    var comp = this;
+    comp.setState({
+      link_popup: window.location.origin+'/list/table/'+table_id
+    });
+  }
+
+  handleCloseLinkPopup()
+  {
+    var comp = this;
+    comp.setState({
+      link_popup: false
+    });
+  }
+
 
   renderCalendar()
   {
@@ -169,7 +206,7 @@ class ScheduledList extends React.Component
                   <i className={table.status==='cancelled' ? "fa fa-calendar-times-o cancelled" : "fa "+calIcon}></i>
                   {table.lft=='1' ? (<i className="fa fa-graduation-cap"></i>) : ''}
                   <div className="plans-item">
-                    <div className="plans-item-head">{table.title}</div>
+                    <div className="plans-item-head"><a href="" onClick={(e)=>{comp.handleGamePopup(table.bgg_id); e.preventDefault();}}>{table.title}</a></div>
                     <div className="plans-item-body">
                       <p className="plans-time">{table.status==='cancelled' ? 'Cancelled' : moment(table.start_datetime).fromNow()}</p>
                       <span className="plan-tag">{moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, MMM Do YYYY, h:mm a')}</span>
@@ -180,10 +217,11 @@ class ScheduledList extends React.Component
                     <div className="plans-btns">
                       {/* leave game, join game, see players, first come, edit */}
                       {table.player_id !== CONFIG.state.user.id && table.allow_signups!=1 ? (<button disabled>First Come (no sign up)</button>) : ''}
-                      {table.player_id !== CONFIG.state.user.id && table.allow_signups==1 && table.joined==1 ? (<button className='leave' onClick={comp.handleLeaveGame.bind(comp, table)}>Leave Game</button>) : ''}
+                      {table.player_id !== CONFIG.state.user.id && table.allow_signups==1 && table.joined==1 ? (<button className='leave' onClick={comp.handleLeaveGame.bind(comp, table)}>Leave</button>) : ''}
                       {table.player_id !== CONFIG.state.user.id && table.allow_signups==1 && table.joined<1 ? (<button className='join' onClick={comp.handleJoinGame.bind(comp, table)}>{table.signups >= table.seats ? 'Join Waitlist' : 'Join Game'}</button>) : ''}
-                      {table.allow_signups==1 ? (<button className="players" onClick={CONFIG.state.index.openTableDialog.bind(CONFIG.state.index, table.table_id)}>See Players</button>) : ''}
-                      {table.player_id == CONFIG.state.user.id ? (<button className='edit' onClick={()=>{browserHistory.push('/tables/edit/'+table.table_id)}}>Edit</button>) : ''}
+                      {table.allow_signups==1 ? (<button className="players" onClick={CONFIG.state.index.openTableDialog.bind(CONFIG.state.index, table.table_id)}>Players</button>) : ''}
+                      {table.player_id == CONFIG.state.user.id ? (<button className='edit has-icon' onClick={()=>{browserHistory.push('/tables/edit/'+table.table_id)}}><FontIcon value='edit' /></button>) : ''}
+                      {table.status!=='cancelled' ? <button className="edit has-icon" onClick={comp.handleLinkPopup.bind(comp, table.table_id)}><FontIcon value='link' /></button> : ''}
                     </div>
                   </div>
                 </li>
@@ -218,6 +256,38 @@ class ScheduledList extends React.Component
         <LoadingInline
           active={!comp.state.loaded}
         />
+
+        <Dialog
+          className="game-popup"
+          title=""
+          type="normal"
+          onEscKeyDown={comp.handleCloseGamePopup.bind(comp)}
+          onOverlayClick={comp.handleCloseGamePopup.bind(comp)}
+          active={comp.state.game_popup}
+          actions={[
+            {label: "Close", onClick: comp.handleCloseGamePopup.bind(comp), primary: true, raised: true}
+          ]}
+        >
+          {comp.state.game_popup ?
+            <GamePopup
+              bgg_id={comp.state.game_popup_id}
+            />
+          : <div />}
+        </Dialog>
+
+        <Dialog
+          className="link-popup"
+          title=""
+          type="small"
+          onEscKeyDown={comp.handleCloseLinkPopup.bind(comp)}
+          onOverlayClick={comp.handleCloseLinkPopup.bind(comp)}
+          active={comp.state.link_popup!==false}
+          actions={[
+            {label: "Close", onClick: comp.handleCloseLinkPopup.bind(comp), primary: true, raised: true}
+          ]}
+        >
+          <a href={comp.state.link_popup}>{comp.state.link_popup}</a>
+        </Dialog>
 
       </div>
     );
