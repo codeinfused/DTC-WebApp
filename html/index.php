@@ -22,7 +22,7 @@
   <link rel="shortcut icon" href="/favicon.ico">
 
   <!-- Android Meta -->
-  <link rel="manifest" href="/android-manifest.json">
+  <link rel="manifest" href="/android-manifest-2.json">
   <meta name="application-name" content="Dice Tower Con">
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="theme-color" content="#601c88" />
