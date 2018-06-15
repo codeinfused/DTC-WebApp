@@ -1,8 +1,8 @@
-@import "base.css";
-@import "loaders.css";
-@import "toastr.css";
-@import "splash.css";
-@import "tables.css";
-@import "search.css";
-@import "mypages.css";
+@import "base.css?v=3";
+@import "loaders.css?v=3";
+@import "toastr.css?v=3";
+@import "splash.css?v=3";
+@import "tables.css?v=3";
+@import "search.css?v=3";
+@import "mypages.css?v=3";
 .v-2-2-0{ display: none; }
