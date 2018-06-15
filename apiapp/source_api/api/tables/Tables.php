@@ -279,13 +279,27 @@ abstract class Tables
         foreach($users as $user){
 
         }
-
-        $req = $pdo->prepare(
-          "INSERT INTO notifications n (user_id, title, message, game_title, game_start, reference_id, created_date) VALUES
-          ( created_date=NOW())
-
-        ");
+        // $req = $pdo->prepare(
+        //   "INSERT INTO notifications n (user_id, title, message, game_title, game_start, reference_id, created_date) VALUES
+        //   ( created_date=NOW())
+        // ");
       }
+    }
+    else{  /* EDITING EXISTING */
+
+      $table_id = $data['table_id'];
+      
+      if($data['joined']===1){
+        self::join_table($pdo, $uid, array(
+          'table_id' => $table_id
+        ));
+      }
+      if($data['joined']===0){
+        self::leave_table($pdo, $uid, array(
+          'table_id' => $table_id
+        ));
+      }
+
     }
 
     return array('success'=>true);
