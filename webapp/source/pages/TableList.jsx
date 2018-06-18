@@ -179,13 +179,14 @@ class TableList extends React.Component
                   </span>
                 </div>
                 <div className="table-item-details">
+                  {table.table_type==='future' ? (<span className="table-item-tag">{moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, M/D/Y, h:mm a')}</span>) : ''}
+                  <span className="table-item-tag">Takes {table.playtime ? table.playtime : Math.round((Math.round(table.avgplay/6)/10)*2)/2 + ' hours'}</span>
                   {table.table_type==='now' ? (
                     <span className="table-item-tag">Host: {table.host_name}</span>
                   ) : (
                     <span className="table-item-tag">{table.signups} of {table.seats} seats taken</span>
                   )}
                   <span className="table-item-tag">{table.table_location +' '+ (table.table_sublocation_alpha||'') + '-' + (table.table_sublocation_num||'')}</span>
-                  {table.table_type==='future' ? (<span className="table-item-tag">{moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, MMM Do YYYY, h:mm a')}</span>) : ''}
                 </div>
                 {table.status === 'cancelled' ? '' : (
                   <div className="table-item-actions">

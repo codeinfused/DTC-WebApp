@@ -29,6 +29,7 @@ class TableEdit extends React.Component
       bgg_id: this.props.params.bgg_id,
       game: {},
       seats: 2,
+      playtime: null,
       //game_type: 'normal',
       table_type: 'now',
       table_location: 'Caribbean Ballroom',
@@ -53,6 +54,11 @@ class TableEdit extends React.Component
     this.sublocs_num = Array.apply(null, {length: 36}).map(Number.call, Number);
     this.sublocs_num = this.sublocs_num.slice(1);
 
+    this.tableTypes = [
+      {id: 'now', name: 'Now'},
+      {id: 'later', name: 'Later'},
+      {id: 'demo', name: 'Demo'}
+    ];
 
     this.tableLocations = [
       {label: 'Caribbean Ballroom', value: 'Caribbean Ballroom' },
@@ -64,6 +70,18 @@ class TableEdit extends React.Component
       {label: 'Curaco', value: 'Curaco'},
       {label: 'Hibiscus', value: 'Hibiscus'},
       {label: 'Reception Lobby', value: 'Reception Lobby'}
+    ];
+
+    this.playtimeOptions = [
+      {label: 'Auto', value: ''},
+      {label: '30 (half hour)', value: '0.5 hour'},
+      {label: '60 (1 hour)', value: '1 hour'},
+      {label: '90 (1½ hours)', value: '1.5 hours'},
+      {label: '120 (2 hours)', value: '2 hours'},
+      {label: '150 (2½ hours)', value: '2.5 hours'},
+      {label: '180 (3 hours)', value: '3 hours'},
+      {label: '240 (4 hours)', value: '4 hours'},
+      {label: '300 (5+ hours)', value: '5+ hours'},
     ];
 
     this.getGameData = this.getGameData.bind(this);
@@ -187,6 +205,7 @@ class TableEdit extends React.Component
       seats: comp.state.seats,
       table_location: comp.state.table_location,
       table_type: comp.state.table_type,
+      playtime: (comp.state.playtime == '' ? null : comp.state.playtime),
       //game_type: comp.state.game_type,
       lft: comp.state.lft,
       private: comp.state.private,
@@ -219,7 +238,7 @@ class TableEdit extends React.Component
           <LoadingInline active={!comp.state.loaded} />
         ) : (
           <div className="page-table-edit-wrap">
-            <h1>Table Editor</h1>
+            <h1>{comp.state.mountType==='create' ? 'New Table' : 'Table Editor'}</h1>
             <div className="my-profile">
               <img src={CONFIG.state.user.thumb ? CONFIG.state.user.thumb : '/images/profile-generic.jpg'} />
             </div>
@@ -231,7 +250,17 @@ class TableEdit extends React.Component
                 {/* <RadioGroup name='table_type' value={comp.state.table_type} onChange={comp.handleChangeInput.bind(comp, 'table_type')}>
                   <RadioButton label='Looking Now' value='now' /><RadioButton label='Scheduled' value='future' />
                 </RadioGroup> */}
-                <Dropdown label='Schedule' source={[{label:'Now', value:'now'}, {label:'Later', value:'future'}]} value={comp.state.table_type} onChange={comp.handleChangeInput.bind(comp, 'table_type')} />
+                {/* <Dropdown label='Schedule' source={[{label:'Now', value:'now'}, {label:'Later', value:'future'}]} value={comp.state.table_type} onChange={comp.handleChangeInput.bind(comp, 'table_type')} /> */}
+                <fieldset>
+                  <legend>Type of Table</legend>
+                  <div className="switch-toggle switch-candy large-4">
+                    <input id='type-now' name="table_type" type="radio" value='now' checked={comp.state.table_type==='now'} onChange={comp.handleChangeInput.bind(comp, 'table_type', 'now')} />
+                    <label htmlFor='type-now'>Now</label>
+                    <input id='type-later' name="table_type" type="radio" value='later' checked={comp.state.table_type==='later'} onChange={comp.handleChangeInput.bind(comp, 'table_type', 'later')} />
+                    <label htmlFor='type-later'>Later</label>
+                    <a></a>
+                  </div>
+                </fieldset>
               </div>
               {comp.state.table_type==='now' ? '' : (
                 <div>
@@ -261,6 +290,12 @@ class TableEdit extends React.Component
                 </select>
               </div>
               <div className="table-form-item">
+                <div className="table-form-playtime">
+                  <Dropdown label='Estimated Length' source={comp.playtimeOptions} value={comp.state.playtime} allowBlank={false} onChange={comp.handleChangeInput.bind(comp, 'playtime')} />
+                  <span>{comp.state.game.playtime[0]} - {comp.state.game.playtime[1]} minutes</span>
+                </div>
+              </div>
+              <div className="table-form-item">
                 <div className="table-form-playerseats" style={{marginTop:'8px'}}>How Many Players <span>({comp.state.game.players[0] + '-' + comp.state.game.players[1]})</span></div>
                 <Slider pinned snaps min={2} max={12} step={1} editable value={comp.state.seats} onChange={comp.handleChangeInput.bind(comp, 'seats')} />
               </div>
@@ -271,7 +306,7 @@ class TableEdit extends React.Component
                 {comp.state.table_type==='now' ? '' : (<Switch label="Unlisted (Only visible to you)" checked={comp.state.private} onChange={comp.handleChangeInput.bind(comp, 'private')} /> )}
               </div>
               <div className="table-form-item">
-                <button type="submit" className="submit">Set Table!</button>
+                <button type="submit" className="submit">Save Game Table!</button>
               </div>
             </form>
 

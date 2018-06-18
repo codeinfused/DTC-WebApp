@@ -224,9 +224,10 @@ class MyPlans extends React.Component
                     <div className="plans-item-head"><a href="" onClick={(e)=>{comp.handleGamePopup(table.bgg_id); e.preventDefault();}}>{table.title}</a></div>
                     <div className="plans-item-body">
                       <p className="plans-time">{table.status==='cancelled' ? 'Cancelled' : moment(table.start_datetime).fromNow()}</p>
-                      <span className="plan-tag">{moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, MMM Do YYYY, h:mm a')}</span>
+                      <span className="plan-tag">{moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, M/D/Y, h:mm a')}</span>
+                      <span className="plan-tag">Takes {table.playtime ? table.playtime : Math.round((Math.round(table.avgplay/6)/10)*2)/2 + ' hours'}</span>
                       <span className="plan-tag">{table.table_location +' '+ (table.table_sublocation_alpha||'') + '-' + (table.table_sublocation_num||'')}</span>
-                      <span className={"plan-tag" + (isMyTable ? " hosting" : "")}>{(isMyTable ? (table.private==1?"Unlisted":"Host: Me") : "Host: "+table.host_name)}</span>
+                      <span className={"plan-tag" + (isMyTable ? " hosting" : " otherhost")}>{(isMyTable ? (table.private==1?"Unlisted":"Host: Me") : "Host: "+table.host_name)}</span>
                       {table.allow_signups==1 ? (<span className="plan-tag">{table.signups} of {table.seats} seats taken</span>) : ''}
                     </div>
                     <div className="plans-btns">

@@ -2,7 +2,7 @@ import CONFIG from '../config.jsx';
 import axios from 'axios';
 import React from 'react';
 import {browserHistory} from 'react-router';
-import {FontIcon} from 'react-toolbox';
+import {FontIcon, Dialog} from 'react-toolbox';
 import {Button, IconButton} from 'react-toolbox/lib/button';
 import {LoadingInline} from '../components/Loaders.jsx';
 
@@ -12,8 +12,19 @@ class About extends React.Component
   {
     super(props);
     this.state = {
-      loader: false
+      loader: false,
+      popup_map: false
     };
+  }
+
+  handleOpenMap()
+  {
+    this.setState({popup_map: true});
+  }
+
+  handleCloseMap()
+  {
+    this.setState({popup_map: false});
   }
 
   render()
@@ -22,31 +33,57 @@ class About extends React.Component
 
     return (
       <div id="page-about" className="transition-item page-about page-wrap page-basic">
-        <h2>Tips</h2>
+        <h2>DTC App Info</h2>
+        <p>This site provides a tool for finding and scheduling games to play during The Dice Tower Convention. The goal is to let players quickly see games they're interested in without having to roam all the rooms. Of course, this only works if you spread the word! The more people using DTCApp, the more games to find!</p>
         <ul>
-          <li>This app is a website, not an actual Android or iOS app. But you can add it to your phone like an app <em>(see next)</em></li>
-          <li>To add this site to your phone's home-screen for a smoother experience: from your browser's <em>Share</em> menu, press "Add to Home screen".</li>
-          <li>Most of the search options (like year or categories) also sort by their boardgamegeek ranking!</li>
+          <li>This app is a website, not an Android or iPhone app. But you can add it to your phone like an app <em>(see next)</em></li>
+          <li>To add our app icon to your phone, open <em>"Share"</em> on this website, and press <em>"Add to Home screen"</em>.</li>
           <li>The convention offers free wifi, use it!</li>
+          <li>Grab a "Players Wanted" sign to help others find your table!</li>
         </ul>
 
+        <div>
+          <Button raised primary
+            label="Open Convention Map"
+            icon="map"
+            onClick={comp.handleOpenMap.bind(comp)}
+          />
+        </div>
+
         <h2>Thanks to BGG!</h2>
-        <p>All the board game data used here is from the amazing folks at boardgamegeek.com, thanks to their open API service. Serious kudos.</p>
+        <p>All the board game data used here is from the amazing folks at <a href="http://boardgamegeek.com" target="_blank" style={{color:'#fff'}}>boardgamegeek.com</a>, thanks to their open API service!</p>
+        <ul>
+          <li>On the "Search Games" page, results also sort by their boardgamegeek ranking!</li>
+          <li>BGG data used here ignores board game expansions to make the lists shorter.</li>
+        </ul>
 
         <h2>Who Made This?</h2>
-        <p>My name is Mike, and I created this little app because I love DTC. With the growing size, I wanted a way to easily find fellow gamers and the games I want to play.</p>
-        <p>The app isn't perfect, and I have plenty of improvements to make. It'll only get better the more people that use it, which in turn encourages me to put more work into it.</p>
-        <p>If you've enjoyed using this app to find games to play, track me down for a high five.</p>
+        <p>My name is Mike, and I created this DTC App because I love Dice Tower Con. With the con growing in size each year, I wanted a way to easily find the games I want to play. There's plenty of improvements I want to make, and it'll only get better the more people that use it, making finding games more widespread!</p>
+        <p>If you've enjoyed using this app to meet players, track me down for a high five.</p>
         <p><span className="about-mike-photo"><img src="/images/mike.jpg" /></span></p>
 
-        <p><br />If you're reading this, you must be extra crazy. Just schedule some games on the app already.</p>
-        <p><a className="dbox-donation-button" href="https://donorbox.org/dtcapp?amount=5" target="_donate">Buy Mike a Beer</a></p>
+        <p>If you want to help with the costs of running this server, adding more features, or my coffee programming fuels... I welcome any support!</p>
+        <p><a className="dbox-donation-button" href="https://donorbox.org/dtcapp?amount=5" target="_donate">Buy Mike a Coffee</a></p>
 
         <p><a href="/privacy" style={{color:'#fff'}}>View Privacy Policy</a></p>
 
         <LoadingInline
           active={comp.state.loader}
         />
+
+        <Dialog
+          className="map-popup"
+          title=""
+          type="large"
+          onEscKeyDown={comp.handleCloseMap.bind(comp)}
+          onOverlayClick={comp.handleCloseMap.bind(comp)}
+          active={comp.state.popup_map!==false}
+          actions={[
+            {label: "Close", onClick: comp.handleCloseMap.bind(comp), primary: true, raised: true}
+          ]}
+        >
+          <img src="/images/DTCMap2018.jpg" style={{width: '100%'}} />
+        </Dialog>
       </div>
     );
   }

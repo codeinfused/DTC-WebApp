@@ -33,6 +33,7 @@ class SearchGames extends React.Component
       sortBy: 'bggrate',
       tag: '',
       loader: true,
+      renderView: 'phone',
       source: props.route.source
     };
 
@@ -92,9 +93,20 @@ class SearchGames extends React.Component
   componentWillReceiveProps(nextProps)
   {
     var comp = this;
-    if(this.state.source !== nextProps.route.source){
-
-      comp.setState({loader: true, currentGamePage: 0, source: nextProps.route.source, games: [], currentResultCount: 0}, ()=>{setTimeout(function(){comp.searchGames();},300)});
+    if(this.state.source !== nextProps.route.source)
+    {
+      comp.setState({
+        loader: true,
+        currentGamePage: 0,
+        source: nextProps.route.source,
+        games: [],
+        currentResultCount: 0
+      }, ()=>{setTimeout(function(){comp.searchGames();},300)});
+    }
+    if(this.state.renderView !== nextProps.renderView){
+      comp.setState({
+        renderView: nextProps.renderView
+      });
     }
   }
 
@@ -103,7 +115,7 @@ class SearchGames extends React.Component
     var comp = this;
     this.setState({
       searchText: (CONFIG.state.last_searchText || ''),
-      tag: CONFIG.state.last_tag,
+      tag: (CONFIG.state.last_tag ? CONFIG.state.last_tag : ''),
       sortBy: (CONFIG.state.last_sortBy ? CONFIG.state.last_sortBy : 'bggrate'),
       currentGamePage: (CONFIG.state.last_currentGamePage || 0)
     }, function(){
@@ -397,7 +409,7 @@ class SearchGames extends React.Component
     }
 
     return (
-      <div className="game-search-list">
+      <div className="game-search-list clearfix">
         {comp.state.games.map(function(game, i)
         {
           var notifyActive = CONFIG.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";

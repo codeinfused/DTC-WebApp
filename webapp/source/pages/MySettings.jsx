@@ -309,7 +309,7 @@ class MySettings extends React.Component
           <div className="my-settings-item">
             <h3>My Game Settings</h3>
             <p><em>Your "want to play" and alert settings on games.</em></p>
-            <div className="my-wtp-list">
+            <div className="my-wtp-list clearfix" id="page-game-search">
               {comp.state.wtp.map(function(game){
                 //var notifyActive = CONFIG.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
                 //var wtpActive = CONFIG.state.user.wtp.indexOf(game.bgg_id) > -1 ? " active" : "";

@@ -54,6 +54,139 @@ class GamePopup extends React.Component
     })
   }
 
+  handleFindTables(bgg_id, type)
+  {
+    browserHistory.push('/list/'+type+'/'+bgg_id);
+  }
+
+  // WTP and NOTIFY actions
+  // -------------------------------------------
+
+  updateGameWTP(bgg_id, inc)
+  {
+    var comp = this;
+    var games = _.cloneDeep(comp.state.games);
+
+    var gameI = _.findIndex(games, function(g){ return g.bgg_id == bgg_id; });
+    if(gameI > -1){
+      games[gameI].wtp = (+games[gameI].wtp) + inc;
+      comp.setState({games: games});
+    }
+  }
+
+  addWTP(bgg_id)
+  {
+    var comp = this;
+    CONFIG.state.user.wtp.push(bgg_id);
+    CONFIG.state.user.wtp = _.uniq(CONFIG.state.user.wtp);
+
+    comp.updateGameWTP(bgg_id, 1);
+
+    axios.post(CONFIG.api.wtp, {
+      bgg_id: bgg_id,
+      t: (new Date()).getTime()
+    }, {
+      headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
+    }).catch(function(json){
+      ToastsAPI.toast('error', null, 'Error adding game.', {timeOut:6000});
+    });
+    this.forceUpdate();
+  }
+
+  deleteWTP(bgg_id)
+  {
+    var comp = this;
+    var ind = CONFIG.state.user.wtp.indexOf(bgg_id);
+    CONFIG.state.user.wtp.splice(ind, 1);
+    var ind2 = CONFIG.state.user.notify.indexOf(bgg_id);
+    CONFIG.state.user.notify.splice(ind2, 1);
+
+    comp.updateGameWTP(bgg_id, -1);
+
+    axios.post(CONFIG.api.wtp+'/delete', {
+      bgg_id: bgg_id,
+      t: (new Date()).getTime()
+    }, {
+      headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
+    }).catch(function(json){
+      ToastsAPI.toast('error', null, 'Error deleting game.', {timeOut:6000});
+    });
+    this.forceUpdate();
+  }
+
+  addNotify(bgg_id)
+  {
+    var comp = this;
+    var wtp_ind = CONFIG.state.user.wtp.indexOf(bgg_id);
+    if(wtp_ind < 0){
+      CONFIG.state.user.wtp.push(bgg_id);
+      comp.updateGameWTP(bgg_id, 1);
+    }
+    CONFIG.state.user.notify.push(bgg_id);
+    CONFIG.state.user.notify = _.uniq(CONFIG.state.user.notify);
+
+    axios.post(CONFIG.api.notify, {
+      bgg_id: bgg_id,
+      t: (new Date()).getTime()
+    }, {
+      headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
+    }).then(function(){
+      ToastsAPI.toast('success', null, 'You will be notified of tables for this game.', {timeOut:6000});
+    }).catch(function(json){
+      ToastsAPI.toast('error', null, 'Error adding notification.', {timeOut:6000});
+    });
+    this.forceUpdate();
+  }
+
+  deleteNotify(bgg_id)
+  {
+    var comp = this;
+    var ind = CONFIG.state.user.notify.indexOf(bgg_id);
+    CONFIG.state.user.notify.splice(ind, 1);
+
+    axios.post(CONFIG.api.notify+'/delete', {
+      bgg_id: bgg_id,
+      t: (new Date()).getTime()
+    }, {
+      headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
+    }).catch(function(json){
+      ToastsAPI.toast('error', null, 'Error deleting notification.', {timeOut:6000});
+    });
+    this.forceUpdate();
+  }
+
+  handleToggleWTP(bgg_id)
+  {
+    var comp = this;
+    if(CONFIG.state.user.wtp.indexOf(bgg_id) < 0){
+      comp.addWTP(bgg_id);
+    }else{
+      comp.deleteWTP(bgg_id);
+    }
+  }
+
+  handleToggleNotify(bgg_id)
+  {
+    var comp = this;
+    if(CONFIG.state.user.notify.indexOf(bgg_id) < 0){
+      comp.addNotify(bgg_id);
+    }else{
+      comp.deleteNotify(bgg_id);
+    }
+  }
+
+  handleCreateGame(game)
+  {
+    CONFIG.state.currentCreateGame = game;
+    //CONFIG.transitionOut(this, function(){
+    if(!CONFIG.state.auth || CONFIG.state.user.grant_type==='guest'){
+      ToastsAPI.toast('error', "Sorry, guests can't create tables.", null, {timeOut:8000});
+      return;
+    }
+    browserHistory.push('/tables/create/'+game.bgg_id);
+    //});
+  }
+
   renderGame()
   {
     var comp = this;
@@ -111,7 +244,40 @@ class GamePopup extends React.Component
               return (<div key={'bggtag-'+i} className="plan-tag">{tag}</div>);
             })}
           </div>
-          <div className={"game-item-description"+(comp.state.activeGameOpenDesc ? " open" : "")}>{entities.html.decode(entities.xml.decode(game.desc))}<div className="desc-overlay"></div></div>
+          <div className={"game-item-description open"}>{entities.html.decode(entities.xml.decode(game.desc))}</div>
+          <div className="game-item-actions">
+            {(!CONFIG.state.auth || CONFIG.state.user.grant_type==='guest') ? (
+              <div className="game-item-action">
+                  <div className="game-item-action-line"><span><em>Sorry, guests cannot create tables.</em></span></div>
+              </div>
+            ) : (
+              <div className="game-item-action">
+                <button className="game-item-btn-giant" onClick={comp.handleCreateGame.bind(comp, game)}>Start a new game table!</button>
+              </div>
+            )}
+            <div className="game-item-action">
+              <div className="game-item-action-line">
+                <div className="game-item-action-title">Wanting to play</div>
+                <div className={"game-item-action-btn action-notify-btn" + notifyActive}><IconButton icon='notifications' onClick={comp.handleToggleNotify.bind(comp, game.bgg_id)} /></div>
+                <div className={"game-item-action-btn action-wtp-btn" + wtpActive}><IconButton icon='check' onClick={comp.handleToggleWTP.bind(comp, game.bgg_id)} /></div>
+                <div className="game-item-action-count">{+game.wtp}</div>
+              </div>
+            </div>
+            <div className="game-item-action">
+              <div className="game-item-action-line">
+                <div className="game-item-action-title">Tables looking for players</div>
+                <div className="game-item-action-btn action-searchtables-btn"><IconButton icon='search' onClick={comp.handleFindTables.bind(comp, game.bgg_id, 'now')} /></div>
+                <div className="game-item-action-count">{+game.lfp}</div>
+              </div>
+            </div>
+            <div className="game-item-action">
+              <div className="game-item-action-line">
+                <div className="game-item-action-title">Scheduled game tables</div>
+                <div className="game-item-action-btn action-searchschedule-btn"><IconButton icon='search' onClick={comp.handleFindTables.bind(comp, game.bgg_id, 'future')} /></div>
+                <div className="game-item-action-count">{+game.scheduled}</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -121,7 +287,7 @@ class GamePopup extends React.Component
   {
     var comp = this;
     return (
-      <div className="game-item-wrap">
+      <div className="game-item-wrap" id="page-game-search">
         {comp.state.loaded ? comp.renderGame() : <div />}
       </div>
     );

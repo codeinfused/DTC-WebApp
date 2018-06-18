@@ -42,23 +42,28 @@ class AppLayout extends React.Component
       appLoading: false,
       sideMenuOpen: false,
       ignoreLandscape: false,
+      tabletMin: 768,
+      desktopMin: 1440,
+      isTabletWide: false,
+      isDesktopWide: false,
       alerts: [],
       tableDialogActive: false,
       tableDialogData: {},
-      tableDialogLoading: false
+      tableDialogLoading: false,
+      activeNav: (props.location.pathname ? props.location.pathname : '/home')
     };
 
     this.navButtons = [
       {label:'Home',                path:'/home', icon:'home'},
       {label:'Tables Right Now',    path:'/lfp', icon:'video_library'},
       {label:'Scheduled Tables',    path:'/schedules', icon:'event_note'},
-      {label:'Start/Search Games',       path:'/games', icon:'library_books', callback: comp.DBLoadBGG},
-      // {label:'Con Library',         path:'/library', icon:'import_contacts', callback: comp.DBLoadLibrary},
+      {label:'Start/Search Games',  path:'/games', icon:'library_books', callback: comp.DBLoadBGG},
+      {label:'Con Library',         path:'/library', icon:'import_contacts', callback: comp.DBLoadLibrary},
       {label:'Game Alerts',         path:'/alerts', icon:'notifications'},
       {label:'My Plans',            path:'/myplans', icon:'date_range'},
       {label:'My Tables',           path:'/mytables', icon:'playlist_add_check'},
       {label:'My Settings',         path:'/me', icon:'settings_applications'},
-      {label:'About',               path:'/about', icon:'info'}
+      {label:'About & Map',         path:'/about', icon:'info'}
     ];
 
     this.getNewAlerts = this.getNewAlerts.bind(this);
@@ -69,11 +74,37 @@ class AppLayout extends React.Component
 
   componentDidMount()
   {
+    var comp = this;
     CONFIG.authPromise = new Promise((resolve, reject) => {
-      var checkPromise = CONFIG.checkAuth(this, 'appLoaded');
+      var checkPromise = CONFIG.checkAuth(comp, 'appLoaded');
       checkPromise.then(resolve);
       checkPromise.catch(reject);
     });
+    comp.checkScreenWidth();
+    window.addEventListener("resize", comp.checkScreenWidth.bind(comp));
+  }
+
+  checkScreenWidth()
+  {
+    var comp = this;
+    var sw = window.innerWidth;
+    var stateObj = {};
+
+    if(sw >= comp.state.desktopMin && !comp.state.isDesktopWide){
+      stateObj.isDesktopWide = true;
+    }else if(sw < comp.state.desktopMin && comp.state.isDesktopWide){
+      stateObj.isDesktopWide = false;
+    }
+
+    if(sw >= comp.state.tabletMin && !comp.state.isTabletWide){
+      stateObj.isTabletWide = true;
+    }else if(sw < comp.state.tabletMin && comp.state.isTabletWide){
+      stateObj.isTabletWide = false;
+    }
+
+    if(Object.keys(stateObj).length > 0){
+      comp.setState(stateObj);
+    }
   }
 
   DBLoadBGG()
@@ -110,6 +141,7 @@ class AppLayout extends React.Component
   {
     this.toggleSideMenu();
     if(item.callback){ item.callback.call(this); }
+    this.setState({activeNav: item.path});
     browserHistory.push(item.path);
   }
 
@@ -196,7 +228,7 @@ class AppLayout extends React.Component
     var kids = this.props.children;
 
     return (
-      <div id="app" className={comp.state.sideMenuOpen?"menu-open":"menu-closed"}>
+      <div id="app" className={(comp.state.sideMenuOpen?"menu-open":"menu-closed")}>
 
 
         {/* <MediaQuery minDeviceWidth={900}>
@@ -213,6 +245,7 @@ class AppLayout extends React.Component
             <h2 className="app-menu-head" onClick={()=>{comp.toggleSideMenu(); browserHistory.push('/home');}}><img src="/images/dtc-logo-transp-full.png" /></h2>
             {comp.navButtons.map(function(item, i){
               return (<Button
+                className={comp.state.activeNav===item.path ? 'active' : ''}
                 onClick={comp.handleAppNav.bind(comp, item)}
                 key={'app-nav-'+i}
                 icon={item.icon}
@@ -226,7 +259,7 @@ class AppLayout extends React.Component
               transitionEnterTimeout={500}
               transitionLeaveTimeout={500}
             >
-              {React.cloneElement(this.props.children, {key: pathpage, appLoading: comp.state.appLoading})}
+              {React.cloneElement(this.props.children, {key: pathpage, appLoading: comp.state.appLoading, renderView: (comp.state.isDesktopWide?'desktop':comp.state.isTabletWide?'tablet':'phone')})}
             </CSSTransitionGroup>
           </div>
 

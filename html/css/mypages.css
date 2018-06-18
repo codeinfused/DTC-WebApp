@@ -128,7 +128,7 @@ ul.plans-timeline .plans-item{
   padding: 0 0 5px;
   position: relative;
 }
-ul.plans-timeline .cancelled .plans-item{ opacity: 0.6; background: #e6b8b8; }
+ul.plans-timeline .cancelled .plans-item{ opacity: 0.6; background: #f1e8e8; }
 
 .plans-item .plans-item-head{
   padding: 12px 14px;
@@ -158,6 +158,9 @@ ul.plans-timeline .cancelled .plans-item{ opacity: 0.6; background: #e6b8b8; }
 }
 .plans-item-body .plan-tag.hosting{
   background: #49af5d;
+}
+.plans-item-body .plan-tag.otherhost{
+  background: #846e50;
 }
 
 p.plans-time {
