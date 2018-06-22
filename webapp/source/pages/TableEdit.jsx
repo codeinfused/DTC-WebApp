@@ -42,14 +42,13 @@ class TableEdit extends React.Component
     ];
 
     this.tableLocations = [
-      {label: 'Caribbean Ballroom', value: 'Caribbean Ballroom' },
-      {label: 'Grand Sierra Ballroom', value: 'Grand Sierra Ballroom'},
-      {label: 'Boca I/II', value: 'Boca I/II'},
-      {label: 'Boca V-VIII', value: 'Boca V-VIII'},
-      {label: 'Antigua', value: 'Antigua'},
-      {label: 'Bonaire', value: 'Bonaire'},
-      {label: 'Curaco', value: 'Curaco'},
-      {label: 'Hibiscus', value: 'Hibiscus'},
+
+      {label: 'Grand Sierra Ballroom (Open)', value: 'Grand Sierra Ballroom'},
+      {label: 'Antigua (Open)', value: 'Antigua'},
+      {label: 'Boca (Events, Werewolf)', value: 'Boca'},
+      {label: 'Curaco (RPGs, War Games, Kids)', value: 'Curaco'},
+      {label: 'Bonaire (Publisher Demos and Events)', value: 'Bonaire'},
+      {label: 'Caribbean (Exhibitor Events)', value: 'Caribbean Ballroom' },
       {label: 'Reception Lobby', value: 'Reception Lobby'}
     ];
 
@@ -89,7 +88,7 @@ class TableEdit extends React.Component
       playtime: null,
       //game_type: 'normal',
       table_type: 'now',
-      table_location: 'Caribbean Ballroom',
+      table_location: 'Grand Sierra Ballroom',
       table_sublocation_alpha: 'A',
       table_sublocation_num: '1',
       start_datetime: '',

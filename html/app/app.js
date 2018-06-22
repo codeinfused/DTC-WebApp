@@ -98570,7 +98570,7 @@
 	
 	    _this.tableTypes = [{ id: 'now', name: 'Now' }, { id: 'later', name: 'Later' }, { id: 'demo', name: 'Demo' }];
 	
-	    _this.tableLocations = [{ label: 'Caribbean Ballroom', value: 'Caribbean Ballroom' }, { label: 'Grand Sierra Ballroom', value: 'Grand Sierra Ballroom' }, { label: 'Boca I/II', value: 'Boca I/II' }, { label: 'Boca V-VIII', value: 'Boca V-VIII' }, { label: 'Antigua', value: 'Antigua' }, { label: 'Bonaire', value: 'Bonaire' }, { label: 'Curaco', value: 'Curaco' }, { label: 'Hibiscus', value: 'Hibiscus' }, { label: 'Reception Lobby', value: 'Reception Lobby' }];
+	    _this.tableLocations = [{ label: 'Grand Sierra Ballroom (Open)', value: 'Grand Sierra Ballroom' }, { label: 'Antigua (Open)', value: 'Antigua' }, { label: 'Boca (Events, Werewolf)', value: 'Boca' }, { label: 'Curaco (RPGs, War Games, Kids)', value: 'Curaco' }, { label: 'Bonaire (Publisher Demos and Events)', value: 'Bonaire' }, { label: 'Caribbean (Exhibitor Events)', value: 'Caribbean Ballroom' }, { label: 'Reception Lobby', value: 'Reception Lobby' }];
 	
 	    _this.playtimeOptions = [{ label: 'Auto', value: '' }, { label: '30 (half hour)', value: '0.5 hour' }, { label: '60 (1 hour)', value: '1 hour' }, { label: '90 (1½ hours)', value: '1.5 hours' }, { label: '120 (2 hours)', value: '2 hours' }, { label: '150 (2½ hours)', value: '2.5 hours' }, { label: '180 (3 hours)', value: '3 hours' }, { label: '240 (4 hours)', value: '4 hours' }, { label: '300 (5+ hours)', value: '5+ hours' }];
 	
@@ -98591,7 +98591,7 @@
 	      playtime: null,
 	      //game_type: 'normal',
 	      table_type: 'now',
-	      table_location: 'Caribbean Ballroom',
+	      table_location: 'Grand Sierra Ballroom',
 	      table_sublocation_alpha: 'A',
 	      table_sublocation_num: '1',
 	      start_datetime: '',
