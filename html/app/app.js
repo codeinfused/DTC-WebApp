@@ -98502,7 +98502,7 @@
 	            active: comp.state.popup_map !== false,
 	            actions: [{ label: "Close", onClick: comp.handleCloseMap.bind(comp), primary: true, raised: true }]
 	          },
-	          _react2.default.createElement('img', { src: '/images/DTCMap2018.jpg', style: { width: '100%' } })
+	          _react2.default.createElement('img', { src: '/images/DTCMap2018.jpg', style: { width: '100%', minWidth: '900px' } })
 	        )
 	      );
 	    }

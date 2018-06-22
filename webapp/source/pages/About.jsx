@@ -82,7 +82,7 @@ class About extends React.Component
             {label: "Close", onClick: comp.handleCloseMap.bind(comp), primary: true, raised: true}
           ]}
         >
-          <img src="/images/DTCMap2018.jpg" style={{width: '100%'}} />
+          <img src="/images/DTCMap2018.jpg" style={{width: '100%', minWidth: '900px'}} />
         </Dialog>
       </div>
     );
