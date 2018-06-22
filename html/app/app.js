@@ -113,39 +113,39 @@
 	
 	var _About2 = _interopRequireDefault(_About);
 	
-	var _TableEdit = __webpack_require__(844);
+	var _TableEdit = __webpack_require__(845);
 	
 	var _TableEdit2 = _interopRequireDefault(_TableEdit);
 	
-	var _TableList = __webpack_require__(845);
+	var _TableList = __webpack_require__(846);
 	
 	var _TableList2 = _interopRequireDefault(_TableList);
 	
-	var _MyTables = __webpack_require__(847);
+	var _MyTables = __webpack_require__(848);
 	
 	var _MyTables2 = _interopRequireDefault(_MyTables);
 	
-	var _MyPlans = __webpack_require__(848);
+	var _MyPlans = __webpack_require__(849);
 	
 	var _MyPlans2 = _interopRequireDefault(_MyPlans);
 	
-	var _MySettings = __webpack_require__(849);
+	var _MySettings = __webpack_require__(850);
 	
 	var _MySettings2 = _interopRequireDefault(_MySettings);
 	
-	var _MyAlerts = __webpack_require__(850);
+	var _MyAlerts = __webpack_require__(851);
 	
 	var _MyAlerts2 = _interopRequireDefault(_MyAlerts);
 	
-	var _PlayersWanted = __webpack_require__(851);
+	var _PlayersWanted = __webpack_require__(852);
 	
 	var _PlayersWanted2 = _interopRequireDefault(_PlayersWanted);
 	
-	var _ScheduledList = __webpack_require__(852);
+	var _ScheduledList = __webpack_require__(853);
 	
 	var _ScheduledList2 = _interopRequireDefault(_ScheduledList);
 	
-	var _Privacy = __webpack_require__(853);
+	var _Privacy = __webpack_require__(854);
 	
 	var _Privacy2 = _interopRequireDefault(_Privacy);
 	
@@ -98310,7 +98310,7 @@
 	
 	var _Loaders = __webpack_require__(715);
 	
-	var _MapPopup = __webpack_require__(854);
+	var _MapPopup = __webpack_require__(844);
 	
 	var _MapPopup2 = _interopRequireDefault(_MapPopup);
 	
@@ -98503,6 +98503,107 @@
 	
 	var _config2 = _interopRequireDefault(_config);
 	
+	var _react = __webpack_require__(2);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _reactToolbox = __webpack_require__(243);
+	
+	var _button = __webpack_require__(244);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var MapPopup = function (_React$Component) {
+	  _inherits(MapPopup, _React$Component);
+	
+	  function MapPopup(props) {
+	    _classCallCheck(this, MapPopup);
+	
+	    var _this = _possibleConstructorReturn(this, (MapPopup.__proto__ || Object.getPrototypeOf(MapPopup)).call(this, props));
+	
+	    var comp = _this;
+	    _this.state = {
+	      popup_map: false,
+	      styles: Object.assign({ display: "inline-block", textTransform: "none", position: "relative", top: "-1px" }, props.styles)
+	    };
+	    return _this;
+	  }
+	
+	  _createClass(MapPopup, [{
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      var comp = this;
+	    }
+	  }, {
+	    key: 'handleOpenMap',
+	    value: function handleOpenMap() {
+	      this.setState({ popup_map: true });
+	    }
+	  }, {
+	    key: 'handleCloseMap',
+	    value: function handleCloseMap() {
+	      this.setState({ popup_map: false });
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var comp = this;
+	
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'map-popup-cm', style: { display: "inline-block" } },
+	        _react2.default.createElement(_button.Button, {
+	          label: 'View DTC Floor Map',
+	          onClick: comp.handleOpenMap.bind(comp),
+	          style: comp.state.styles,
+	          raised: comp.props.raised,
+	          accent: comp.props.accent,
+	          primary: comp.props.primary
+	        }),
+	        _react2.default.createElement(
+	          _reactToolbox.Dialog,
+	          {
+	            className: 'map-popup',
+	            title: '',
+	            type: 'large',
+	            onEscKeyDown: comp.handleCloseMap.bind(comp),
+	            onOverlayClick: comp.handleCloseMap.bind(comp),
+	            active: comp.state.popup_map !== false,
+	            actions: [{ label: "Close", onClick: comp.handleCloseMap.bind(comp), primary: true, raised: true }]
+	          },
+	          _react2.default.createElement('img', { src: '/images/DTCMap2018.jpg', style: { width: '100%', minWidth: '900px' } })
+	        )
+	      );
+	    }
+	  }]);
+	
+	  return MapPopup;
+	}(_react2.default.Component);
+	
+	exports.default = MapPopup;
+
+/***/ }),
+/* 845 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _config = __webpack_require__(552);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
 	var _axios = __webpack_require__(525);
 	
 	var _axios2 = _interopRequireDefault(_axios);
@@ -98531,7 +98632,7 @@
 	
 	var _ToastsAPI2 = _interopRequireDefault(_ToastsAPI);
 	
-	var _MapPopup = __webpack_require__(854);
+	var _MapPopup = __webpack_require__(844);
 	
 	var _MapPopup2 = _interopRequireDefault(_MapPopup);
 	
@@ -98715,7 +98816,7 @@
 	      //var start_date = d.format('YYYY-MM-DD');
 	      //var start_time = d.format('HH:mm:00');
 	      var dRounded = MomentRound(d, _moment2.default.duration(15, "minutes"), "ceil");
-	      console.log(dRounded);
+	
 	      var d_obj = dRounded.toDate();
 	
 	      comp.setState({
@@ -98989,7 +99090,7 @@
 	exports.default = TableEdit;
 
 /***/ }),
-/* 845 */
+/* 846 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -99032,7 +99133,7 @@
 	
 	var _ToastsAPI2 = _interopRequireDefault(_ToastsAPI);
 	
-	var _GamePopup = __webpack_require__(846);
+	var _GamePopup = __webpack_require__(847);
 	
 	var _GamePopup2 = _interopRequireDefault(_GamePopup);
 	
@@ -99396,7 +99497,7 @@
 	exports.default = TableList;
 
 /***/ }),
-/* 846 */
+/* 847 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -99664,7 +99765,7 @@
 	    key: 'addIgnore',
 	    value: function addIgnore(bad_player_id) {
 	      var comp = this;
-	      console.log(_config2.default.state.user);
+	
 	      _config2.default.state.user.ignore.push(bad_player_id);
 	      _config2.default.state.user.ignore = _.uniq(_config2.default.state.user.ignore);
 	      if (comp.props.onToggleIgnore) {
@@ -99970,7 +100071,7 @@
 	exports.default = GamePopup;
 
 /***/ }),
-/* 847 */
+/* 848 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -100013,7 +100114,7 @@
 	
 	var _ToastsAPI2 = _interopRequireDefault(_ToastsAPI);
 	
-	var _GamePopup = __webpack_require__(846);
+	var _GamePopup = __webpack_require__(847);
 	
 	var _GamePopup2 = _interopRequireDefault(_GamePopup);
 	
@@ -100362,7 +100463,7 @@
 	exports.default = MyTables;
 
 /***/ }),
-/* 848 */
+/* 849 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -100405,7 +100506,7 @@
 	
 	var _ToastsAPI2 = _interopRequireDefault(_ToastsAPI);
 	
-	var _GamePopup = __webpack_require__(846);
+	var _GamePopup = __webpack_require__(847);
 	
 	var _GamePopup2 = _interopRequireDefault(_GamePopup);
 	
@@ -100831,7 +100932,7 @@
 	exports.default = MyPlans;
 
 /***/ }),
-/* 849 */
+/* 850 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -100947,7 +101048,7 @@
 	          ignore: json.data.ignore
 	        });
 	      }).catch(function (json) {
-	        console.log(json);
+	
 	        _ToastsAPI2.default.toast('error', null, 'Failed to get some settings.', { timeOut: 6000 });
 	      });
 	    }
@@ -101223,7 +101324,7 @@
 	    key: 'handleToggleIgnore',
 	    value: function handleToggleIgnore(bad_player_id) {
 	      var comp = this;
-	      console.log(_config2.default.state.user.ignore, bad_player_id);
+	
 	      if (_config2.default.state.user.ignore.indexOf(bad_player_id) < 0) {
 	        comp.addIgnore(bad_player_id);
 	      } else {
@@ -101490,7 +101591,7 @@
 	exports.default = MySettings;
 
 /***/ }),
-/* 850 */
+/* 851 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -101767,7 +101868,7 @@
 	exports.default = MyAlerts;
 
 /***/ }),
-/* 851 */
+/* 852 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -101810,7 +101911,7 @@
 	
 	var _ToastsAPI2 = _interopRequireDefault(_ToastsAPI);
 	
-	var _GamePopup = __webpack_require__(846);
+	var _GamePopup = __webpack_require__(847);
 	
 	var _GamePopup2 = _interopRequireDefault(_GamePopup);
 	
@@ -102052,7 +102153,7 @@
 	exports.default = PlayersWanted;
 
 /***/ }),
-/* 852 */
+/* 853 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -102095,7 +102196,7 @@
 	
 	var _ToastsAPI2 = _interopRequireDefault(_ToastsAPI);
 	
-	var _GamePopup = __webpack_require__(846);
+	var _GamePopup = __webpack_require__(847);
 	
 	var _GamePopup2 = _interopRequireDefault(_GamePopup);
 	
@@ -102172,7 +102273,7 @@
 	          game_popup: false
 	        });
 	      }).catch(function (json) {
-	        console.log(json);
+	
 	        _ToastsAPI2.default.toast('error', null, 'Error getting tables list.', { timeOut: 6000 });
 	      });
 	    }
@@ -102530,7 +102631,7 @@
 	exports.default = ScheduledList;
 
 /***/ }),
-/* 853 */
+/* 854 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -102714,107 +102815,6 @@
 	;
 	
 	exports.default = Privacy;
-
-/***/ }),
-/* 854 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _config = __webpack_require__(552);
-	
-	var _config2 = _interopRequireDefault(_config);
-	
-	var _react = __webpack_require__(2);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	var _reactToolbox = __webpack_require__(243);
-	
-	var _button = __webpack_require__(244);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var MapPopup = function (_React$Component) {
-	  _inherits(MapPopup, _React$Component);
-	
-	  function MapPopup(props) {
-	    _classCallCheck(this, MapPopup);
-	
-	    var _this = _possibleConstructorReturn(this, (MapPopup.__proto__ || Object.getPrototypeOf(MapPopup)).call(this, props));
-	
-	    var comp = _this;
-	    _this.state = {
-	      popup_map: false,
-	      styles: Object.assign({ display: "inline-block", textTransform: "none", position: "relative", top: "-1px" }, props.styles)
-	    };
-	    return _this;
-	  }
-	
-	  _createClass(MapPopup, [{
-	    key: 'componentDidMount',
-	    value: function componentDidMount() {
-	      var comp = this;
-	    }
-	  }, {
-	    key: 'handleOpenMap',
-	    value: function handleOpenMap() {
-	      this.setState({ popup_map: true });
-	    }
-	  }, {
-	    key: 'handleCloseMap',
-	    value: function handleCloseMap() {
-	      this.setState({ popup_map: false });
-	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      var comp = this;
-	      console.log(comp.props);
-	      return _react2.default.createElement(
-	        'div',
-	        { className: 'map-popup-cm', style: { display: "inline-block" } },
-	        _react2.default.createElement(_button.Button, {
-	          label: 'View DTC Floor Map',
-	          onClick: comp.handleOpenMap.bind(comp),
-	          style: comp.state.styles,
-	          raised: comp.props.raised,
-	          accent: comp.props.accent,
-	          primary: comp.props.primary
-	        }),
-	        _react2.default.createElement(
-	          _reactToolbox.Dialog,
-	          {
-	            className: 'map-popup',
-	            title: '',
-	            type: 'large',
-	            onEscKeyDown: comp.handleCloseMap.bind(comp),
-	            onOverlayClick: comp.handleCloseMap.bind(comp),
-	            active: comp.state.popup_map !== false,
-	            actions: [{ label: "Close", onClick: comp.handleCloseMap.bind(comp), primary: true, raised: true }]
-	          },
-	          _react2.default.createElement('img', { src: '/images/DTCMap2018.jpg', style: { width: '100%', minWidth: '900px' } })
-	        )
-	      );
-	    }
-	  }]);
-	
-	  return MapPopup;
-	}(_react2.default.Component);
-	
-	exports.default = MapPopup;
 
 /***/ })
 /******/ ]);
