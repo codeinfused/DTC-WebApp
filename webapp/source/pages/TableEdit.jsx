@@ -10,8 +10,13 @@ import moment from 'moment';
 
 import {LoadingInline} from '../components/Loaders.jsx';
 import ToastsAPI from '../components/ToastsAPI.jsx';
+import MapPopup from '../components/MapPopup.jsx';
 
 const entities = {xml: new XmlEntities(), html: new AllHtmlEntities()};
+
+function MomentRound(date, duration, method) {
+  return moment(Math[method]((+date) / (+duration)) * (+duration));
+}
 
 class TableEdit extends React.Component
 {
@@ -21,34 +26,9 @@ class TableEdit extends React.Component
     var comp = this;
     var action = false;
 
-    this.state = {
-      mountType: this.checkMountType(props),
-      loaded: false,
-      dialogActive: false,
-      table_id: this.props.params.table_id,
-      bgg_id: this.props.params.bgg_id,
-      game: {},
-      seats: 2,
-      playtime: null,
-      //game_type: 'normal',
-      table_type: 'now',
-      table_location: 'Caribbean Ballroom',
-      table_sublocation_alpha: 'A',
-      table_sublocation_num: '1',
-      start_datetime: '',
-      start_date: new Date(),
-      start_time: new Date(),
-      lfp: true,
-      lft: false,
-      joined: true,
-      reserved: 0,
-      allow_signups: true,
-      private: false
-    };
-
     this.dateRange = [
-      '2018-07-03',
-      '2018-07-08'
+      '2018-07-04 08:00:00',
+      '2018-07-08 23:00:00'
     ];
 
     this.sublocs_alpha = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q'];
@@ -93,6 +73,35 @@ class TableEdit extends React.Component
       {label: '4 players', value: '4'},
       {label: '5 players', value: '5'},
     ];
+
+    var mToday = moment();
+    var defaultDate = moment.max(mToday, moment(this.dateRange[0]));
+    defaultDate = moment.min(defaultDate, moment(this.dateRange[1]));
+
+    this.state = {
+      mountType: this.checkMountType(props),
+      loaded: false,
+      dialogActive: false,
+      table_id: this.props.params.table_id,
+      bgg_id: this.props.params.bgg_id,
+      game: {},
+      seats: 2,
+      playtime: null,
+      //game_type: 'normal',
+      table_type: 'now',
+      table_location: 'Caribbean Ballroom',
+      table_sublocation_alpha: 'A',
+      table_sublocation_num: '1',
+      start_datetime: '',
+      start_date: defaultDate.toDate(),
+      start_time: MomentRound(defaultDate, moment.duration(15, "minutes"), "round").toDate(),
+      lfp: true,
+      lft: false,
+      joined: true,
+      reserved: 0,
+      allow_signups: true,
+      private: false
+    };
 
     this.getGameData = this.getGameData.bind(this);
     this.handleSubmitTable = this.handleSubmitTable.bind(this);
@@ -201,9 +210,12 @@ class TableEdit extends React.Component
   {
     var comp = this;
     var d = moment(d);
-    var d_obj = d.toDate();
     //var start_date = d.format('YYYY-MM-DD');
     //var start_time = d.format('HH:mm:00');
+    var dRounded = MomentRound(d, moment.duration(15, "minutes"), "ceil");
+    console.log(dRounded);
+    var d_obj = dRounded.toDate();
+
     comp.setState({
       start_date: d_obj,
       start_time: d_obj
@@ -217,12 +229,13 @@ class TableEdit extends React.Component
     state[field] = value;
     var d = moment(state.start_date);
     var t = moment(state.start_time);
+    var tRounded = MomentRound(t, moment.duration(15, "minutes"), "round");
 
     if(field==='start_time'){
-      var t_mod = moment(t);
+      value = tRounded.toDate();
     }
 
-    var start_datetime = d.format('YYYY-MM-DD') +' '+ t.format('HH:mm:00');
+    var start_datetime = d.format('YYYY-MM-DD') +' '+ tRounded.format('HH:mm:00');
 
     comp.setState({
       [field]: value,
@@ -337,6 +350,7 @@ class TableEdit extends React.Component
                     return (<option key={"locnum"+num} value={num}>{num}</option>);
                   })}
                 </select>
+                <MapPopup styles={{fontSize:"1.1rem", height:"2.6rem", lineHeight:"2.6rem", marginLeft:"1rem"}} raised />
               </div>
               <div className="table-form-item">
                 <div className="table-form-playtime">

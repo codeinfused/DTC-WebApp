@@ -98310,6 +98310,10 @@
 	
 	var _Loaders = __webpack_require__(715);
 	
+	var _MapPopup = __webpack_require__(854);
+	
+	var _MapPopup2 = _interopRequireDefault(_MapPopup);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -98327,23 +98331,12 @@
 	    var _this = _possibleConstructorReturn(this, (About.__proto__ || Object.getPrototypeOf(About)).call(this, props));
 	
 	    _this.state = {
-	      loader: false,
-	      popup_map: false
+	      loader: false
 	    };
 	    return _this;
 	  }
 	
 	  _createClass(About, [{
-	    key: 'handleOpenMap',
-	    value: function handleOpenMap() {
-	      this.setState({ popup_map: true });
-	    }
-	  }, {
-	    key: 'handleCloseMap',
-	    value: function handleCloseMap() {
-	      this.setState({ popup_map: false });
-	    }
-	  }, {
 	    key: 'render',
 	    value: function render() {
 	      var comp = this;
@@ -98402,15 +98395,7 @@
 	            'Grab a "Players Wanted" sign to help others find your table!'
 	          )
 	        ),
-	        _react2.default.createElement(
-	          'div',
-	          null,
-	          _react2.default.createElement(_button.Button, { raised: true, primary: true,
-	            label: 'Open Convention Map',
-	            icon: 'map',
-	            onClick: comp.handleOpenMap.bind(comp)
-	          })
-	        ),
+	        _react2.default.createElement(_MapPopup2.default, { styles: { fontSize: "1.3rem", height: "2.6rem", lineHeight: "2.6rem", marginLeft: "0.1rem", marginTop: "1rem" }, raised: true }),
 	        _react2.default.createElement(
 	          'h2',
 	          null,
@@ -98490,20 +98475,7 @@
 	        ),
 	        _react2.default.createElement(_Loaders.LoadingInline, {
 	          active: comp.state.loader
-	        }),
-	        _react2.default.createElement(
-	          _reactToolbox.Dialog,
-	          {
-	            className: 'map-popup',
-	            title: '',
-	            type: 'large',
-	            onEscKeyDown: comp.handleCloseMap.bind(comp),
-	            onOverlayClick: comp.handleCloseMap.bind(comp),
-	            active: comp.state.popup_map !== false,
-	            actions: [{ label: "Close", onClick: comp.handleCloseMap.bind(comp), primary: true, raised: true }]
-	          },
-	          _react2.default.createElement('img', { src: '/images/DTCMap2018.jpg', style: { width: '100%', minWidth: '900px' } })
-	        )
+	        })
 	      );
 	    }
 	  }]);
@@ -98559,6 +98531,10 @@
 	
 	var _ToastsAPI2 = _interopRequireDefault(_ToastsAPI);
 	
+	var _MapPopup = __webpack_require__(854);
+	
+	var _MapPopup2 = _interopRequireDefault(_MapPopup);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -98571,6 +98547,10 @@
 	
 	var entities = { xml: new _htmlEntities.XmlEntities(), html: new _htmlEntities.AllHtmlEntities() };
 	
+	function MomentRound(date, duration, method) {
+	  return (0, _moment2.default)(Math[method](+date / +duration) * +duration);
+	}
+	
 	var TableEdit = function (_React$Component) {
 	  _inherits(TableEdit, _React$Component);
 	
@@ -98581,6 +98561,24 @@
 	
 	    var comp = _this;
 	    var action = false;
+	
+	    _this.dateRange = ['2018-07-04 08:00:00', '2018-07-08 23:00:00'];
+	
+	    _this.sublocs_alpha = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q'];
+	    _this.sublocs_num = Array.apply(null, { length: 36 }).map(Number.call, Number);
+	    _this.sublocs_num = _this.sublocs_num.slice(1);
+	
+	    _this.tableTypes = [{ id: 'now', name: 'Now' }, { id: 'later', name: 'Later' }, { id: 'demo', name: 'Demo' }];
+	
+	    _this.tableLocations = [{ label: 'Caribbean Ballroom', value: 'Caribbean Ballroom' }, { label: 'Grand Sierra Ballroom', value: 'Grand Sierra Ballroom' }, { label: 'Boca I/II', value: 'Boca I/II' }, { label: 'Boca V-VIII', value: 'Boca V-VIII' }, { label: 'Antigua', value: 'Antigua' }, { label: 'Bonaire', value: 'Bonaire' }, { label: 'Curaco', value: 'Curaco' }, { label: 'Hibiscus', value: 'Hibiscus' }, { label: 'Reception Lobby', value: 'Reception Lobby' }];
+	
+	    _this.playtimeOptions = [{ label: 'Auto', value: '' }, { label: '30 (half hour)', value: '0.5 hour' }, { label: '60 (1 hour)', value: '1 hour' }, { label: '90 (1½ hours)', value: '1.5 hours' }, { label: '120 (2 hours)', value: '2 hours' }, { label: '150 (2½ hours)', value: '2.5 hours' }, { label: '180 (3 hours)', value: '3 hours' }, { label: '240 (4 hours)', value: '4 hours' }, { label: '300 (5+ hours)', value: '5+ hours' }];
+	
+	    _this.reservedPlayers = [{ label: 'None', value: '' }, { label: '1 player', value: '1' }, { label: '2 players', value: '2' }, { label: '3 players', value: '3' }, { label: '4 players', value: '4' }, { label: '5 players', value: '5' }];
+	
+	    var mToday = (0, _moment2.default)();
+	    var defaultDate = _moment2.default.max(mToday, (0, _moment2.default)(_this.dateRange[0]));
+	    defaultDate = _moment2.default.min(defaultDate, (0, _moment2.default)(_this.dateRange[1]));
 	
 	    _this.state = {
 	      mountType: _this.checkMountType(props),
@@ -98597,8 +98595,8 @@
 	      table_sublocation_alpha: 'A',
 	      table_sublocation_num: '1',
 	      start_datetime: '',
-	      start_date: new Date(),
-	      start_time: new Date(),
+	      start_date: defaultDate.toDate(),
+	      start_time: MomentRound(defaultDate, _moment2.default.duration(15, "minutes"), "round").toDate(),
 	      lfp: true,
 	      lft: false,
 	      joined: true,
@@ -98606,20 +98604,6 @@
 	      allow_signups: true,
 	      private: false
 	    };
-	
-	    _this.dateRange = ['2018-07-03', '2018-07-08'];
-	
-	    _this.sublocs_alpha = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q'];
-	    _this.sublocs_num = Array.apply(null, { length: 36 }).map(Number.call, Number);
-	    _this.sublocs_num = _this.sublocs_num.slice(1);
-	
-	    _this.tableTypes = [{ id: 'now', name: 'Now' }, { id: 'later', name: 'Later' }, { id: 'demo', name: 'Demo' }];
-	
-	    _this.tableLocations = [{ label: 'Caribbean Ballroom', value: 'Caribbean Ballroom' }, { label: 'Grand Sierra Ballroom', value: 'Grand Sierra Ballroom' }, { label: 'Boca I/II', value: 'Boca I/II' }, { label: 'Boca V-VIII', value: 'Boca V-VIII' }, { label: 'Antigua', value: 'Antigua' }, { label: 'Bonaire', value: 'Bonaire' }, { label: 'Curaco', value: 'Curaco' }, { label: 'Hibiscus', value: 'Hibiscus' }, { label: 'Reception Lobby', value: 'Reception Lobby' }];
-	
-	    _this.playtimeOptions = [{ label: 'Auto', value: '' }, { label: '30 (half hour)', value: '0.5 hour' }, { label: '60 (1 hour)', value: '1 hour' }, { label: '90 (1½ hours)', value: '1.5 hours' }, { label: '120 (2 hours)', value: '2 hours' }, { label: '150 (2½ hours)', value: '2.5 hours' }, { label: '180 (3 hours)', value: '3 hours' }, { label: '240 (4 hours)', value: '4 hours' }, { label: '300 (5+ hours)', value: '5+ hours' }];
-	
-	    _this.reservedPlayers = [{ label: 'None', value: '' }, { label: '1 player', value: '1' }, { label: '2 players', value: '2' }, { label: '3 players', value: '3' }, { label: '4 players', value: '4' }, { label: '5 players', value: '5' }];
 	
 	    _this.getGameData = _this.getGameData.bind(_this);
 	    _this.handleSubmitTable = _this.handleSubmitTable.bind(_this);
@@ -98728,9 +98712,12 @@
 	    value: function splitDateTime(val) {
 	      var comp = this;
 	      var d = (0, _moment2.default)(d);
-	      var d_obj = d.toDate();
 	      //var start_date = d.format('YYYY-MM-DD');
 	      //var start_time = d.format('HH:mm:00');
+	      var dRounded = MomentRound(d, _moment2.default.duration(15, "minutes"), "ceil");
+	      console.log(dRounded);
+	      var d_obj = dRounded.toDate();
+	
 	      comp.setState({
 	        start_date: d_obj,
 	        start_time: d_obj
@@ -98746,12 +98733,13 @@
 	      state[field] = value;
 	      var d = (0, _moment2.default)(state.start_date);
 	      var t = (0, _moment2.default)(state.start_time);
+	      var tRounded = MomentRound(t, _moment2.default.duration(15, "minutes"), "round");
 	
 	      if (field === 'start_time') {
-	        var t_mod = (0, _moment2.default)(t);
+	        value = tRounded.toDate();
 	      }
 	
-	      var start_datetime = d.format('YYYY-MM-DD') + ' ' + t.format('HH:mm:00');
+	      var start_datetime = d.format('YYYY-MM-DD') + ' ' + tRounded.format('HH:mm:00');
 	
 	      comp.setState((_comp$setState = {}, _defineProperty(_comp$setState, field, value), _defineProperty(_comp$setState, 'start_datetime', start_datetime), _comp$setState));
 	    }
@@ -98906,7 +98894,8 @@
 	                    num
 	                  );
 	                })
-	              )
+	              ),
+	              _react2.default.createElement(_MapPopup2.default, { styles: { fontSize: "1.1rem", height: "2.6rem", lineHeight: "2.6rem", marginLeft: "1rem" }, raised: true })
 	            ),
 	            _react2.default.createElement(
 	              'div',
@@ -99287,7 +99276,7 @@
 	              table.table_type === 'future' && table.player_id !== _config2.default.state.user.id && table.allow_signups == 1 && table.joined < 1 ? _react2.default.createElement(
 	                'button',
 	                { onClick: comp.handleJoinGame.bind(comp, table) },
-	                'Join Game!'
+	                +table.signups >= +table.seats ? 'Join Waitlist' : 'Join Game'
 	              ) : '',
 	              table.table_type === 'future' && table.player_id !== _config2.default.state.user.id && table.allow_signups == 1 && table.joined > 0 ? _react2.default.createElement(
 	                'button',
@@ -99675,7 +99664,7 @@
 	    key: 'addIgnore',
 	    value: function addIgnore(bad_player_id) {
 	      var comp = this;
-	
+	      console.log(_config2.default.state.user);
 	      _config2.default.state.user.ignore.push(bad_player_id);
 	      _config2.default.state.user.ignore = _.uniq(_config2.default.state.user.ignore);
 	      if (comp.props.onToggleIgnore) {
@@ -100958,7 +100947,7 @@
 	          ignore: json.data.ignore
 	        });
 	      }).catch(function (json) {
-	
+	        console.log(json);
 	        _ToastsAPI2.default.toast('error', null, 'Failed to get some settings.', { timeOut: 6000 });
 	      });
 	    }
@@ -101234,7 +101223,7 @@
 	    key: 'handleToggleIgnore',
 	    value: function handleToggleIgnore(bad_player_id) {
 	      var comp = this;
-	
+	      console.log(_config2.default.state.user.ignore, bad_player_id);
 	      if (_config2.default.state.user.ignore.indexOf(bad_player_id) < 0) {
 	        comp.addIgnore(bad_player_id);
 	      } else {
@@ -102183,7 +102172,7 @@
 	          game_popup: false
 	        });
 	      }).catch(function (json) {
-	
+	        console.log(json);
 	        _ToastsAPI2.default.toast('error', null, 'Error getting tables list.', { timeOut: 6000 });
 	      });
 	    }
@@ -102429,7 +102418,7 @@
 	                  table.player_id !== _config2.default.state.user.id && table.allow_signups == 1 && table.joined < 1 ? _react2.default.createElement(
 	                    'button',
 	                    { className: 'join', onClick: comp.handleJoinGame.bind(comp, table) },
-	                    table.signups >= table.seats ? 'Join Waitlist' : 'Join Game'
+	                    +table.signups >= +table.seats ? 'Join Waitlist' : 'Join Game'
 	                  ) : '',
 	                  table.allow_signups == 1 ? _react2.default.createElement(
 	                    'button',
@@ -102725,6 +102714,107 @@
 	;
 	
 	exports.default = Privacy;
+
+/***/ }),
+/* 854 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _config = __webpack_require__(552);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	var _react = __webpack_require__(2);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _reactToolbox = __webpack_require__(243);
+	
+	var _button = __webpack_require__(244);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var MapPopup = function (_React$Component) {
+	  _inherits(MapPopup, _React$Component);
+	
+	  function MapPopup(props) {
+	    _classCallCheck(this, MapPopup);
+	
+	    var _this = _possibleConstructorReturn(this, (MapPopup.__proto__ || Object.getPrototypeOf(MapPopup)).call(this, props));
+	
+	    var comp = _this;
+	    _this.state = {
+	      popup_map: false,
+	      styles: Object.assign({ display: "inline-block", textTransform: "none", position: "relative", top: "-1px" }, props.styles)
+	    };
+	    return _this;
+	  }
+	
+	  _createClass(MapPopup, [{
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      var comp = this;
+	    }
+	  }, {
+	    key: 'handleOpenMap',
+	    value: function handleOpenMap() {
+	      this.setState({ popup_map: true });
+	    }
+	  }, {
+	    key: 'handleCloseMap',
+	    value: function handleCloseMap() {
+	      this.setState({ popup_map: false });
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var comp = this;
+	      console.log(comp.props);
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'map-popup-cm', style: { display: "inline-block" } },
+	        _react2.default.createElement(_button.Button, {
+	          label: 'View DTC Floor Map',
+	          onClick: comp.handleOpenMap.bind(comp),
+	          style: comp.state.styles,
+	          raised: comp.props.raised,
+	          accent: comp.props.accent,
+	          primary: comp.props.primary
+	        }),
+	        _react2.default.createElement(
+	          _reactToolbox.Dialog,
+	          {
+	            className: 'map-popup',
+	            title: '',
+	            type: 'large',
+	            onEscKeyDown: comp.handleCloseMap.bind(comp),
+	            onOverlayClick: comp.handleCloseMap.bind(comp),
+	            active: comp.state.popup_map !== false,
+	            actions: [{ label: "Close", onClick: comp.handleCloseMap.bind(comp), primary: true, raised: true }]
+	          },
+	          _react2.default.createElement('img', { src: '/images/DTCMap2018.jpg', style: { width: '100%', minWidth: '900px' } })
+	        )
+	      );
+	    }
+	  }]);
+	
+	  return MapPopup;
+	}(_react2.default.Component);
+	
+	exports.default = MapPopup;
 
 /***/ })
 /******/ ]);

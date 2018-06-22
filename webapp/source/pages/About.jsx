@@ -5,6 +5,7 @@ import {browserHistory} from 'react-router';
 import {FontIcon, Dialog} from 'react-toolbox';
 import {Button, IconButton} from 'react-toolbox/lib/button';
 import {LoadingInline} from '../components/Loaders.jsx';
+import MapPopup from '../components/MapPopup.jsx';
 
 class About extends React.Component
 {
@@ -12,19 +13,8 @@ class About extends React.Component
   {
     super(props);
     this.state = {
-      loader: false,
-      popup_map: false
+      loader: false
     };
-  }
-
-  handleOpenMap()
-  {
-    this.setState({popup_map: true});
-  }
-
-  handleCloseMap()
-  {
-    this.setState({popup_map: false});
   }
 
   render()
@@ -42,13 +32,7 @@ class About extends React.Component
           <li>Grab a "Players Wanted" sign to help others find your table!</li>
         </ul>
 
-        <div>
-          <Button raised primary
-            label="Open Convention Map"
-            icon="map"
-            onClick={comp.handleOpenMap.bind(comp)}
-          />
-        </div>
+        <MapPopup styles={{fontSize:"1.3rem", height:"2.6rem", lineHeight:"2.6rem", marginLeft:"0.1rem", marginTop:"1rem"}} raised />
 
         <h2>Thanks to BGG!</h2>
         <p>All the board game data used here is from the amazing folks at <a href="http://boardgamegeek.com" target="_blank" style={{color:'#fff'}}>boardgamegeek.com</a>, thanks to their open API service!</p>
@@ -71,19 +55,6 @@ class About extends React.Component
           active={comp.state.loader}
         />
 
-        <Dialog
-          className="map-popup"
-          title=""
-          type="large"
-          onEscKeyDown={comp.handleCloseMap.bind(comp)}
-          onOverlayClick={comp.handleCloseMap.bind(comp)}
-          active={comp.state.popup_map!==false}
-          actions={[
-            {label: "Close", onClick: comp.handleCloseMap.bind(comp), primary: true, raised: true}
-          ]}
-        >
-          <img src="/images/DTCMap2018.jpg" style={{width: '100%', minWidth: '900px'}} />
-        </Dialog>
       </div>
     );
   }

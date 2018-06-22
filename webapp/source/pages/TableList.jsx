@@ -191,7 +191,7 @@ class TableList extends React.Component
                 {table.status === 'cancelled' ? '' : (
                   <div className="table-item-actions">
                     {table.table_type==='future' && table.player_id !== CONFIG.state.user.id && table.allow_signups!=1 ? (<button disabled>First Come (no sign up)</button>) : ''}
-                    {table.table_type==='future' && table.player_id !== CONFIG.state.user.id && table.allow_signups==1 && table.joined<1 ? (<button onClick={comp.handleJoinGame.bind(comp, table)}>Join Game!</button>) : ''}
+                    {table.table_type==='future' && table.player_id !== CONFIG.state.user.id && table.allow_signups==1 && table.joined<1 ? (<button onClick={comp.handleJoinGame.bind(comp, table)}>{+table.signups >= +table.seats ? 'Join Waitlist' : 'Join Game'}</button>) : ''}
                     {table.table_type==='future' && table.player_id !== CONFIG.state.user.id && table.allow_signups==1 && table.joined>0 ? (<button className='leave' onClick={comp.handleLeaveGame.bind(comp, table)}>Leave</button>) : ''}
                     {table.table_type==='future' && table.allow_signups==1 ? (<button className="players" onClick={CONFIG.state.index.openTableDialog.bind(CONFIG.state.index, table.table_id)}>Players</button>) : ''}
                     {table.player_id == CONFIG.state.user.id ? (<button className='edit has-icon' onClick={()=>{browserHistory.push('/tables/edit/'+table.table_id)}}><FontIcon value='edit' /></button>) : ''}
