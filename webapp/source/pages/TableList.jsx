@@ -180,13 +180,13 @@ class TableList extends React.Component
                 </div>
                 <div className="table-item-details">
                   {table.table_type==='future' ? (<span className="table-item-tag">{moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, M/D/Y, h:mm a')}</span>) : ''}
+                  <span className="plan-tag">{table.table_location +' '+ (table.table_sublocation_alpha||'') + '-' + (table.table_sublocation_num||'')}</span>
                   <span className="table-item-tag">Takes {table.playtime ? table.playtime : Math.round((Math.round(table.avgplay/6)/10)*2)/2 + ' hours'}</span>
                   {table.table_type==='now' ? (
                     <span className="table-item-tag">Host: {table.host_name}</span>
                   ) : (
                     <span className="table-item-tag">{table.signups} of {table.seats} seats taken</span>
                   )}
-                  <span className="table-item-tag">{table.table_location +' '+ (table.table_sublocation_alpha||'') + '-' + (table.table_sublocation_num||'')}</span>
                 </div>
                 {table.status === 'cancelled' ? '' : (
                   <div className="table-item-actions">
@@ -217,7 +217,7 @@ class TableList extends React.Component
     var comp = this;
     return (
       <div id="page-list-tables" className="transition-item page-list-tables page-wrap">
-        <div className={"table-list-wrap" + (comp.state.loaded ? " loading" : "")}>
+        <div className={"table-list-wrap" + (comp.state.loaded ? " loading" : "")} style={{paddingTop: '0'}}>
           {(comp.state.tables && comp.state.tables.length > 0) ? comp.renderTableList() : comp.renderNoTables()}
         </div>
 

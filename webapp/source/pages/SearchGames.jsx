@@ -68,6 +68,8 @@ class SearchGames extends React.Component
       {label: 'Puzzles', value: 'Puzzle'},
       {label: 'Racing', value: 'Racing'},
       {label: 'Realtime Action', value:'Real-time'},
+      {label: 'Role Focused', value:'Role Playing'},
+      {label: 'RPG Pen & Paper', value:'RPG'},
       {label: 'Science Fiction Theme', value: 'Science Fiction'},
       {label: 'Sports Theme', value: 'Sports'},
       {label: 'Storytelling', value: 'Storytelling'},
@@ -558,7 +560,7 @@ class SearchGames extends React.Component
     }
 
     return (
-      <div id="page-game-search" className={"transition-item page-search page-wrap " + trans}>
+      <div id="page-game-search" className={"page-game-search transition-item page-search page-wrap " + trans}>
 
         <div className={"game-search-section" + (comp.state.loader ? " loading" : "")}>
           {comp.renderGameSearch()}

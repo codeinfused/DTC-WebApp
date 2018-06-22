@@ -45,11 +45,15 @@ abstract class Tables
       LEFT JOIN game_signups gs ON gs.table_id = tb.id
       JOIN bgg_game_db db ON tb.bgg_id = db.bgg_id
       LEFT JOIN users u ON u.id = tb.player_id
+      LEFT JOIN game_ignore gi ON gi.bgg_id = tb.bgg_id
+      LEFT JOIN game_ignore gi2 ON gi2.bad_player_id = tb.player_id
       WHERE tb.table_type='future'
       AND tb.start_datetime LIKE :date
       AND tb.start_datetime > NOW() - INTERVAL 20 MINUTE
       AND tb.status='ready'
       AND tb.private='0'
+      AND gi.id IS NULL
+      AND gi2.id IS NULL
       GROUP BY tb.id
       ORDER BY tb.start_datetime ASC"
     );
@@ -71,7 +75,15 @@ abstract class Tables
     );
     $dbCheck->execute(array(':table_id' => $table_id, ':uid' => $uid));
     $table = $dbCheck->fetch();
-    if($table){
+
+    if($table)
+    {
+      $reserveCheck = $pdo->prepare("SELECT COUNT(id) as ct FROM game_signups WHERE table_id=:table_id AND player_id < 7");
+      $reserveCheck->execute(array(
+        ':table_id' => $table_id
+      ));
+      $current_reserves = $reserveCheck->fetch();
+
       $table['game'] = array(
         'title'=>$table['title'],
         'players'=>[$table['minplayers'], $table['maxplayers']],
@@ -81,6 +93,7 @@ abstract class Tables
       $table['lft'] = (boolean) $table['lft'];
       $table['joined'] = (boolean) $table['joined'];
       $table['private'] = (boolean) $table['private'];
+      $table['reserved'] = $current_reserves['ct'];
     }
     return array('table'=>$table);
   }
@@ -193,14 +206,19 @@ abstract class Tables
   {
     $dbCheck = $pdo->prepare(
       "SELECT db.title, tb.id as table_id, tb.bgg_id, tb.player_id, CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as host_name,
-      tb.table_type, tb.seats, tb.table_location, tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft, tb.allow_signups, tb.status, tb.playtime, ROUND((db.minplaytime+db.maxplaytime)/2) as avgplay,
+      tb.table_type, tb.seats, tb.table_location, tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft, tb.allow_signups, tb.status, tb.playtime,
+      ROUND((db.minplaytime+db.maxplaytime)/2) as avgplay
       FROM game_tables tb
       JOIN bgg_game_db db ON tb.bgg_id = db.bgg_id
       LEFT JOIN users u ON u.id = tb.player_id
+      LEFT JOIN game_ignore gi ON gi.bgg_id = tb.bgg_id
+      LEFT JOIN game_ignore gi2 ON gi2.bad_player_id = tb.player_id
       WHERE tb.table_type=:table_type
       AND tb.start_datetime > NOW() - INTERVAL 20 MINUTE
       AND tb.status='ready'
       AND tb.private='0'
+      AND gi.id IS NULL
+      AND gi2.id IS NULL
       GROUP BY tb.id
       ORDER BY tb.start_datetime ASC"
     );
@@ -216,6 +234,7 @@ abstract class Tables
   static function edit_table($pdo, $uid, $data)
   {
     $data['joined'] = $data['joined'] ? 1 : 0;
+
     $exec_params = array(
       ':uid' => $uid,
       ':bid' => $data['bgg_id'],
@@ -293,6 +312,8 @@ abstract class Tables
         //   ( created_date=NOW())
         // ");
       }
+
+      $table_id = $new_table_id;
     }
     else{  /* EDITING EXISTING */
 
@@ -309,9 +330,44 @@ abstract class Tables
         ));
       }
 
+    } // end checks if new/edit
+
+    if(!empty($data['reserved'])){
+      $reserved_max = intval($data['reserved']);
+      self::join_reserved_spots($pdo, $table_id, $reserved_max);
+    }else{
+      self::delete_reserved_spots($pdo, $table_id, 1, 7);
     }
 
     return array('success'=>true);
+  }
+
+  static function join_reserved_spots($pdo, $table_id, $howmany)
+  {
+    $howmany_id = $howmany + 1;
+    $dbCheck = $pdo->prepare("SELECT COUNT(id) as ct FROM game_signups WHERE table_id=:table_id AND player_id < 7");
+    $dbCheck->execute(array(
+      ':table_id' => $table_id
+    ));
+    $current_reserves = $dbCheck->fetch();
+
+    if($current_reserves['ct'] < $howmany){
+      for($i=$current_reserves['ct']+2; $i<$howmany+2; $i++){
+        self::join_table($pdo, $i, array('table_id'=>$table_id));
+      }
+    }else if($current_reserves['ct'] > $howmany){
+      self::delete_reserved_spots($pdo, $table_id, $howmany+1, 7);
+    }
+  }
+
+  static function delete_reserved_spots($pdo, $table_id, $min, $max)
+  {
+    $dbCheck = $pdo->prepare("DELETE FROM game_signups WHERE table_id=:table_id AND player_id > :min AND player_id <= :max");
+    $dbCheck->execute(array(
+      ':table_id' => $table_id,
+      ':min' => $min,
+      ':max' => $max
+    ));
   }
 
   static function refresh_table($pdo, $uid, $data)

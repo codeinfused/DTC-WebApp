@@ -59,7 +59,7 @@ class GamePopup extends React.Component
     browserHistory.push('/list/'+type+'/'+bgg_id);
   }
 
-  // WTP and NOTIFY actions
+  // WTP Want To Play ACTIONS
   // -------------------------------------------
 
   updateGameWTP(bgg_id, inc)
@@ -114,6 +114,19 @@ class GamePopup extends React.Component
     this.forceUpdate();
   }
 
+  handleToggleWTP(bgg_id)
+  {
+    var comp = this;
+    if(CONFIG.state.user.wtp.indexOf(bgg_id) < 0){
+      comp.addWTP(bgg_id);
+    }else{
+      comp.deleteWTP(bgg_id);
+    }
+  }
+
+  // BUTTON: NOTIFICATIONS TOGGLE
+  // -----------------------------------------------
+
   addNotify(bgg_id)
   {
     var comp = this;
@@ -144,25 +157,10 @@ class GamePopup extends React.Component
     var ind = CONFIG.state.user.notify.indexOf(bgg_id);
     CONFIG.state.user.notify.splice(ind, 1);
 
-    axios.post(CONFIG.api.notify+'/delete', {
-      bgg_id: bgg_id,
-      t: (new Date()).getTime()
-    }, {
-      headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
-    }).catch(function(json){
+    axios.post(CONFIG.api.notify+'/delete', {bgg_id: bgg_id,t: (new Date()).getTime()}, {headers: {'Authorization': 'Bearer '+CONFIG.state.auth}}).catch(function(json){
       ToastsAPI.toast('error', null, 'Error deleting notification.', {timeOut:6000});
     });
     this.forceUpdate();
-  }
-
-  handleToggleWTP(bgg_id)
-  {
-    var comp = this;
-    if(CONFIG.state.user.wtp.indexOf(bgg_id) < 0){
-      comp.addWTP(bgg_id);
-    }else{
-      comp.deleteWTP(bgg_id);
-    }
   }
 
   handleToggleNotify(bgg_id)
@@ -174,6 +172,95 @@ class GamePopup extends React.Component
       comp.deleteNotify(bgg_id);
     }
   }
+
+
+  // BUTTON: DO NOT SHOW GAME
+  // -----------------------------------------------
+
+  addDNS(bgg_id)
+  {
+    var comp = this;
+    CONFIG.state.user.dns.push(bgg_id);
+    CONFIG.state.user.dns = _.uniq(CONFIG.state.user.dns);
+    if(comp.props.onToggleDNS){
+      comp.props.onToggleDNS('add', bgg_id);
+    }
+    axios.post(CONFIG.api.dns, {bgg_id: bgg_id, t: (new Date()).getTime()}, {headers: {'Authorization': 'Bearer '+CONFIG.state.auth}}).catch(function(json){
+      ToastsAPI.toast('error', null, 'Error adding game.', {timeOut:6000});
+    });
+    this.forceUpdate();
+  }
+
+  deleteDNS(bgg_id)
+  {
+    var comp = this;
+    var ind = CONFIG.state.user.dns.indexOf(bgg_id);
+    CONFIG.state.user.dns.splice(ind, 1);
+    if(comp.props.onToggleDNS){
+      comp.props.onToggleDNS('delete', bgg_id);
+    }
+    axios.post(CONFIG.api.dns+'/delete', {bgg_id: bgg_id,t: (new Date()).getTime()}, {headers: {'Authorization': 'Bearer '+CONFIG.state.auth}}).catch(function(json){
+      ToastsAPI.toast('error', null, 'Error deleting notification.', {timeOut:6000});
+    });
+    this.forceUpdate();
+  }
+
+  handleToggleDNS(bgg_id)
+  {
+    var comp = this;
+    if(CONFIG.state.user.dns.indexOf(bgg_id) < 0){
+      comp.addDNS(bgg_id);
+    }else{
+      comp.deleteDNS(bgg_id);
+    }
+  }
+
+
+  // BUTTON: IGNORE GAME HOST
+  // -----------------------------------------------
+
+  addIgnore(bad_player_id)
+  {
+    var comp = this;
+    console.log(CONFIG.state.user);
+    CONFIG.state.user.ignore.push(bad_player_id);
+    CONFIG.state.user.ignore = _.uniq(CONFIG.state.user.ignore);
+    if(comp.props.onToggleIgnore){
+      comp.props.onToggleIgnore('add', bad_player_id);
+    }
+    axios.post(CONFIG.api.ignore, {bad_player_id: bad_player_id, t: (new Date()).getTime()}, {headers: {'Authorization': 'Bearer '+CONFIG.state.auth}}).catch(function(json){
+      ToastsAPI.toast('error', null, 'Error adding game.', {timeOut:6000});
+    });
+    this.forceUpdate();
+  }
+
+  deleteIgnore(bad_player_id)
+  {
+    var comp = this;
+    var ind = CONFIG.state.user.ignore.indexOf(bad_player_id);
+    CONFIG.state.user.ignore.splice(ind, 1);
+    if(comp.props.onToggleIgnore){
+      comp.props.onToggleIgnore('delete', bad_player_id);
+    }
+    axios.post(CONFIG.api.ignore+'/delete', {bad_player_id: bad_player_id, t: (new Date()).getTime()}, {headers: {'Authorization': 'Bearer '+CONFIG.state.auth}}).catch(function(json){
+      ToastsAPI.toast('error', null, 'Error deleting notification.', {timeOut:6000});
+    });
+    this.forceUpdate();
+  }
+
+  handleToggleIgnore(bad_player_id)
+  {
+    var comp = this;
+    if(CONFIG.state.user.ignore.indexOf(bad_player_id) < 0){
+      comp.addIgnore(bad_player_id);
+    }else{
+      comp.deleteIgnore(bad_player_id);
+    }
+  }
+
+
+  // =========================================
+  // --
 
   handleCreateGame(game)
   {
@@ -206,6 +293,8 @@ class GamePopup extends React.Component
 
     var notifyActive = CONFIG.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
     var wtpActive = CONFIG.state.user.wtp.indexOf(game.bgg_id) > -1 ? " active" : "";
+    var dnsActive = CONFIG.state.user.dns.indexOf(game.bgg_id) > -1 ? " hide-active" : "";
+    var ignoreActive = CONFIG.state.user.ignore.indexOf(comp.props.host_id) > -1 ? " hide-active" : "";
     var image = false;
 
     if(!!game.image)
@@ -277,6 +366,15 @@ class GamePopup extends React.Component
                 <div className="game-item-action-count">{+game.scheduled}</div>
               </div>
             </div>
+            {((!comp.props.onToggleDNS && !comp.props.onToggleIgnore) || game.player_id==CONFIG.state.user.id) ? '' : (
+            <div className="game-item-action">
+              <div className="game-item-action-line">
+                <div className="game-item-action-title">Hide this board game or host</div>
+                {!comp.props.onToggleIgnore ? '' : (<div className={"game-item-action-btn action-ignore-btn " + ignoreActive}><IconButton icon='person' onClick={comp.handleToggleIgnore.bind(comp, comp.props.host_id)} /></div>)}
+                {!comp.props.onToggleDNS ? '' : (<div className={"game-item-action-btn action-donotshow-btn " + dnsActive}><IconButton icon='remove_circle' onClick={comp.handleToggleDNS.bind(comp, game.bgg_id)} /></div>)}
+              </div>
+            </div>
+            )}
           </div>
         </div>
       </div>
@@ -287,7 +385,7 @@ class GamePopup extends React.Component
   {
     var comp = this;
     return (
-      <div className="game-item-wrap" id="page-game-search">
+      <div className="game-item-wrap page-game-search" id="page-game-search">
         {comp.state.loaded ? comp.renderGame() : <div />}
       </div>
     );

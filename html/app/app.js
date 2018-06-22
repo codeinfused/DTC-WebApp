@@ -186,7 +186,9 @@
 	      activeNav: props.location.pathname ? props.location.pathname : '/home'
 	    };
 	
-	    _this.navButtons = [{ label: 'Home', path: '/home', icon: 'home' }, { label: 'Tables Right Now', path: '/lfp', icon: 'video_library' }, { label: 'Scheduled Tables', path: '/schedules', icon: 'event_note' }, { label: 'Start/Search Games', path: '/games', icon: 'library_books', callback: comp.DBLoadBGG }, { label: 'Con Library', path: '/library', icon: 'import_contacts', callback: comp.DBLoadLibrary }, { label: 'Game Alerts', path: '/alerts', icon: 'notifications' }, { label: 'My Plans', path: '/myplans', icon: 'date_range' }, { label: 'My Tables', path: '/mytables', icon: 'playlist_add_check' }, { label: 'My Settings', path: '/me', icon: 'settings_applications' }, { label: 'About & Map', path: '/about', icon: 'info' }];
+	    _this.navButtons = [{ label: 'Home', path: '/home', icon: 'home' }, { label: 'Tables Right Now', path: '/lfp', icon: 'video_library' }, { label: 'Scheduled Tables', path: '/schedules', icon: 'event_note' }, { label: 'Start/Search Games', path: '/games', icon: 'library_books', callback: comp.DBLoadBGG },
+	    // {label:'Con Library',         path:'/library', icon:'import_contacts', callback: comp.DBLoadLibrary},
+	    { label: 'Game Alerts', path: '/alerts', icon: 'notifications' }, { label: 'My Plans', path: '/myplans', icon: 'date_range' }, { label: 'My Tables', path: '/mytables', icon: 'playlist_add_check' }, { label: 'My Settings', path: '/me', icon: 'settings_applications' }, { label: 'About & Map', path: '/about', icon: 'info' }];
 	
 	    _this.getNewAlerts = _this.getNewAlerts.bind(_this);
 	    _this.openTableDialog = _this.openTableDialog.bind(_this);
@@ -57115,6 +57117,8 @@
 	    verify: baseAPI + "verifyauth",
 	    wtp: baseAPI + "user/me/wtp",
 	    notify: baseAPI + "user/me/notify",
+	    dns: baseAPI + "user/me/dns",
+	    ignore: baseAPI + "user/me/ignore",
 	    getAlerts: baseAPI + "user/getalerts",
 	    myAlertSettings: baseAPI + "user/myalertgames",
 	
@@ -97080,7 +97084,7 @@
 	
 	    _this.sortOptions = [{ label: 'Sort BGG Ranking', value: 'bggrate' }, { label: 'Players Wanting To Play', value: 'wtp' }, { label: 'Tables Needing Players', value: 'lfp' }, { label: 'Scheduled Games', value: 'scheduled' }, { label: 'Year Released', value: 'year' }, { label: 'Popular 7+ Players', value: 'maxplayers' }];
 	
-	    _this.tagOptions = [{ label: 'No Filter', value: '' }, { label: 'Abstract', value: 'Abstract Strategy' }, { label: 'Action / Dexterity', value: 'Action / Dexterity' }, { label: 'Area Control', value: 'Area Control / Area Influence' }, { label: 'Auction / Bidding', value: 'Auction/Bidding' }, { label: 'Bluffing', value: 'Bluffing' }, { label: 'Card Games', value: 'Card Game' }, { label: 'Coop Games', value: 'Co-operative Play' }, { label: 'Deckbuilders / Pools', value: 'Deck / Pool Building' }, { label: 'Deduction', value: 'Deduction' }, { label: 'Dice Games', value: 'Dice' }, { label: 'Drafting', value: "Card Drafting" }, { label: 'Fantasy Theme', value: 'Fantasy' }, { label: 'Horror Theme', value: 'Horror' }, { label: 'Medieval Theme', value: 'Medieval' }, { label: 'Movies & TV Theme', value: "Movies / TV / Radio theme" }, { label: 'Party Games', value: 'Party Game' }, { label: 'Pirate Theme', value: 'Pirates' }, { label: 'Puzzles', value: 'Puzzle' }, { label: 'Racing', value: 'Racing' }, { label: 'Realtime Action', value: 'Real-time' }, { label: 'Science Fiction Theme', value: 'Science Fiction' }, { label: 'Sports Theme', value: 'Sports' }, { label: 'Storytelling', value: 'Storytelling' }, { label: 'Take That', value: 'Take That' }, { label: 'War Games', value: 'Wargame' }, { label: 'Worker Placement', value: 'Worker Placement' }, { label: 'Zombies Theme', value: 'Zombies' }];
+	    _this.tagOptions = [{ label: 'No Filter', value: '' }, { label: 'Abstract', value: 'Abstract Strategy' }, { label: 'Action / Dexterity', value: 'Action / Dexterity' }, { label: 'Area Control', value: 'Area Control / Area Influence' }, { label: 'Auction / Bidding', value: 'Auction/Bidding' }, { label: 'Bluffing', value: 'Bluffing' }, { label: 'Card Games', value: 'Card Game' }, { label: 'Coop Games', value: 'Co-operative Play' }, { label: 'Deckbuilders / Pools', value: 'Deck / Pool Building' }, { label: 'Deduction', value: 'Deduction' }, { label: 'Dice Games', value: 'Dice' }, { label: 'Drafting', value: "Card Drafting" }, { label: 'Fantasy Theme', value: 'Fantasy' }, { label: 'Horror Theme', value: 'Horror' }, { label: 'Medieval Theme', value: 'Medieval' }, { label: 'Movies & TV Theme', value: "Movies / TV / Radio theme" }, { label: 'Party Games', value: 'Party Game' }, { label: 'Pirate Theme', value: 'Pirates' }, { label: 'Puzzles', value: 'Puzzle' }, { label: 'Racing', value: 'Racing' }, { label: 'Realtime Action', value: 'Real-time' }, { label: 'Role Focused', value: 'Role Playing' }, { label: 'RPG Pen & Paper', value: 'RPG' }, { label: 'Science Fiction Theme', value: 'Science Fiction' }, { label: 'Sports Theme', value: 'Sports' }, { label: 'Storytelling', value: 'Storytelling' }, { label: 'Take That', value: 'Take That' }, { label: 'War Games', value: 'Wargame' }, { label: 'Worker Placement', value: 'Worker Placement' }, { label: 'Zombies Theme', value: 'Zombies' }];
 	
 	    _this.handleSearchChange = _this.handleSearchChange.bind(_this);
 	    _this.handleSearchGames = _this.handleSearchGames.bind(_this);
@@ -97732,7 +97736,7 @@
 	
 	      return _react2.default.createElement(
 	        'div',
-	        { id: 'page-game-search', className: "transition-item page-search page-wrap " + trans },
+	        { id: 'page-game-search', className: "page-game-search transition-item page-search page-wrap " + trans },
 	        _react2.default.createElement(
 	          'div',
 	          { className: "game-search-section" + (comp.state.loader ? " loading" : "") },
@@ -98598,6 +98602,7 @@
 	      lfp: true,
 	      lft: false,
 	      joined: true,
+	      reserved: 0,
 	      allow_signups: true,
 	      private: false
 	    };
@@ -98614,6 +98619,8 @@
 	
 	    _this.playtimeOptions = [{ label: 'Auto', value: '' }, { label: '30 (half hour)', value: '0.5 hour' }, { label: '60 (1 hour)', value: '1 hour' }, { label: '90 (1½ hours)', value: '1.5 hours' }, { label: '120 (2 hours)', value: '2 hours' }, { label: '150 (2½ hours)', value: '2.5 hours' }, { label: '180 (3 hours)', value: '3 hours' }, { label: '240 (4 hours)', value: '4 hours' }, { label: '300 (5+ hours)', value: '5+ hours' }];
 	
+	    _this.reservedPlayers = [{ label: 'None', value: '' }, { label: '1 player', value: '1' }, { label: '2 players', value: '2' }, { label: '3 players', value: '3' }, { label: '4 players', value: '4' }, { label: '5 players', value: '5' }];
+	
 	    _this.getGameData = _this.getGameData.bind(_this);
 	    _this.handleSubmitTable = _this.handleSubmitTable.bind(_this);
 	    _this.handleCloseDialog = _this.handleCloseDialog.bind(_this);
@@ -98624,6 +98631,9 @@
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
 	      var comp = this;
+	      //moment.relativeTimeRounding(Math.floor);
+	      //moment.relativeTimeThreshold('m', 15);
+	
 	      if (!_config2.default.state.auth || _config2.default.state.user.grant_type === 'guest') {
 	        _ToastsAPI2.default.toast('error', "Sorry, guests can't create tables.", null, { timeOut: 8000 });
 	        _reactRouter.browserHistory.goBack();
@@ -98690,6 +98700,12 @@
 	          }
 	          var newState = Object.assign({}, curState, json.data.table);
 	          newState.loaded = true;
+	          if (newState.start_datetime) {
+	            var d = (0, _moment2.default)(newState.start_datetime);
+	            var d_obj = d.toDate();
+	            newState.start_date = d_obj;
+	            newState.start_time = d_obj;
+	          }
 	          comp.setState(newState);
 	        }
 	      }).catch(function (json) {
@@ -98708,6 +98724,19 @@
 	      this.setState(_defineProperty({}, field, value.target.value));
 	    }
 	  }, {
+	    key: 'splitDateTime',
+	    value: function splitDateTime(val) {
+	      var comp = this;
+	      var d = (0, _moment2.default)(d);
+	      var d_obj = d.toDate();
+	      //var start_date = d.format('YYYY-MM-DD');
+	      //var start_time = d.format('HH:mm:00');
+	      comp.setState({
+	        start_date: d_obj,
+	        start_time: d_obj
+	      });
+	    }
+	  }, {
 	    key: 'handleChangeDatetime',
 	    value: function handleChangeDatetime(field, value) {
 	      var _comp$setState;
@@ -98715,9 +98744,14 @@
 	      var comp = this;
 	      var state = _.cloneDeep(comp.state);
 	      state[field] = value;
-	      var d = state.start_date;
-	      var t = state.start_time;
-	      var start_datetime = (0, _moment2.default)(d).format('YYYY-MM-DD') + ' ' + (0, _moment2.default)(t).format('HH:mm:00');
+	      var d = (0, _moment2.default)(state.start_date);
+	      var t = (0, _moment2.default)(state.start_time);
+	
+	      if (field === 'start_time') {
+	        var t_mod = (0, _moment2.default)(t);
+	      }
+	
+	      var start_datetime = d.format('YYYY-MM-DD') + ' ' + t.format('HH:mm:00');
 	
 	      comp.setState((_comp$setState = {}, _defineProperty(_comp$setState, field, value), _defineProperty(_comp$setState, 'start_datetime', start_datetime), _comp$setState));
 	    }
@@ -98739,6 +98773,7 @@
 	        lft: comp.state.lft,
 	        private: comp.state.private,
 	        joined: comp.state.joined,
+	        reserved: comp.state.reserved,
 	        allow_signups: comp.state.allow_signups,
 	        table_sublocation_alpha: comp.state.table_sublocation_alpha,
 	        table_sublocation_num: comp.state.table_sublocation_num
@@ -98756,6 +98791,19 @@
 	    value: function handleCloseDialog() {
 	      this.setState({ dialogActive: false });
 	      _reactRouter.browserHistory.goBack();
+	    }
+	  }, {
+	    key: 'renderReservedSpots',
+	    value: function renderReservedSpots() {
+	      var comp = this;
+	      var seats = comp.state.seats;
+	      var joined = comp.state.joined === true ? 1 : 0;
+	
+	      return comp.reservedPlayers.filter(function (obj, i) {
+	        if (i < seats - joined) {
+	          return obj;
+	        }
+	      });
 	    }
 	  }, {
 	    key: 'render',
@@ -98805,7 +98853,7 @@
 	                    { htmlFor: 'type-now' },
 	                    'Now'
 	                  ),
-	                  _react2.default.createElement('input', { id: 'type-later', name: 'table_type', type: 'radio', value: 'later', checked: comp.state.table_type === 'later', onChange: comp.handleChangeInput.bind(comp, 'table_type', 'later') }),
+	                  _react2.default.createElement('input', { id: 'type-later', name: 'table_type', type: 'radio', value: 'future', checked: comp.state.table_type === 'future', onChange: comp.handleChangeInput.bind(comp, 'table_type', 'future') }),
 	                  _react2.default.createElement(
 	                    'label',
 	                    { htmlFor: 'type-later' },
@@ -98897,10 +98945,11 @@
 	            _react2.default.createElement(
 	              'div',
 	              { className: 'table-form-item' },
-	              comp.state.table_type === 'now' ? '' : _react2.default.createElement(_reactToolbox.Switch, { label: 'Allow Sign-ups', checked: comp.state.allow_signups, onChange: comp.handleChangeInput.bind(comp, 'allow_signups') }),
+	              _react2.default.createElement(_reactToolbox.Switch, { label: 'Looking For Teacher?', checked: comp.state.lft, onChange: comp.handleChangeInput.bind(comp, 'lft') }),
+	              comp.state.table_type === 'now' ? '' : _react2.default.createElement(_reactToolbox.Switch, { label: 'Unlisted (Only visible to you)', checked: comp.state.private, onChange: comp.handleChangeInput.bind(comp, 'private') }),
+	              comp.state.table_type === 'now' ? '' : _react2.default.createElement(_reactToolbox.Switch, { label: 'Allow Sign-ups?', checked: comp.state.allow_signups, onChange: comp.handleChangeInput.bind(comp, 'allow_signups') }),
 	              comp.state.table_type === 'now' ? '' : _react2.default.createElement(_reactToolbox.Switch, { label: 'Join Your Own Table?', checked: comp.state.joined, onChange: comp.handleChangeInput.bind(comp, 'joined') }),
-	              _react2.default.createElement(_reactToolbox.Switch, { label: 'Looking For Teacher', checked: comp.state.lft, onChange: comp.handleChangeInput.bind(comp, 'lft') }),
-	              comp.state.table_type === 'now' ? '' : _react2.default.createElement(_reactToolbox.Switch, { label: 'Unlisted (Only visible to you)', checked: comp.state.private, onChange: comp.handleChangeInput.bind(comp, 'private') })
+	              comp.state.table_type === 'now' ? '' : _react2.default.createElement(_reactToolbox.Dropdown, { label: 'Reserve Any Other Spaces?', source: comp.renderReservedSpots(), value: comp.state.reserved, allowBlank: false, onChange: comp.handleChangeInput.bind(comp, 'reserved') })
 	            ),
 	            _react2.default.createElement(
 	              'div',
@@ -99204,6 +99253,11 @@
 	              ) : '',
 	              _react2.default.createElement(
 	                'span',
+	                { className: 'plan-tag' },
+	                table.table_location + ' ' + (table.table_sublocation_alpha || '') + '-' + (table.table_sublocation_num || '')
+	              ),
+	              _react2.default.createElement(
+	                'span',
 	                { className: 'table-item-tag' },
 	                'Takes ',
 	                table.playtime ? table.playtime : Math.round(Math.round(table.avgplay / 6) / 10 * 2) / 2 + ' hours'
@@ -99220,11 +99274,6 @@
 	                ' of ',
 	                table.seats,
 	                ' seats taken'
-	              ),
-	              _react2.default.createElement(
-	                'span',
-	                { className: 'table-item-tag' },
-	                table.table_location + ' ' + (table.table_sublocation_alpha || '') + '-' + (table.table_sublocation_num || '')
 	              )
 	            ),
 	            table.status === 'cancelled' ? '' : _react2.default.createElement(
@@ -99294,7 +99343,7 @@
 	        { id: 'page-list-tables', className: 'transition-item page-list-tables page-wrap' },
 	        _react2.default.createElement(
 	          'div',
-	          { className: "table-list-wrap" + (comp.state.loaded ? " loading" : "") },
+	          { className: "table-list-wrap" + (comp.state.loaded ? " loading" : ""), style: { paddingTop: '0' } },
 	          comp.state.tables && comp.state.tables.length > 0 ? comp.renderTableList() : comp.renderNoTables()
 	        ),
 	        _react2.default.createElement(_Loaders.LoadingInline, {
@@ -99459,7 +99508,7 @@
 	      _reactRouter.browserHistory.push('/list/' + type + '/' + bgg_id);
 	    }
 	
-	    // WTP and NOTIFY actions
+	    // WTP Want To Play ACTIONS
 	    // -------------------------------------------
 	
 	  }, {
@@ -99517,6 +99566,20 @@
 	      this.forceUpdate();
 	    }
 	  }, {
+	    key: 'handleToggleWTP',
+	    value: function handleToggleWTP(bgg_id) {
+	      var comp = this;
+	      if (_config2.default.state.user.wtp.indexOf(bgg_id) < 0) {
+	        comp.addWTP(bgg_id);
+	      } else {
+	        comp.deleteWTP(bgg_id);
+	      }
+	    }
+	
+	    // BUTTON: NOTIFICATIONS TOGGLE
+	    // -----------------------------------------------
+	
+	  }, {
 	    key: 'addNotify',
 	    value: function addNotify(bgg_id) {
 	      var comp = this;
@@ -99547,25 +99610,10 @@
 	      var ind = _config2.default.state.user.notify.indexOf(bgg_id);
 	      _config2.default.state.user.notify.splice(ind, 1);
 	
-	      _axios2.default.post(_config2.default.api.notify + '/delete', {
-	        bgg_id: bgg_id,
-	        t: new Date().getTime()
-	      }, {
-	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
-	      }).catch(function (json) {
+	      _axios2.default.post(_config2.default.api.notify + '/delete', { bgg_id: bgg_id, t: new Date().getTime() }, { headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth } }).catch(function (json) {
 	        _ToastsAPI2.default.toast('error', null, 'Error deleting notification.', { timeOut: 6000 });
 	      });
 	      this.forceUpdate();
-	    }
-	  }, {
-	    key: 'handleToggleWTP',
-	    value: function handleToggleWTP(bgg_id) {
-	      var comp = this;
-	      if (_config2.default.state.user.wtp.indexOf(bgg_id) < 0) {
-	        comp.addWTP(bgg_id);
-	      } else {
-	        comp.deleteWTP(bgg_id);
-	      }
 	    }
 	  }, {
 	    key: 'handleToggleNotify',
@@ -99577,6 +99625,95 @@
 	        comp.deleteNotify(bgg_id);
 	      }
 	    }
+	
+	    // BUTTON: DO NOT SHOW GAME
+	    // -----------------------------------------------
+	
+	  }, {
+	    key: 'addDNS',
+	    value: function addDNS(bgg_id) {
+	      var comp = this;
+	      _config2.default.state.user.dns.push(bgg_id);
+	      _config2.default.state.user.dns = _.uniq(_config2.default.state.user.dns);
+	      if (comp.props.onToggleDNS) {
+	        comp.props.onToggleDNS('add', bgg_id);
+	      }
+	      _axios2.default.post(_config2.default.api.dns, { bgg_id: bgg_id, t: new Date().getTime() }, { headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth } }).catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, 'Error adding game.', { timeOut: 6000 });
+	      });
+	      this.forceUpdate();
+	    }
+	  }, {
+	    key: 'deleteDNS',
+	    value: function deleteDNS(bgg_id) {
+	      var comp = this;
+	      var ind = _config2.default.state.user.dns.indexOf(bgg_id);
+	      _config2.default.state.user.dns.splice(ind, 1);
+	      if (comp.props.onToggleDNS) {
+	        comp.props.onToggleDNS('delete', bgg_id);
+	      }
+	      _axios2.default.post(_config2.default.api.dns + '/delete', { bgg_id: bgg_id, t: new Date().getTime() }, { headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth } }).catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, 'Error deleting notification.', { timeOut: 6000 });
+	      });
+	      this.forceUpdate();
+	    }
+	  }, {
+	    key: 'handleToggleDNS',
+	    value: function handleToggleDNS(bgg_id) {
+	      var comp = this;
+	      if (_config2.default.state.user.dns.indexOf(bgg_id) < 0) {
+	        comp.addDNS(bgg_id);
+	      } else {
+	        comp.deleteDNS(bgg_id);
+	      }
+	    }
+	
+	    // BUTTON: IGNORE GAME HOST
+	    // -----------------------------------------------
+	
+	  }, {
+	    key: 'addIgnore',
+	    value: function addIgnore(bad_player_id) {
+	      var comp = this;
+	      console.log(_config2.default.state.user);
+	      _config2.default.state.user.ignore.push(bad_player_id);
+	      _config2.default.state.user.ignore = _.uniq(_config2.default.state.user.ignore);
+	      if (comp.props.onToggleIgnore) {
+	        comp.props.onToggleIgnore('add', bad_player_id);
+	      }
+	      _axios2.default.post(_config2.default.api.ignore, { bad_player_id: bad_player_id, t: new Date().getTime() }, { headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth } }).catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, 'Error adding game.', { timeOut: 6000 });
+	      });
+	      this.forceUpdate();
+	    }
+	  }, {
+	    key: 'deleteIgnore',
+	    value: function deleteIgnore(bad_player_id) {
+	      var comp = this;
+	      var ind = _config2.default.state.user.ignore.indexOf(bad_player_id);
+	      _config2.default.state.user.ignore.splice(ind, 1);
+	      if (comp.props.onToggleIgnore) {
+	        comp.props.onToggleIgnore('delete', bad_player_id);
+	      }
+	      _axios2.default.post(_config2.default.api.ignore + '/delete', { bad_player_id: bad_player_id, t: new Date().getTime() }, { headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth } }).catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, 'Error deleting notification.', { timeOut: 6000 });
+	      });
+	      this.forceUpdate();
+	    }
+	  }, {
+	    key: 'handleToggleIgnore',
+	    value: function handleToggleIgnore(bad_player_id) {
+	      var comp = this;
+	      if (_config2.default.state.user.ignore.indexOf(bad_player_id) < 0) {
+	        comp.addIgnore(bad_player_id);
+	      } else {
+	        comp.deleteIgnore(bad_player_id);
+	      }
+	    }
+	
+	    // =========================================
+	    // --
+	
 	  }, {
 	    key: 'handleCreateGame',
 	    value: function handleCreateGame(game) {
@@ -99609,6 +99746,8 @@
 	
 	      var notifyActive = _config2.default.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
 	      var wtpActive = _config2.default.state.user.wtp.indexOf(game.bgg_id) > -1 ? " active" : "";
+	      var dnsActive = _config2.default.state.user.dns.indexOf(game.bgg_id) > -1 ? " hide-active" : "";
+	      var ignoreActive = _config2.default.state.user.ignore.indexOf(comp.props.host_id) > -1 ? " hide-active" : "";
 	      var image = false;
 	
 	      if (!!game.image) {
@@ -99792,6 +99931,29 @@
 	                  +game.scheduled
 	                )
 	              )
+	            ),
+	            !comp.props.onToggleDNS && !comp.props.onToggleIgnore || game.player_id == _config2.default.state.user.id ? '' : _react2.default.createElement(
+	              'div',
+	              { className: 'game-item-action' },
+	              _react2.default.createElement(
+	                'div',
+	                { className: 'game-item-action-line' },
+	                _react2.default.createElement(
+	                  'div',
+	                  { className: 'game-item-action-title' },
+	                  'Hide this board game or host'
+	                ),
+	                !comp.props.onToggleIgnore ? '' : _react2.default.createElement(
+	                  'div',
+	                  { className: "game-item-action-btn action-ignore-btn " + ignoreActive },
+	                  _react2.default.createElement(_button.IconButton, { icon: 'person', onClick: comp.handleToggleIgnore.bind(comp, comp.props.host_id) })
+	                ),
+	                !comp.props.onToggleDNS ? '' : _react2.default.createElement(
+	                  'div',
+	                  { className: "game-item-action-btn action-donotshow-btn " + dnsActive },
+	                  _react2.default.createElement(_button.IconButton, { icon: 'remove_circle', onClick: comp.handleToggleDNS.bind(comp, game.bgg_id) })
+	                )
+	              )
 	            )
 	          )
 	        )
@@ -99804,7 +99966,7 @@
 	      var comp = this;
 	      return _react2.default.createElement(
 	        'div',
-	        { className: 'game-item-wrap', id: 'page-game-search' },
+	        { className: 'game-item-wrap page-game-search', id: 'page-game-search' },
 	        comp.state.loaded ? comp.renderGame() : _react2.default.createElement('div', null)
 	      );
 	    }
@@ -100750,6 +100912,8 @@
 	    _this.state = {
 	      loaded: true,
 	      wtp: [],
+	      ignore: [],
+	      dns: [],
 	      allow_notifications: !!+_config2.default.state.user.allow_notifications
 	    };
 	
@@ -100789,9 +100953,12 @@
 	      }).then(function (json) {
 	        comp.setState({
 	          loaded: true,
-	          wtp: json.data.wtp
+	          wtp: json.data.wtp,
+	          dns: json.data.dns,
+	          ignore: json.data.ignore
 	        });
 	      }).catch(function (json) {
+	        console.log(json);
 	        _ToastsAPI2.default.toast('error', null, 'Failed to get some settings.', { timeOut: 6000 });
 	      });
 	    }
@@ -100977,6 +101144,107 @@
 	      });
 	      this.forceUpdate();
 	    }
+	
+	    // BUTTON: DO NOT SHOW GAME
+	    // -----------------------------------------------
+	
+	  }, {
+	    key: 'addDNS',
+	    value: function addDNS(bgg_id) {
+	      var comp = this;
+	      _config2.default.state.user.dns.push(bgg_id);
+	      _config2.default.state.user.dns = _.uniq(_config2.default.state.user.dns);
+	      if (comp.props.onToggleDNS) {
+	        comp.props.onToggleDNS('add', bgg_id);
+	      }
+	      var ax = _axios2.default.post(_config2.default.api.dns, { bgg_id: bgg_id, t: new Date().getTime() }, { headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth } });
+	      ax.catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, 'Error adding game.', { timeOut: 6000 });
+	      });
+	      ax.then(function () {
+	        comp.getMyAlertSettings();
+	      });
+	    }
+	  }, {
+	    key: 'deleteDNS',
+	    value: function deleteDNS(bgg_id) {
+	      var comp = this;
+	      var ind = _config2.default.state.user.dns.indexOf(bgg_id);
+	      _config2.default.state.user.dns.splice(ind, 1);
+	      if (comp.props.onToggleDNS) {
+	        comp.props.onToggleDNS('delete', bgg_id);
+	      }
+	      var ax = _axios2.default.post(_config2.default.api.dns + '/delete', { bgg_id: bgg_id, t: new Date().getTime() }, { headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth } });
+	      ax.catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, 'Error deleting notification.', { timeOut: 6000 });
+	      });
+	      ax.then(function () {
+	        comp.getMyAlertSettings();
+	      });
+	    }
+	  }, {
+	    key: 'handleToggleDNS',
+	    value: function handleToggleDNS(bgg_id) {
+	      var comp = this;
+	      if (_config2.default.state.user.dns.indexOf(bgg_id) < 0) {
+	        comp.addDNS(bgg_id);
+	      } else {
+	        comp.deleteDNS(bgg_id);
+	      }
+	    }
+	
+	    // BUTTON: IGNORE GAME HOST
+	    // -----------------------------------------------
+	
+	  }, {
+	    key: 'addIgnore',
+	    value: function addIgnore(bad_player_id) {
+	      var comp = this;
+	      _config2.default.state.user.ignore.push(bad_player_id);
+	      _config2.default.state.user.ignore = _.uniq(_config2.default.state.user.ignore);
+	      if (comp.props.onToggleIgnore) {
+	        comp.props.onToggleIgnore('add', bad_player_id);
+	      }
+	      var ax = _axios2.default.post(_config2.default.api.ignore, { bad_player_id: bad_player_id, t: new Date().getTime() }, { headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth } });
+	      ax.catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, 'Error adding game.', { timeOut: 6000 });
+	      });
+	      ax.then(function () {
+	        comp.getMyAlertSettings();
+	      });
+	    }
+	  }, {
+	    key: 'deleteIgnore',
+	    value: function deleteIgnore(bad_player_id) {
+	      var comp = this;
+	      var ind = _config2.default.state.user.ignore.indexOf(bad_player_id);
+	      _config2.default.state.user.ignore.splice(ind, 1);
+	      if (comp.props.onToggleIgnore) {
+	        comp.props.onToggleIgnore('delete', bad_player_id);
+	      }
+	      var ax = _axios2.default.post(_config2.default.api.ignore + '/delete', { bad_player_id: bad_player_id, t: new Date().getTime() }, { headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth } });
+	      ax.catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, 'Error deleting notification.', { timeOut: 6000 });
+	      });
+	      ax.then(function () {
+	        comp.getMyAlertSettings();
+	      });
+	    }
+	  }, {
+	    key: 'handleToggleIgnore',
+	    value: function handleToggleIgnore(bad_player_id) {
+	      var comp = this;
+	      console.log(_config2.default.state.user.ignore, bad_player_id);
+	      if (_config2.default.state.user.ignore.indexOf(bad_player_id) < 0) {
+	        comp.addIgnore(bad_player_id);
+	      } else {
+	        comp.deleteIgnore(bad_player_id);
+	      }
+	    }
+	
+	    // -----------------------
+	    //
+	
 	  }, {
 	    key: 'render',
 	    value: function render() {
@@ -101078,7 +101346,7 @@
 	            ),
 	            _react2.default.createElement(
 	              'div',
-	              { className: 'my-wtp-list clearfix', id: 'page-game-search' },
+	              { className: 'page-game-search my-game-list my-wtp-list clearfix' },
 	              comp.state.wtp.map(function (game) {
 	                //var notifyActive = CONFIG.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
 	                //var wtpActive = CONFIG.state.user.wtp.indexOf(game.bgg_id) > -1 ? " active" : "";
@@ -101110,7 +101378,112 @@
 	                    )
 	                  )
 	                );
-	              })
+	              }),
+	              comp.state.wtp.length > 0 ? '' : _react2.default.createElement(
+	                'div',
+	                { className: 'game-item-action' },
+	                _react2.default.createElement(
+	                  'div',
+	                  { className: 'game-item-action-line empty' },
+	                  _react2.default.createElement(
+	                    'div',
+	                    { className: 'game-item-action-title' },
+	                    'Your "Want To Play" list is empty!'
+	                  )
+	                )
+	              )
+	            ),
+	            _react2.default.createElement(
+	              'p',
+	              { style: { marginTop: '30px' } },
+	              _react2.default.createElement(
+	                'em',
+	                null,
+	                'Don\'t show me these games in Scheduling:'
+	              )
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'page-game-search my-game-list my-dns-list clearfix' },
+	              comp.state.dns.map(function (game) {
+	                return _react2.default.createElement(
+	                  'div',
+	                  { className: 'game-item-action', key: 'alert-settings-' + game.bgg_id },
+	                  _react2.default.createElement(
+	                    'div',
+	                    { className: 'game-item-action-line' },
+	                    _react2.default.createElement(
+	                      'div',
+	                      { className: 'game-item-action-title' },
+	                      game.game_title
+	                    ),
+	                    _react2.default.createElement(
+	                      'div',
+	                      { className: "game-item-action-btn action-dns-btn active" },
+	                      _react2.default.createElement(_button.IconButton, { icon: 'remove_circle', onClick: comp.handleToggleDNS.bind(comp, game.bgg_id) })
+	                    )
+	                  )
+	                );
+	              }),
+	              comp.state.dns.length > 0 ? '' : _react2.default.createElement(
+	                'div',
+	                { className: 'game-item-action' },
+	                _react2.default.createElement(
+	                  'div',
+	                  { className: 'game-item-action-line empty' },
+	                  _react2.default.createElement(
+	                    'div',
+	                    { className: 'game-item-action-title' },
+	                    'No board games being ignored.'
+	                  )
+	                )
+	              )
+	            ),
+	            _react2.default.createElement(
+	              'p',
+	              { style: { marginTop: '30px' } },
+	              _react2.default.createElement(
+	                'em',
+	                null,
+	                'Don\'t show me scheduled games from these Hosts:'
+	              )
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'page-game-search my-game-list my-ignore-list clearfix' },
+	              comp.state.ignore.map(function (host) {
+	                return _react2.default.createElement(
+	                  'div',
+	                  { className: 'game-item-action', key: 'alert-settings-' + host.bad_player_id },
+	                  _react2.default.createElement(
+	                    'div',
+	                    { className: 'game-item-action-line' },
+	                    _react2.default.createElement(
+	                      'div',
+	                      { className: 'game-item-action-title' },
+	                      host.fullname
+	                    ),
+	                    _react2.default.createElement(
+	                      'div',
+	                      { className: "game-item-action-btn action-ignore-btn active" },
+	                      _react2.default.createElement(_button.IconButton, { icon: 'person', onClick: comp.handleToggleIgnore.bind(comp, host.bad_player_id) })
+	                    )
+	                  )
+	                );
+	              }),
+	              comp.state.ignore.length > 0 ? '' : _react2.default.createElement(
+	                'div',
+	                { className: 'game-item-action' },
+	                _react2.default.createElement(
+	                  'div',
+	                  { className: 'game-item-action-line empty' },
+	                  _react2.default.createElement(
+	                    'div',
+	                    { className: 'game-item-action-title' },
+	                    'You haven\'t blocked any hosts.'
+	                  )
+	                )
+	              )
 	            )
 	          )
 	        ),
@@ -101492,11 +101865,12 @@
 	    value: function componentWillReceiveProps(nextProps) {}
 	  }, {
 	    key: 'handleGamePopup',
-	    value: function handleGamePopup(bgg_id) {
+	    value: function handleGamePopup(bgg_id, host_id) {
 	      var comp = this;
 	      comp.setState({
 	        game_popup: true,
-	        game_popup_id: bgg_id
+	        game_popup_id: bgg_id,
+	        game_host_id: host_id
 	      });
 	    }
 	  }, {
@@ -101506,6 +101880,34 @@
 	      comp.setState({
 	        game_popup: false
 	      });
+	    }
+	  }, {
+	    key: 'onToggleIgnore',
+	    value: function onToggleIgnore(type, bad_player_id) {
+	      var comp = this;
+	      var tables = _.cloneDeep(comp.state.tables);
+	
+	      var newtables = tables.map(function (g) {
+	        if (g.player_id == bad_player_id) {
+	          g.ignore = type === 'add';
+	        }
+	        return g;
+	      });
+	      comp.setState({ tables: tables });
+	    }
+	  }, {
+	    key: 'onToggleDNS',
+	    value: function onToggleDNS(type, bgg_id) {
+	      var comp = this;
+	      var tables = _.cloneDeep(comp.state.tables);
+	
+	      var newtables = tables.map(function (g) {
+	        if (g.bgg_id == bgg_id) {
+	          g.ignore = type === 'add';
+	        }
+	        return g;
+	      });
+	      comp.setState({ tables: tables });
 	    }
 	  }, {
 	    key: 'getTableList',
@@ -101550,7 +101952,7 @@
 	                _react2.default.createElement(
 	                  'a',
 	                  { href: '', onClick: function onClick(e) {
-	                      comp.handleGamePopup(table.bgg_id);e.preventDefault();
+	                      comp.handleGamePopup(table.bgg_id, table.player_id);e.preventDefault();
 	                    } },
 	                  table.title
 	                )
@@ -101574,7 +101976,7 @@
 	              ) : '',
 	              _react2.default.createElement(
 	                'span',
-	                { className: 'table-item-tag' },
+	                { className: 'plan-tag' },
 	                table.table_location + ' ' + (table.table_sublocation_alpha || '') + '-' + (table.table_sublocation_num || '')
 	              ),
 	              table.table_type === 'future' ? _react2.default.createElement(
@@ -101582,6 +101984,13 @@
 	                { className: 'table-item-tag' },
 	                (0, _moment2.default)(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, MMM Do YYYY, h:mm a')
 	              ) : '',
+	              _react2.default.createElement(
+	                'span',
+	                { className: 'table-item-tag' },
+	                'Takes ',
+	                table.playtime ? table.playtime : Math.round(Math.round(table.avgplay / 6) / 10 * 2) / 2 + ' hours'
+	              ),
+	              _react2.default.createElement('div', null),
 	              _react2.default.createElement(
 	                'span',
 	                { className: 'table-item-tag' },
@@ -101620,7 +102029,7 @@
 	        { id: 'page-my-tables', className: 'transition-item page-my-tables page-wrap' },
 	        _react2.default.createElement(
 	          'div',
-	          { className: "table-list-wrap" + (comp.state.loader ? " loading" : "") },
+	          { className: "table-list-wrap" + (comp.state.loader ? " loading" : ""), style: { paddingTop: '0' } },
 	          comp.state.tables && comp.state.tables.length > 0 ? comp.renderTableList() : comp.renderNoTables()
 	        ),
 	        _react2.default.createElement(_Loaders.LoadingInline, {
@@ -101638,7 +102047,10 @@
 	            actions: [{ label: "Close", onClick: comp.handleCloseGamePopup.bind(comp), primary: true, raised: true }]
 	          },
 	          comp.state.game_popup ? _react2.default.createElement(_GamePopup2.default, {
-	            bgg_id: comp.state.game_popup_id
+	            bgg_id: comp.state.game_popup_id,
+	            host_id: comp.state.game_host_id,
+	            onToggleIgnore: comp.onToggleIgnore.bind(comp),
+	            onToggleDNS: comp.onToggleDNS.bind(comp)
 	          }) : _react2.default.createElement('div', null)
 	        )
 	      );
@@ -101830,11 +102242,12 @@
 	    }
 	  }, {
 	    key: 'handleGamePopup',
-	    value: function handleGamePopup(bgg_id) {
+	    value: function handleGamePopup(bgg_id, host_id) {
 	      var comp = this;
 	      comp.setState({
 	        game_popup: true,
-	        game_popup_id: bgg_id
+	        game_popup_id: bgg_id,
+	        game_host_id: host_id
 	      });
 	    }
 	  }, {
@@ -101860,6 +102273,34 @@
 	      comp.setState({
 	        link_popup: false
 	      });
+	    }
+	  }, {
+	    key: 'onToggleIgnore',
+	    value: function onToggleIgnore(type, bad_player_id) {
+	      var comp = this;
+	      var tables = _.cloneDeep(comp.state.tables);
+	
+	      var newtables = tables.map(function (g) {
+	        if (g.player_id == bad_player_id) {
+	          g.ignore = type === 'add';
+	        }
+	        return g;
+	      });
+	      comp.setState({ tables: tables });
+	    }
+	  }, {
+	    key: 'onToggleDNS',
+	    value: function onToggleDNS(type, bgg_id) {
+	      var comp = this;
+	      var tables = _.cloneDeep(comp.state.tables);
+	
+	      var newtables = tables.map(function (g) {
+	        if (g.bgg_id == bgg_id) {
+	          g.ignore = type === 'add';
+	        }
+	        return g;
+	      });
+	      comp.setState({ tables: tables });
 	    }
 	  }, {
 	    key: 'renderCalendar',
@@ -101897,6 +102338,9 @@
 	
 	      var thisDayList = comp.state.tables.filter(function (table, i) {
 	        var isSelected = (0, _moment2.default)(selectedObj[0].full, 'YYYY-MM-DD').isSame((0, _moment2.default)(table.start_datetime, 'YYYY-MM-DD HH:mm:ss'), 'day');
+	        if (table.ignore) {
+	          isSelected = false;
+	        }
 	        return isSelected;
 	      });
 	
@@ -101925,7 +102369,7 @@
 	                  _react2.default.createElement(
 	                    'a',
 	                    { href: '', onClick: function onClick(e) {
-	                        comp.handleGamePopup(table.bgg_id);e.preventDefault();
+	                        comp.handleGamePopup(table.bgg_id, table.player_id);e.preventDefault();
 	                      } },
 	                    table.title
 	                  )
@@ -102064,7 +102508,10 @@
 	            actions: [{ label: "Close", onClick: comp.handleCloseGamePopup.bind(comp), primary: true, raised: true }]
 	          },
 	          comp.state.game_popup ? _react2.default.createElement(_GamePopup2.default, {
-	            bgg_id: comp.state.game_popup_id
+	            bgg_id: comp.state.game_popup_id,
+	            host_id: comp.state.game_host_id,
+	            onToggleIgnore: comp.onToggleIgnore.bind(comp),
+	            onToggleDNS: comp.onToggleDNS.bind(comp)
 	          }) : _react2.default.createElement('div', null)
 	        ),
 	        _react2.default.createElement(

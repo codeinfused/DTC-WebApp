@@ -257,10 +257,10 @@ p.plans-time {
   margin: 16px auto;
 }
 
-.my-wtp-list .game-item-action{
+.my-game-list .game-item-action{
   padding: 5px 0px !important;
 }
-.my-wtp-list .game-item-action-title{
+.my-game-list .game-item-action-title{
   width: calc(100% - 114px);
   font-size: 1.05rem;
   white-space: nowrap;
@@ -269,6 +269,9 @@ p.plans-time {
   text-align: left;
 }
 
+.my-dns-list .game-item-action-btn.active, .my-ignore-list .game-item-action-btn.active{
+  background: #b73434;
+}
 
 /* MY ALERTS */
 

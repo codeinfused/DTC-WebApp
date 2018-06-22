@@ -29,6 +29,8 @@ const CONFIG = {
     verify: baseAPI+"verifyauth",
     wtp: baseAPI+"user/me/wtp",
     notify: baseAPI+"user/me/notify",
+    dns: baseAPI+"user/me/dns",
+    ignore: baseAPI+"user/me/ignore",
     getAlerts: baseAPI+"user/getalerts",
     myAlertSettings: baseAPI+"user/myalertgames",
 

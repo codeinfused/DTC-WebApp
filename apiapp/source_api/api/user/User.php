@@ -11,7 +11,17 @@ abstract class User
     $wtps = $req->fetchAll();
     $req->closeCursor();
 
-    return array('wtp' => $wtps);
+    $req = $pdo->prepare("SELECT gi.bgg_id, db.title AS game_title FROM game_ignore gi JOIN bgg_game_db db ON db.bgg_id=gi.bgg_id WHERE gi.player_id=:uid AND gi.bgg_id IS NOT NULL ORDER BY db.title");
+    $req->execute(array(":uid"=>$uid));
+    $dns = $req->fetchAll();
+    $req->closeCursor();
+
+    $req = $pdo->prepare("SELECT gi.bad_player_id, CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) AS fullname FROM game_ignore gi JOIN users u ON u.id=gi.bad_player_id WHERE gi.player_id=:uid AND gi.bad_player_id IS NOT NULL ORDER BY u.lastname");
+    $req->execute(array(":uid"=>$uid));
+    $ignore = $req->fetchAll();
+    $req->closeCursor();
+
+    return array('wtp' => $wtps, 'dns' => $dns, 'ignore' => $ignore);
   }
 
   static function getNotifications($pdo, $uid)
@@ -64,11 +74,30 @@ abstract class User
     $wtps = $req->fetchAll();
     $req->closeCursor();
 
+    $req = $pdo->prepare("SELECT bgg_id FROM game_ignore WHERE player_id = :uid AND bgg_id IS NOT NULL");
+    $req->execute(array(":uid"=>$uid));
+    $dns = $req->fetchAll();
+    $req->closeCursor();
+
+    $req = $pdo->prepare("SELECT bad_player_id FROM game_ignore WHERE player_id = :uid AND bad_player_id IS NOT NULL");
+    $req->execute(array(":uid"=>$uid));
+    $ignore = $req->fetchAll();
+    $req->closeCursor();
+
     $user['wtp'] = array();
     $user['notify'] = array();
+    $user['dns'] = array();
+    $user['ignore'] = array();
+
     foreach($wtps as $wtp){
       $user['wtp'][] = $wtp['bgg_id'];
       if($wtp['notify_flag'] == 1){ $user['notify'][] = $wtp['bgg_id']; }
+    }
+    foreach($dns as $donot){
+      if(!empty($donot['bgg_id'])){ $user['dns'][] = $donot['bgg_id']; }
+    }
+    foreach($ignore as $bid){
+      if(!empty($bid['bad_player_id'])){ $user['ignore'][] = $bid['bad_player_id']; }
     }
 
     if($user === false){
@@ -106,6 +135,38 @@ abstract class User
   {
     $req = $pdo->prepare("UPDATE game_wtp SET notify_flag=0 WHERE player_id=:uid AND bgg_id=:bid");
     $req->execute(array(":uid"=>$uid, ":bid"=>$bgg_id));
+    $req->closeCursor();
+    return true;
+  }
+
+  static function addDNS($pdo, $uid, $bgg_id)
+  {
+    $req = $pdo->prepare("INSERT INTO game_ignore (player_id, bgg_id) SELECT * FROM (SELECT :uid as uid, :bid as bid) as tmp WHERE NOT EXISTS( SELECT id FROM game_ignore WHERE player_id=:uid AND bgg_id=:bid ) LIMIT 1");
+    $req->execute(array(":uid"=>$uid, ":bid"=>$bgg_id));
+    $req->closeCursor();
+    return true;
+  }
+
+  static function deleteDNS($pdo, $uid, $bgg_id)
+  {
+    $req = $pdo->prepare("DELETE FROM game_ignore WHERE player_id=:uid AND bgg_id=:bid");
+    $req->execute(array(":uid"=>$uid, ":bid"=>$bgg_id));
+    $req->closeCursor();
+    return true;
+  }
+
+  static function addIgnore($pdo, $uid, $bad_player_id)
+  {
+    $req = $pdo->prepare("INSERT INTO game_ignore (player_id, bad_player_id) SELECT * FROM (SELECT :uid as uid, :bpid as bpid) as tmp WHERE NOT EXISTS( SELECT id FROM game_ignore WHERE player_id=:uid AND bad_player_id=:bpid ) LIMIT 1");
+    $req->execute(array(":uid"=>$uid, ":bpid"=>$bad_player_id));
+    $req->closeCursor();
+    return true;
+  }
+
+  static function deleteIgnore($pdo, $uid, $bad_player_id)
+  {
+    $req = $pdo->prepare("DELETE FROM game_ignore WHERE player_id=:uid AND bad_player_id=:bpid");
+    $req->execute(array(":uid"=>$uid, ":bpid"=>$bad_player_id));
     $req->closeCursor();
     return true;
   }

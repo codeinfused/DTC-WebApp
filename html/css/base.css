@@ -67,7 +67,7 @@ button, button:focus, button:visited{ outline: none !important; cursor: pointer;
 }
 .page-basic li{margin-bottom: 8px;}
 .page-basic p, .page-basic ul{
-  color: #d2d2d2;
+  color: #a7a7a7;
   font-weight: 400;
 }
 
@@ -237,8 +237,12 @@ button, button:focus, button:visited{ outline: none !important; cursor: pointer;
   border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 .bm-menu nav.bm-item-list button.active{
-  border-right: 5px solid rgba(255,255,255,0.6);
+  /* border-right: 5px solid rgba(255,255,255,0.6); */
   background: rgba(255,255,255,0.09);
+  position: relative;
+  left: -2em;
+  width: calc(100% + 2em);
+  padding-left: 2em;
 }
 .bm-menu nav button .material-icons {
   font-size: 2.3rem;
@@ -334,6 +338,7 @@ span.alerts-count {
 
 div[data-react-toolbox="dialog"] section{
   padding: 1.6rem;
+  font-size: 1.2rem;
 }
 div[data-react-toolbox="dialog"] section h6{
   margin: 0 0 1.8rem 0;
@@ -342,6 +347,6 @@ div[data-react-toolbox="dialog"] section h6{
   font-weight: 100;
   color: #111;
 }
-div[data-react-toolbox="dialog"] section{
-  font-size: 1.2rem;
+div[data-react-toolbox="dialog"].map-popup section{
+  overflow: auto;
 }

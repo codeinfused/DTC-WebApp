@@ -104,7 +104,7 @@
   padding: 30px 26px;
   margin: 0px;
 }
-#page-game-search .game-search-list-empty{
+.page-game-search .game-search-list-empty{
   top: 100px;
 }
 .game-search-list-empty h3{
@@ -416,6 +416,9 @@
   background: #fff;
   box-shadow: 0 2px 9px rgba(0,0,0,0.12);
 }
+.game-item-action-line.empty{
+  opacity: 0.6;
+}
 .game-item-action-title{
   float: left;
   height: 44px;
@@ -441,7 +444,7 @@
   background: #645769; /* #fff;*/
   overflow: hidden;
 }
-#page-game-search .game-item-action-btn button{
+.page-game-search .game-item-action-btn button:not([disabled]){
   width: 42px;
   height: 44px;
   line-height: 44px;
@@ -450,8 +453,9 @@
   border: none;
   margin: 0;
 }
-#page-game-search .game-item-action-btn button > span:not([data-react-toolbox="tooltip"]){ line-height: 44px; }
-#page-game-search .game-item-action-btn.active{ background: #31bf5a; }
+.page-game-search .game-item-action-btn button > span:not([data-react-toolbox="tooltip"]){ line-height: 44px; }
+.page-game-search .game-item-action-btn.active{ background: #31bf5a; }
+.page-game-search .game-item-action-btn.hide-active{ background: #b73434; }
 
 div.game-popup[data-react-toolbox="dialog"] section[role="body"] {
   padding: 0;

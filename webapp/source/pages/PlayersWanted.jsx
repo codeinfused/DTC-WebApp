@@ -40,12 +40,13 @@ class PlayersWanted extends React.Component
 
   }
 
-  handleGamePopup(bgg_id)
+  handleGamePopup(bgg_id, host_id)
   {
     var comp = this;
     comp.setState({
       game_popup: true,
-      game_popup_id: bgg_id
+      game_popup_id: bgg_id,
+      game_host_id: host_id
     });
   }
 
@@ -55,6 +56,34 @@ class PlayersWanted extends React.Component
     comp.setState({
       game_popup: false
     })
+  }
+
+  onToggleIgnore(type, bad_player_id)
+  {
+    var comp = this;
+    var tables = _.cloneDeep(comp.state.tables);
+
+    var newtables = tables.map(function(g){
+      if(g.player_id == bad_player_id){
+        g.ignore = (type==='add');
+      }
+      return g;
+    });
+    comp.setState({tables: tables});
+  }
+
+  onToggleDNS(type, bgg_id)
+  {
+    var comp = this;
+    var tables = _.cloneDeep(comp.state.tables);
+
+    var newtables = tables.map(function(g){
+      if(g.bgg_id == bgg_id){
+        g.ignore = (type==='add');
+      }
+      return g;
+    });
+    comp.setState({tables: tables});
   }
 
   getTableList()
@@ -87,15 +116,17 @@ class PlayersWanted extends React.Component
             return (
               <div className="table-item" key={"table-item-"+table.table_id}>
                 <div className="table-item-header">
-                  <span className="table-item-title"><a href="" onClick={(e)=>{comp.handleGamePopup(table.bgg_id); e.preventDefault();}}>{table.title}</a></span>
+                  <span className="table-item-title"><a href="" onClick={(e)=>{comp.handleGamePopup(table.bgg_id, table.player_id); e.preventDefault();}}>{table.title}</a></span>
                   <span className={"table-item-when " + table.status}>
                     {table.status === 'cancelled' ? 'Cancelled' : moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').fromNow()}
                   </span>
                 </div>
                 <div className="table-item-details">
                   {table.table_type==='future' ? (<span className="table-item-tag">{table.signups} of {table.seats} seats taken</span>) : ''}
-                  <span className="table-item-tag">{table.table_location +' '+ (table.table_sublocation_alpha||'') + '-' + (table.table_sublocation_num||'')}</span>
+                  <span className="plan-tag">{table.table_location +' '+ (table.table_sublocation_alpha||'') + '-' + (table.table_sublocation_num||'')}</span>
                   {table.table_type==='future' ? (<span className="table-item-tag">{moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, MMM Do YYYY, h:mm a')}</span>) : ''}
+                  <span className="table-item-tag">Takes {table.playtime ? table.playtime : Math.round((Math.round(table.avgplay/6)/10)*2)/2 + ' hours'}</span>
+                  <div></div>
                   <span className="table-item-tag">Host: {table.host_name}</span>
                 </div>
               </div>
@@ -119,7 +150,7 @@ class PlayersWanted extends React.Component
     var comp = this;
     return (
       <div id="page-my-tables" className="transition-item page-my-tables page-wrap">
-        <div className={"table-list-wrap" + (comp.state.loader ? " loading" : "")}>
+        <div className={"table-list-wrap" + (comp.state.loader ? " loading" : "")} style={{paddingTop: '0'}}>
           {(comp.state.tables && comp.state.tables.length > 0) ? comp.renderTableList() : comp.renderNoTables()}
         </div>
 
@@ -141,6 +172,9 @@ class PlayersWanted extends React.Component
           {comp.state.game_popup ?
             <GamePopup
               bgg_id={comp.state.game_popup_id}
+              host_id={comp.state.game_host_id}
+              onToggleIgnore={comp.onToggleIgnore.bind(comp)}
+              onToggleDNS={comp.onToggleDNS.bind(comp)}
             />
           : <div />}
         </Dialog>

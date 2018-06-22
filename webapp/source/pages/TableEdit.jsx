@@ -41,6 +41,7 @@ class TableEdit extends React.Component
       lfp: true,
       lft: false,
       joined: true,
+      reserved: 0,
       allow_signups: true,
       private: false
     };
@@ -84,6 +85,15 @@ class TableEdit extends React.Component
       {label: '300 (5+ hours)', value: '5+ hours'},
     ];
 
+    this.reservedPlayers = [
+      {label: 'None', value: ''},
+      {label: '1 player', value: '1'},
+      {label: '2 players', value: '2'},
+      {label: '3 players', value: '3'},
+      {label: '4 players', value: '4'},
+      {label: '5 players', value: '5'},
+    ];
+
     this.getGameData = this.getGameData.bind(this);
     this.handleSubmitTable = this.handleSubmitTable.bind(this);
     this.handleCloseDialog = this.handleCloseDialog.bind(this);
@@ -92,6 +102,9 @@ class TableEdit extends React.Component
   componentDidMount()
   {
     var comp = this;
+    //moment.relativeTimeRounding(Math.floor);
+    //moment.relativeTimeThreshold('m', 15);
+
     if(!CONFIG.state.auth || CONFIG.state.user.grant_type==='guest'){
       ToastsAPI.toast('error', "Sorry, guests can't create tables.", null, {timeOut:8000});
       browserHistory.goBack();
@@ -160,6 +173,12 @@ class TableEdit extends React.Component
         }
         var newState = Object.assign({}, curState, json.data.table);
         newState.loaded = true;
+        if(newState.start_datetime){
+          var d = moment(newState.start_datetime);
+          var d_obj = d.toDate();
+          newState.start_date = d_obj;
+          newState.start_time = d_obj;
+        }
         comp.setState(newState);
       }
     }).catch(function(json){
@@ -178,14 +197,32 @@ class TableEdit extends React.Component
     this.setState({[field]: value.target.value});
   }
 
+  splitDateTime(val)
+  {
+    var comp = this;
+    var d = moment(d);
+    var d_obj = d.toDate();
+    //var start_date = d.format('YYYY-MM-DD');
+    //var start_time = d.format('HH:mm:00');
+    comp.setState({
+      start_date: d_obj,
+      start_time: d_obj
+    });
+  }
+
   handleChangeDatetime(field, value)
   {
     var comp = this;
     var state = _.cloneDeep(comp.state);
     state[field] = value;
-    var d = state.start_date;
-    var t = state.start_time;
-    var start_datetime = moment(d).format('YYYY-MM-DD') +' '+ moment(t).format('HH:mm:00');
+    var d = moment(state.start_date);
+    var t = moment(state.start_time);
+
+    if(field==='start_time'){
+      var t_mod = moment(t);
+    }
+
+    var start_datetime = d.format('YYYY-MM-DD') +' '+ t.format('HH:mm:00');
 
     comp.setState({
       [field]: value,
@@ -210,6 +247,7 @@ class TableEdit extends React.Component
       lft: comp.state.lft,
       private: comp.state.private,
       joined: comp.state.joined,
+      reserved: comp.state.reserved,
       allow_signups: comp.state.allow_signups,
       table_sublocation_alpha: comp.state.table_sublocation_alpha,
       table_sublocation_num: comp.state.table_sublocation_num
@@ -227,6 +265,17 @@ class TableEdit extends React.Component
   {
     this.setState({dialogActive: false});
     browserHistory.goBack();
+  }
+
+  renderReservedSpots()
+  {
+    var comp = this;
+    var seats = comp.state.seats;
+    var joined = comp.state.joined===true ? 1 : 0;
+
+    return comp.reservedPlayers.filter(function(obj, i){
+      if( i < seats - joined ){ return obj; }
+    });
   }
 
   render()
@@ -256,7 +305,7 @@ class TableEdit extends React.Component
                   <div className="switch-toggle switch-candy large-4">
                     <input id='type-now' name="table_type" type="radio" value='now' checked={comp.state.table_type==='now'} onChange={comp.handleChangeInput.bind(comp, 'table_type', 'now')} />
                     <label htmlFor='type-now'>Now</label>
-                    <input id='type-later' name="table_type" type="radio" value='later' checked={comp.state.table_type==='later'} onChange={comp.handleChangeInput.bind(comp, 'table_type', 'later')} />
+                    <input id='type-later' name="table_type" type="radio" value='future' checked={comp.state.table_type==='future'} onChange={comp.handleChangeInput.bind(comp, 'table_type', 'future')} />
                     <label htmlFor='type-later'>Later</label>
                     <a></a>
                   </div>
@@ -300,10 +349,11 @@ class TableEdit extends React.Component
                 <Slider pinned snaps min={2} max={12} step={1} editable value={comp.state.seats} onChange={comp.handleChangeInput.bind(comp, 'seats')} />
               </div>
               <div className="table-form-item">
-                {comp.state.table_type==='now' ? '' : (<Switch label="Allow Sign-ups" checked={comp.state.allow_signups} onChange={comp.handleChangeInput.bind(comp, 'allow_signups')} /> )}
-                {comp.state.table_type==='now' ? '' : (<Switch label="Join Your Own Table?" checked={comp.state.joined} onChange={comp.handleChangeInput.bind(comp, 'joined')} /> )}
-                <Switch label="Looking For Teacher" checked={comp.state.lft} onChange={comp.handleChangeInput.bind(comp, 'lft')} />
+                <Switch label="Looking For Teacher?" checked={comp.state.lft} onChange={comp.handleChangeInput.bind(comp, 'lft')} />
                 {comp.state.table_type==='now' ? '' : (<Switch label="Unlisted (Only visible to you)" checked={comp.state.private} onChange={comp.handleChangeInput.bind(comp, 'private')} /> )}
+                {comp.state.table_type==='now' ? '' : (<Switch label="Allow Sign-ups?" checked={comp.state.allow_signups} onChange={comp.handleChangeInput.bind(comp, 'allow_signups')} /> )}
+                {comp.state.table_type==='now' ? '' : (<Switch label="Join Your Own Table?" checked={comp.state.joined} onChange={comp.handleChangeInput.bind(comp, 'joined')} /> )}
+                {comp.state.table_type==='now' ? '' : (<Dropdown label="Reserve Any Other Spaces?" source={comp.renderReservedSpots()} value={comp.state.reserved} allowBlank={false} onChange={comp.handleChangeInput.bind(comp, 'reserved')} /> )}
               </div>
               <div className="table-form-item">
                 <button type="submit" className="submit">Save Game Table!</button>

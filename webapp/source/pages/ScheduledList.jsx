@@ -129,12 +129,13 @@ class ScheduledList extends React.Component
     });
   }
 
-  handleGamePopup(bgg_id)
+  handleGamePopup(bgg_id, host_id)
   {
     var comp = this;
     comp.setState({
       game_popup: true,
-      game_popup_id: bgg_id
+      game_popup_id: bgg_id,
+      game_host_id: host_id
     });
   }
 
@@ -162,6 +163,34 @@ class ScheduledList extends React.Component
     });
   }
 
+  onToggleIgnore(type, bad_player_id)
+  {
+    var comp = this;
+    var tables = _.cloneDeep(comp.state.tables);
+
+    var newtables = tables.map(function(g){
+      if(g.player_id == bad_player_id){
+        g.ignore = (type==='add');
+      }
+      return g;
+    });
+    comp.setState({tables: tables});
+  }
+
+  onToggleDNS(type, bgg_id)
+  {
+    var comp = this;
+    var tables = _.cloneDeep(comp.state.tables);
+
+    var newtables = tables.map(function(g){
+      if(g.bgg_id == bgg_id){
+        g.ignore = (type==='add');
+      }
+      return g;
+    });
+    comp.setState({tables: tables});
+  }
+
 
   renderCalendar()
   {
@@ -187,6 +216,7 @@ class ScheduledList extends React.Component
 
     var thisDayList = comp.state.tables.filter(function(table, i){
       var isSelected = moment(selectedObj[0].full, 'YYYY-MM-DD').isSame(moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss'), 'day');
+      if(table.ignore){ isSelected = false; }
       return isSelected;
     });
 
@@ -206,7 +236,7 @@ class ScheduledList extends React.Component
                   <i className={table.status==='cancelled' ? "fa fa-calendar-times-o cancelled" : "fa "+calIcon}></i>
                   {table.lft=='1' ? (<i className="fa fa-graduation-cap"></i>) : ''}
                   <div className="plans-item">
-                    <div className="plans-item-head"><a href="" onClick={(e)=>{comp.handleGamePopup(table.bgg_id); e.preventDefault();}}>{table.title}</a></div>
+                    <div className="plans-item-head"><a href="" onClick={(e)=>{comp.handleGamePopup(table.bgg_id, table.player_id); e.preventDefault();}}>{table.title}</a></div>
                     <div className="plans-item-body">
                       <p className="plans-time">{table.status==='cancelled' ? 'Cancelled' : moment(table.start_datetime).fromNow()}</p>
                       {/* <span className="plan-tag">{moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, MMM Do YYYY, h:mm a')}</span> */}
@@ -273,6 +303,9 @@ class ScheduledList extends React.Component
           {comp.state.game_popup ?
             <GamePopup
               bgg_id={comp.state.game_popup_id}
+              host_id={comp.state.game_host_id}
+              onToggleIgnore={comp.onToggleIgnore.bind(comp)}
+              onToggleDNS={comp.onToggleDNS.bind(comp)}
             />
           : <div />}
         </Dialog>

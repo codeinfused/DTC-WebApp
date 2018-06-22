@@ -22,6 +22,8 @@ class MySettings extends React.Component
     this.state = {
       loaded: true,
       wtp: [],
+      ignore: [],
+      dns: [],
       allow_notifications: !!+(CONFIG.state.user.allow_notifications)
     };
 
@@ -60,9 +62,12 @@ class MySettings extends React.Component
     }).then(function(json){
       comp.setState({
         loaded: true,
-        wtp: json.data.wtp
+        wtp: json.data.wtp,
+        dns: json.data.dns,
+        ignore: json.data.ignore
       });
     }).catch(function(json){
+      console.log(json);
       ToastsAPI.toast('error', null, 'Failed to get some settings.', {timeOut:6000});
     });
   }
@@ -256,6 +261,96 @@ class MySettings extends React.Component
   }
 
 
+  // BUTTON: DO NOT SHOW GAME
+  // -----------------------------------------------
+
+  addDNS(bgg_id)
+  {
+    var comp = this;
+    CONFIG.state.user.dns.push(bgg_id);
+    CONFIG.state.user.dns = _.uniq(CONFIG.state.user.dns);
+    if(comp.props.onToggleDNS){
+      comp.props.onToggleDNS('add', bgg_id);
+    }
+    var ax = axios.post(CONFIG.api.dns, {bgg_id: bgg_id, t: (new Date()).getTime()}, {headers: {'Authorization': 'Bearer '+CONFIG.state.auth}})
+    ax.catch(function(json){
+      ToastsAPI.toast('error', null, 'Error adding game.', {timeOut:6000});
+    });
+    ax.then(function(){ comp.getMyAlertSettings(); });
+  }
+
+  deleteDNS(bgg_id)
+  {
+    var comp = this;
+    var ind = CONFIG.state.user.dns.indexOf(bgg_id);
+    CONFIG.state.user.dns.splice(ind, 1);
+    if(comp.props.onToggleDNS){
+      comp.props.onToggleDNS('delete', bgg_id);
+    }
+    var ax = axios.post(CONFIG.api.dns+'/delete', {bgg_id: bgg_id,t: (new Date()).getTime()}, {headers: {'Authorization': 'Bearer '+CONFIG.state.auth}})
+    ax.catch(function(json){
+      ToastsAPI.toast('error', null, 'Error deleting notification.', {timeOut:6000});
+    });
+    ax.then(function(){ comp.getMyAlertSettings(); });
+  }
+
+  handleToggleDNS(bgg_id)
+  {
+    var comp = this;
+    if(CONFIG.state.user.dns.indexOf(bgg_id) < 0){
+      comp.addDNS(bgg_id);
+    }else{
+      comp.deleteDNS(bgg_id);
+    }
+  }
+
+
+  // BUTTON: IGNORE GAME HOST
+  // -----------------------------------------------
+
+  addIgnore(bad_player_id)
+  {
+    var comp = this;
+    CONFIG.state.user.ignore.push(bad_player_id);
+    CONFIG.state.user.ignore = _.uniq(CONFIG.state.user.ignore);
+    if(comp.props.onToggleIgnore){
+      comp.props.onToggleIgnore('add', bad_player_id);
+    }
+    var ax = axios.post(CONFIG.api.ignore, {bad_player_id: bad_player_id, t: (new Date()).getTime()}, {headers: {'Authorization': 'Bearer '+CONFIG.state.auth}})
+    ax.catch(function(json){
+      ToastsAPI.toast('error', null, 'Error adding game.', {timeOut:6000});
+    });
+    ax.then(function(){ comp.getMyAlertSettings(); });
+  }
+
+  deleteIgnore(bad_player_id)
+  {
+    var comp = this;
+    var ind = CONFIG.state.user.ignore.indexOf(bad_player_id);
+    CONFIG.state.user.ignore.splice(ind, 1);
+    if(comp.props.onToggleIgnore){
+      comp.props.onToggleIgnore('delete', bad_player_id);
+    }
+    var ax = axios.post(CONFIG.api.ignore+'/delete', {bad_player_id: bad_player_id, t: (new Date()).getTime()}, {headers: {'Authorization': 'Bearer '+CONFIG.state.auth}})
+    ax.catch(function(json){
+      ToastsAPI.toast('error', null, 'Error deleting notification.', {timeOut:6000});
+    });
+    ax.then(function(){ comp.getMyAlertSettings(); });
+  }
+
+  handleToggleIgnore(bad_player_id)
+  {
+    var comp = this;
+    console.log(CONFIG.state.user.ignore, bad_player_id);
+    if(CONFIG.state.user.ignore.indexOf(bad_player_id) < 0){
+      comp.addIgnore(bad_player_id);
+    }else{
+      comp.deleteIgnore(bad_player_id);
+    }
+  }
+
+  // -----------------------
+  //
   render()
   {
     var comp = this;
@@ -309,7 +404,7 @@ class MySettings extends React.Component
           <div className="my-settings-item">
             <h3>My Game Settings</h3>
             <p><em>Your "want to play" and alert settings on games.</em></p>
-            <div className="my-wtp-list clearfix" id="page-game-search">
+            <div className="page-game-search my-game-list my-wtp-list clearfix">
               {comp.state.wtp.map(function(game){
                 //var notifyActive = CONFIG.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
                 //var wtpActive = CONFIG.state.user.wtp.indexOf(game.bgg_id) > -1 ? " active" : "";
@@ -327,6 +422,35 @@ class MySettings extends React.Component
                   </div>
                 );
               })}
+              {comp.state.wtp.length > 0 ? '' : (<div className="game-item-action"><div className="game-item-action-line empty"><div className="game-item-action-title">Your "Want To Play" list is empty!</div></div></div>)}
+            </div>
+            <p style={{marginTop: '30px'}}><em>Don't show me these games in Scheduling:</em></p>
+            <div className="page-game-search my-game-list my-dns-list clearfix">
+              {comp.state.dns.map(function(game){
+                return (
+                  <div className="game-item-action" key={'alert-settings-'+game.bgg_id}>
+                    <div className="game-item-action-line">
+                      <div className="game-item-action-title">{game.game_title}</div>
+                      <div className={"game-item-action-btn action-dns-btn active"}><IconButton icon='remove_circle' onClick={comp.handleToggleDNS.bind(comp, game.bgg_id)} /></div>
+                    </div>
+                  </div>
+                );
+              })}
+              {comp.state.dns.length > 0 ? '' : (<div className="game-item-action"><div className="game-item-action-line empty"><div className="game-item-action-title">No board games being ignored.</div></div></div>)}
+            </div>
+            <p style={{marginTop: '30px'}}><em>Don't show me scheduled games from these Hosts:</em></p>
+            <div className="page-game-search my-game-list my-ignore-list clearfix">
+              {comp.state.ignore.map(function(host){
+                return (
+                  <div className="game-item-action" key={'alert-settings-'+host.bad_player_id}>
+                    <div className="game-item-action-line">
+                      <div className="game-item-action-title">{host.fullname}</div>
+                      <div className={"game-item-action-btn action-ignore-btn active"}><IconButton icon='person' onClick={comp.handleToggleIgnore.bind(comp, host.bad_player_id)} /></div>
+                    </div>
+                  </div>
+                );
+              })}
+              {comp.state.ignore.length > 0 ? '' : (<div className="game-item-action"><div className="game-item-action-line empty"><div className="game-item-action-title">You haven't blocked any hosts.</div></div></div>)}
             </div>
           </div>
 
