@@ -99675,7 +99675,7 @@
 	    key: 'addIgnore',
 	    value: function addIgnore(bad_player_id) {
 	      var comp = this;
-	      console.log(_config2.default.state.user);
+	
 	      _config2.default.state.user.ignore.push(bad_player_id);
 	      _config2.default.state.user.ignore = _.uniq(_config2.default.state.user.ignore);
 	      if (comp.props.onToggleIgnore) {
@@ -100958,7 +100958,7 @@
 	          ignore: json.data.ignore
 	        });
 	      }).catch(function (json) {
-	        console.log(json);
+	
 	        _ToastsAPI2.default.toast('error', null, 'Failed to get some settings.', { timeOut: 6000 });
 	      });
 	    }
@@ -101234,7 +101234,7 @@
 	    key: 'handleToggleIgnore',
 	    value: function handleToggleIgnore(bad_player_id) {
 	      var comp = this;
-	      console.log(_config2.default.state.user.ignore, bad_player_id);
+	
 	      if (_config2.default.state.user.ignore.indexOf(bad_player_id) < 0) {
 	        comp.addIgnore(bad_player_id);
 	      } else {
@@ -102183,7 +102183,7 @@
 	          game_popup: false
 	        });
 	      }).catch(function (json) {
-	        console.log(json);
+	
 	        _ToastsAPI2.default.toast('error', null, 'Error getting tables list.', { timeOut: 6000 });
 	      });
 	    }
