@@ -2,6 +2,7 @@ import CONFIG from '../config.jsx';
 import React from 'react';
 import {FontIcon, Dropdown, Dialog} from 'react-toolbox';
 import {Button, IconButton} from 'react-toolbox/lib/button';
+import {assign} from 'lodash';
 
 class MapPopup extends React.Component
 {
@@ -11,7 +12,7 @@ class MapPopup extends React.Component
     var comp = this;
     this.state = {
       popup_map: false,
-      styles: Object.assign({display:"inline-block", textTransform:"none", position:"relative", top:"-1px"}, props.styles)
+      styles: _.assign({display:"inline-block", textTransform:"none", position:"relative", top:"-1px"}, props.styles)
     };
   }
 

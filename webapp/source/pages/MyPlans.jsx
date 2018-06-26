@@ -217,7 +217,7 @@ class MyPlans extends React.Component
             //var isSelected = moment(selectedObj[0].full, 'YYYY-MM-DD').isSame(moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss'), 'day');
             //if(isSelected){
               return (
-                <li key={"table-item-"+table.table_id} className={table.status+" "+(isMyTable?"mytable":"")}>
+                <li key={"table-item-"+table.table_id} className={table.status+" "+(isMyTable?"mytable":table.joined==1?"joined":"")}>
                   <i className={table.status==='cancelled' ? "fa fa-calendar-times-o cancelled" : "fa "+calIcon}></i>
                   {table.lft=='1' ? (<i className="fa fa-graduation-cap"></i>) : ''}
                   <div className="plans-item">

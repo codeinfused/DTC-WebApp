@@ -499,7 +499,7 @@
 
 .switch-toggle.switch-candy,
 .switch-light.switch-candy > span {
-  background-color: #37393e;
+  background-color: #4c5661; /*#37393e;*/
   border-radius: 3px;
   box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255, 255, 255, 0.2);
 }
@@ -507,16 +507,18 @@
 .switch-light.switch-candy span span,
 .switch-light.switch-candy input:checked ~ span span:first-child,
 .switch-toggle.switch-candy label {
-  color: #eaeaea;
+  color: #e0e0e0;
   font-weight: bold;
   text-align: center;
-  text-shadow: 1px 1px 1px #000000;
+  text-shadow: 0px 1px 0px #000000;
+  /* text-shadow: none; */
+  outline: none !important;
 }
 
 .switch-light.switch-candy input ~ span span:first-child,
 .switch-light.switch-candy input:checked ~ span span:nth-child(2),
 .switch-candy input:checked + label {
-  color: #333;
+  color: #212121;
   text-shadow: 0 1px 0 rgba(255,255,255,0.5);
 }
 

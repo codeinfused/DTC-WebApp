@@ -42,14 +42,13 @@ class TableEdit extends React.Component
     ];
 
     this.tableLocations = [
-
       {label: 'Grand Sierra Ballroom (Open)', value: 'Grand Sierra Ballroom'},
       {label: 'Antigua (Open)', value: 'Antigua'},
+      {label: 'Hall Foyer (Open)', value: 'Hall Foyer'},
       {label: 'Boca (Events, Werewolf)', value: 'Boca'},
       {label: 'Curaco (RPGs, War Games, Kids)', value: 'Curaco'},
       {label: 'Bonaire (Publisher Demos and Events)', value: 'Bonaire'},
-      {label: 'Caribbean (Exhibitor Events)', value: 'Caribbean Ballroom' },
-      {label: 'Reception Lobby', value: 'Reception Lobby'}
+      {label: 'Caribbean (Exhibitor Events)', value: 'Caribbean Ballroom' }
     ];
 
     this.playtimeOptions = [
@@ -358,7 +357,7 @@ class TableEdit extends React.Component
                 </div>
               </div>
               <div className="table-form-item">
-                <div className="table-form-playerseats" style={{marginTop:'8px'}}>How Many Players <span>({comp.state.game.players[0] + '-' + comp.state.game.players[1]})</span></div>
+                <div className="table-form-playerseats" style={{marginTop:'8px'}}>How Many Players <span>(recommended: {comp.state.game.players[0] + '-' + comp.state.game.players[1]})</span></div>
                 <Slider pinned snaps min={2} max={12} step={1} editable value={comp.state.seats} onChange={comp.handleChangeInput.bind(comp, 'seats')} />
               </div>
               <div className="table-form-item">

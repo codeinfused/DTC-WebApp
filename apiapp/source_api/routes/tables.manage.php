@@ -2,6 +2,7 @@
 use api\auth\Auth;
 use api\games\GamesDB;
 use api\tables\Tables;
+use api\tables\Events;
 
 // table_player_data
 

@@ -21,7 +21,7 @@ include_once(__DIR__.'/routes/auth.php');
 include_once(__DIR__.'/routes/user.php');
 //
 
-include_once(__DIR__.'/routes/tables.lists.php');
+//include_once(__DIR__.'/routes/tables.lists.php');
 // GET tables (list)
 // GET tables/:id
 // GET tables/search/?params (
@@ -31,7 +31,12 @@ include_once(__DIR__.'/routes/tables.manage.php');
 // POST tables
 // POST tables/:id
 
+include_once(__DIR__.'/routes/events.manage.php');
+// POST events/byday
+
 include_once(__DIR__.'/routes/games.lists.php');
 // GET games
 // GET games/search/?params
 // GET games/:id
+
+include_once(__DIR__.'/routes/library.php');

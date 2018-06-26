@@ -12,7 +12,10 @@ import {LoadingInline} from '../components/Loaders.jsx';
 import ToastsAPI from '../components/ToastsAPI.jsx';
 import GamePopup from '../components/GamePopup.jsx';
 
-class ScheduledList extends React.Component
+import {XmlEntities, AllHtmlEntities} from 'html-entities';
+const entities = {xml: new XmlEntities(), html: new AllHtmlEntities()};
+
+class OfficialEvents extends React.Component
 {
   constructor(props)
   {
@@ -58,7 +61,7 @@ class ScheduledList extends React.Component
   {
     var comp = this;
     comp.setState({loaded: false, currentDayFull: fulldate});
-    axios.post(CONFIG.api.getSchedulesByDay, {
+    axios.post(CONFIG.api.getEventsByDay, {
       date: fulldate,
       t: (new Date()).getTime()
     }, {
@@ -71,7 +74,7 @@ class ScheduledList extends React.Component
       });
     }).catch(function(json){
       console.log(json);
-      ToastsAPI.toast('error', null, 'Error getting tables list.', {timeOut:6000});
+      ToastsAPI.toast('error', null, 'Error getting events list.', {timeOut:6000});
     });
   }
 
@@ -129,13 +132,12 @@ class ScheduledList extends React.Component
     });
   }
 
-  handleGamePopup(bgg_id, host_id)
+  handleGamePopup(table)
   {
     var comp = this;
     comp.setState({
       game_popup: true,
-      game_popup_id: bgg_id,
-      game_host_id: host_id
+      active_game: table
     });
   }
 
@@ -151,7 +153,7 @@ class ScheduledList extends React.Component
   {
     var comp = this;
     comp.setState({
-      link_popup: window.location.origin+'/list/table/'+table_id
+      link_popup: window.location.origin+'/list/dtc_event/'+table_id
     });
   }
 
@@ -236,24 +238,23 @@ class ScheduledList extends React.Component
                   <i className={table.status==='cancelled' ? "fa fa-calendar-times-o cancelled" : "fa "+calIcon}></i>
                   {table.lft=='1' ? (<i className="fa fa-graduation-cap"></i>) : ''}
                   <div className="plans-item">
-                    <div className="plans-item-head"><a href="" onClick={(e)=>{comp.handleGamePopup(table.bgg_id, table.player_id); e.preventDefault();}}>{table.title}</a></div>
+                    <div className="plans-item-head"><a href="" onClick={(e)=>{comp.handleGamePopup(table); e.preventDefault();}}>{table.title}</a></div>
                     <div className="plans-item-body">
                       <p className="plans-time">{table.status==='cancelled' ? 'Cancelled' : moment(table.start_datetime).fromNow()}</p>
                       {/* <span className="plan-tag">{moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, MMM Do YYYY, h:mm a')}</span> */}
-                      <span className="plan-tag">{moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, M/D/Y, h:mm a')}</span>
-                      <span className="plan-tag">Takes {table.playtime ? table.playtime : Math.round((Math.round(table.avgplay/6)/10)*2)/2 + ' hours'}</span>
-                      <span className="plan-tag">{table.table_location +' '+ (table.table_sublocation_alpha||'') + '-' + (table.table_sublocation_num||'')}</span>
+                      <span className="plan-tag">{moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, h:mm a')}</span>
+                      {table.playtime && table.playtime!=='0' ? (<span className="plan-tag">Takes {table.playtime + ' hours'}</span>) : ''}
+                      <span className="plan-tag">{table.table_location}</span>
                       <span className={"plan-tag" + (isMyTable ? " hosting" : " otherhost")}>Host: {(isMyTable ? "Me" : table.host_name)}</span>
-                      {table.allow_signups==1 ? (<span className="plan-tag">{table.signups} of {table.seats} seats taken</span>) : ''}
+                      {table.allow_signups==1 ? (<span className="plan-tag">Seats: {table.seats}</span>) : ''}
                     </div>
                     <div className="plans-btns">
                       {/* leave game, join game, see players, first come, edit */}
                       {table.player_id !== CONFIG.state.user.id && table.allow_signups!=1 ? (<button disabled>First Come (no sign up)</button>) : ''}
                       {table.player_id !== CONFIG.state.user.id && table.allow_signups==1 && table.joined==1 ? (<button className='leave' onClick={comp.handleLeaveGame.bind(comp, table)}>Leave</button>) : ''}
-                      {table.player_id !== CONFIG.state.user.id && table.allow_signups==1 && table.joined<1 ? (<button className='join' onClick={comp.handleJoinGame.bind(comp, table)}>{+table.signups >= +table.seats ? 'Join Waitlist' : 'Join Game'}</button>) : ''}
-                      {table.allow_signups==1 ? (<button className="players" onClick={CONFIG.state.index.openTableDialog.bind(CONFIG.state.index, table.table_id)}>Players</button>) : ''}
-                      {table.player_id == CONFIG.state.user.id ? (<button className='edit has-icon' onClick={()=>{browserHistory.push('/tables/edit/'+table.table_id)}}><FontIcon value='edit' /></button>) : ''}
-                      {table.status!=='cancelled' ? <button className="edit has-icon" onClick={comp.handleLinkPopup.bind(comp, table.table_id)}><FontIcon value='link' /></button> : ''}
+                      {table.player_id !== CONFIG.state.user.id && table.allow_signups==1 && table.joined<1 ? (<button className='join' onClick={comp.handleJoinGame.bind(comp, table)}>Add to Plans</button>) : ''}
+                      {/* {table.player_id == CONFIG.state.user.id ? (<button className='edit has-icon' onClick={()=>{browserHistory.push('/tables/edit/'+table.table_id)}}><FontIcon value='edit' /></button>) : ''} */}
+                      {/* {table.status!=='cancelled' ? <button className="edit has-icon" onClick={comp.handleLinkPopup.bind(comp, table.table_id)}><FontIcon value='link' /></button> : ''} */}
                     </div>
                   </div>
                 </li>
@@ -277,6 +278,7 @@ class ScheduledList extends React.Component
   render()
   {
     var comp = this;
+    var table = comp.state.active_game;
     return (
       <div id="page-my-plans" className="transition-item page-my-plans page-wrap">
 
@@ -300,13 +302,14 @@ class ScheduledList extends React.Component
             {label: "Close", onClick: comp.handleCloseGamePopup.bind(comp), primary: true, raised: true}
           ]}
         >
-          {comp.state.game_popup ?
-            <GamePopup
-              bgg_id={comp.state.game_popup_id}
-              host_id={comp.state.game_host_id}
-              onToggleIgnore={comp.onToggleIgnore.bind(comp)}
-              onToggleDNS={comp.onToggleDNS.bind(comp)}
-            />
+          {comp.state.active_game ?
+            <div className="dtc-event">
+              <h2>{table.title}</h2>
+              <div><span className="table-item-tag">Host: {table.host_name}</span></div>
+              <div><span className="table-item-tag">{moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, h:mm a')}</span><span className="table-item-tag">{table.table_location}</span></div>
+              <div>{table.allow_signups==1 ? (<span className="plan-tag">Seats: {table.seats}</span>) : ''}{table.playtime && table.playtime!=='0' ? (<span className="plan-tag">Takes {table.playtime + ' hours'}</span>) : ''}</div>
+              <div style={{marginTop: '10px'}}>{entities.html.decode(entities.xml.decode(table.description))}</div>
+            </div>
           : <div />}
         </Dialog>
 
@@ -329,4 +332,4 @@ class ScheduledList extends React.Component
   }
 }
 
-export default ScheduledList;
+export default OfficialEvents;

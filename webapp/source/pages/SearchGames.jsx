@@ -32,6 +32,7 @@ class SearchGames extends React.Component
       activeGameOpenDesc: false,
       sortBy: 'bggrate',
       tag: '',
+      search_type: 'bgg',
       loader: true,
       renderView: 'phone',
       source: props.route.source
@@ -347,6 +348,11 @@ class SearchGames extends React.Component
     this.setState({activeGameOpenDesc: !this.state.activeGameOpenDesc});
   }
 
+  handleChangeInput(field, value)
+  {
+    this.setState({[field]: value});
+  }
+
   handleChangeSort(val)
   {
     var comp = this;
@@ -525,7 +531,7 @@ class SearchGames extends React.Component
               <input ref={(input) => {comp.searchInput = input;}} value={comp.state.searchText} placeholder='Search for a game...' onChange={comp.handleSearchChange} type="text" />
               <button type="submit" className="submit"><FontIcon value='search' /></button>
             </div>
-            <div className="game-search-filters">
+            <div className="game-search-filters clearfix">
               <div className="game-search-filter">
                 <Dropdown onChange={comp.handleChangeSort} source={comp.sortOptions} value={comp.state.sortBy} />
                   {/* {comp.sortOptions.map(function(item){
@@ -537,6 +543,19 @@ class SearchGames extends React.Component
                   {/* {comp.tagOptions.map(function(item){
                     return (<option key={"sortoption-"+item.tag} value={item.tag}>{item.label}</option>);
                   })} */}
+              </div>
+            </div>
+            <div className="clearfix">
+              <div className="">
+                <fieldset style={{display:'inline', border:'none', margin:'0', padding:'0', width:'100%', fontSize:'1.275rem'}}>
+                  <div className="switch-toggle switch-candy large-4">
+                    <input id='type-bgg' name="search_type" type="radio" value='bgg' checked={comp.state.search_type==='bgg'} onChange={comp.handleChangeInput.bind(comp, 'search_type', 'bgg')} />
+                    <label htmlFor='type-bgg'>BGG Game Search</label>
+                    <input id='type-dtc' name="search_type" type="radio" value='dtc' checked={comp.state.search_type==='dtc'} onChange={comp.handleChangeInput.bind(comp, 'search_type', 'dtc')} />
+                    <label htmlFor='type-dtc'>DTC Game Library</label>
+                    <a></a>
+                  </div>
+                </fieldset>
               </div>
             </div>
           </form>

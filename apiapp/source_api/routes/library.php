@@ -1,6 +1,25 @@
 <?php
 use api\library\Library;
+use api\library\Events;
 use api\auth\Auth;
+
+// https://boardgamegeek.com/geeklist/219847/dice-tower-convention-library-2018/page/1?
+
+$app->post('/library/events/import/', function($req, $resp, $args) use ($app)
+{
+  // $token = Auth::checkAuthorization($this->db, $request);
+  // if( is_error($token) ){
+  //   return $response->withStatus((int)$token->get_code())->withJson($token->json());
+  // }
+
+  $body = $req->getParsedBody();
+  $secret = $body['secret'];
+  if($secret !== 'dtclfgapp'){ return; }
+
+  $pdo = $this->db;
+  $importFilename = $body['filename'];
+  Events::parse_csv_import($pdo, $importFilename);
+});
 
 $app->post('/library/update/single/', function($req, $resp, $args) use ($app)
 {
@@ -20,7 +39,7 @@ $app->post('/library/update/single/', function($req, $resp, $args) use ($app)
     $pdo = $this->db;
     $bggapi = $this->get('bgg_api');
 
-    $dbCheck = $pdo->prepare("UPDATE library_dtc2017 SET bgg_id=:bgg_id WHERE id=:id");
+    $dbCheck = $pdo->prepare("UPDATE library_dtc2018 SET bgg_id=:bgg_id WHERE id=:id");
     $dbCheck->execute(array( ':bgg_id'=>$bgg_id, ':id'=>$id ));
     $dbCheck->closeCursor();
   }
@@ -35,7 +54,7 @@ $app->post('/library/update/', function($req, $resp, $args) use ($app)
   if( is_error($token) ){
     return $response->withStatus((int)$token->get_code())->withJson($token->json());
   }
-  
+
   $body = $req->getParsedBody();
   $secret = $body['secret'];
 

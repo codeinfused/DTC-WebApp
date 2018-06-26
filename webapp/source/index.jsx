@@ -25,6 +25,7 @@ import MySettings from './pages/MySettings.jsx';
 import MyAlerts from './pages/MyAlerts.jsx';
 import PlayersWanted from './pages/PlayersWanted.jsx';
 import ScheduledList from './pages/ScheduledList.jsx';
+import OfficialEvents from './pages/OfficialEvents.jsx';
 import Privacy from './pages/Privacy.jsx';
 
 class AppLayout extends React.Component
@@ -55,10 +56,11 @@ class AppLayout extends React.Component
 
     this.navButtons = [
       {label:'Home',                path:'/home', icon:'home'},
-      {label:'Tables Right Now',    path:'/lfp', icon:'video_library'},
+      {label:'Tables Right Now',    path:'/lfp', icon:'casino'}, // video_library
       {label:'Scheduled Tables',    path:'/schedules', icon:'event_note'},
-      {label:'Start/Search Games',  path:'/games', icon:'library_books', callback: comp.DBLoadBGG},
+      {label:'Start/Search Games',  path:'/games', icon:'search', callback: comp.DBLoadBGG}, // library_books
       // {label:'Con Library',         path:'/library', icon:'import_contacts', callback: comp.DBLoadLibrary},
+      {label:'Official Events',     path:'/events', icon:'local_play'}, // dvr
       {label:'Game Alerts',         path:'/alerts', icon:'notifications'},
       {label:'My Plans',            path:'/myplans', icon:'date_range'},
       {label:'My Tables',           path:'/mytables', icon:'playlist_add_check'},
@@ -320,6 +322,7 @@ ReactDOM.render(
       <Route path="alerts" component={MyAlerts} />
       <Route path="lfp" component={PlayersWanted} />
       <Route path="schedules" component={ScheduledList} />
+      <Route path="events" component={OfficialEvents} />
       <Route path="privacy" component={Privacy} />
     </Route>
   </Router>,

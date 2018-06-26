@@ -1,6 +1,7 @@
 <?php
 namespace api\library;
 
+
 abstract class Library
 {
 
@@ -9,7 +10,7 @@ abstract class Library
     $bggapi = $context->get('bgg_api');
     $pdo = $context->db;
 
-    $dbCheck = $pdo->prepare("SELECT id, title FROM library_dtc2017 WHERE bgg_id IS NULL ORDER BY id LIMIT 1");
+    $dbCheck = $pdo->prepare("SELECT id, title FROM library_dtc2018 WHERE bgg_id IS NULL ORDER BY id LIMIT 1");
     $dbCheck->execute();
     $games = $dbCheck->fetchAll();
     $dbCheck->closeCursor();
@@ -27,7 +28,7 @@ abstract class Library
     $bggapi = $context->get('bgg_api');
     $pdo = $context->db;
 
-    $dbCheck = $pdo->prepare("SELECT id, title FROM library_dtc2017 WHERE bgg_id IS NULL");
+    $dbCheck = $pdo->prepare("SELECT id, title FROM library_dtc2018 WHERE bgg_id IS NULL");
     $dbCheck->execute();
     $games = $dbCheck->fetchAll();
     $dbCheck->closeCursor();

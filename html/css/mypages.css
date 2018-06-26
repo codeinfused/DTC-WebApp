@@ -6,7 +6,7 @@
   display: flex;
   flex-direction: row;
   position: fixed;
-  height: 86px;
+  height: 74px;
   /* top: 52px; */
   left: 0;
   right: 0;
@@ -14,8 +14,8 @@
 }
 .calendar-day{
   background: #fff;
-  height: 86px;
-  line-height: 86px;
+  height: 74px;
+  line-height: 74px;
   padding: 0px 8px ;
   text-align: center;
   border-right: 1px solid #f0f0f0;
@@ -64,7 +64,7 @@
   padding: 0px 0;
   overflow-y: auto; */
   position: relative;
-  padding-top: 86px;
+  padding-top: 74px;
 }
 
 #page-my-tables .table-list-wrap{
@@ -102,7 +102,7 @@ ul.plans-timeline li > .fa{
   line-height: 34px;
   position: absolute;
   color: #fff;
-  background: #3a9bcc;
+  background: #6f6f6f; /* #3a9bcc; */
   border-radius: 50%;
   text-align: center;
   left: 16px;
@@ -117,6 +117,22 @@ ul.plans-timeline li > .fa.cancelled{
 ul.plans-timeline li > .fa-graduation-cap{
   top: 34px;
 }
+ul.plans-timeline li.joined > .fa{
+  background: #4aade0;
+}
+
+ul.plans-timeline li > .plans-overlap{
+  position: absolute;
+  top: 80px;
+  left: 0px;
+  background: #d84444;
+  color: #fff;
+  transform: rotate(-90deg);
+  display: inline-block;
+  padding: 4px 6px;
+  border-radius: 3px;
+}
+
 ul.plans-timeline .plans-item{
   box-shadow: 0 1px 1px rgba(0,0,0,0.3);
   border-radius: 3px;
@@ -183,7 +199,7 @@ p.plans-time {
   padding: 0px 12px;
   display: inline-block;
   /*background: #3a9bcc;*/
-  background: #d25555;
+  background: #c16161; /*#d25555;*/
   color: #fff;
   cursor: pointer;
   font-size: 1.15rem;
@@ -191,8 +207,8 @@ p.plans-time {
   margin-right: 8px;
 }
 .plans-btns button.edit{ background: #6C7D96; }
-.plans-btns button.delete, .plans-btns button.leave{ background: #d25555; }
-.plans-btns button.join{ background: #30a734; }
+.plans-btns button.delete, .plans-btns button.leave{ background: #c16161; /*#d25555;*/ }
+.plans-btns button.join{ background: #4aade0; /*#30a734;*/ }
 .plans-btns button[disabled]{ background: #9b9b9b; color: #ededed; font-style:italic; }
 .plans-btns button.players{ background: #6C7D96; }
 

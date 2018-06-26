@@ -145,6 +145,10 @@
 	
 	var _ScheduledList2 = _interopRequireDefault(_ScheduledList);
 	
+	var _OfficialEvents = __webpack_require__(855);
+	
+	var _OfficialEvents2 = _interopRequireDefault(_OfficialEvents);
+	
 	var _Privacy = __webpack_require__(854);
 	
 	var _Privacy2 = _interopRequireDefault(_Privacy);
@@ -186,8 +190,10 @@
 	      activeNav: props.location.pathname ? props.location.pathname : '/home'
 	    };
 	
-	    _this.navButtons = [{ label: 'Home', path: '/home', icon: 'home' }, { label: 'Tables Right Now', path: '/lfp', icon: 'video_library' }, { label: 'Scheduled Tables', path: '/schedules', icon: 'event_note' }, { label: 'Start/Search Games', path: '/games', icon: 'library_books', callback: comp.DBLoadBGG },
+	    _this.navButtons = [{ label: 'Home', path: '/home', icon: 'home' }, { label: 'Tables Right Now', path: '/lfp', icon: 'casino' }, // video_library
+	    { label: 'Scheduled Tables', path: '/schedules', icon: 'event_note' }, { label: 'Start/Search Games', path: '/games', icon: 'search', callback: comp.DBLoadBGG }, // library_books
 	    // {label:'Con Library',         path:'/library', icon:'import_contacts', callback: comp.DBLoadLibrary},
+	    { label: 'Official Events', path: '/events', icon: 'local_play' }, // dvr
 	    { label: 'Game Alerts', path: '/alerts', icon: 'notifications' }, { label: 'My Plans', path: '/myplans', icon: 'date_range' }, { label: 'My Tables', path: '/mytables', icon: 'playlist_add_check' }, { label: 'My Settings', path: '/me', icon: 'settings_applications' }, { label: 'About & Map', path: '/about', icon: 'info' }];
 	
 	    _this.getNewAlerts = _this.getNewAlerts.bind(_this);
@@ -500,6 +506,7 @@
 	    _react2.default.createElement(_reactRouter.Route, { path: 'alerts', component: _MyAlerts2.default }),
 	    _react2.default.createElement(_reactRouter.Route, { path: 'lfp', component: _PlayersWanted2.default }),
 	    _react2.default.createElement(_reactRouter.Route, { path: 'schedules', component: _ScheduledList2.default }),
+	    _react2.default.createElement(_reactRouter.Route, { path: 'events', component: _OfficialEvents2.default }),
 	    _react2.default.createElement(_reactRouter.Route, { path: 'privacy', component: _Privacy2.default })
 	  )
 	), document.getElementById('app-wrapper'));
@@ -57134,6 +57141,9 @@
 	    joinTable: baseAPI + "tables/join",
 	    leaveTable: baseAPI + "tables/leave",
 	    lfp: baseAPI + "lfp",
+	
+	    getEventsByDay: baseAPI + "events/byday",
+	
 	    homeLists: baseAPI + "lists/top_home"
 	  },
 	
@@ -97046,6 +97056,8 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -97077,6 +97089,7 @@
 	      activeGameOpenDesc: false,
 	      sortBy: 'bggrate',
 	      tag: '',
+	      search_type: 'bgg',
 	      loader: true,
 	      renderView: 'phone',
 	      source: props.route.source
@@ -97365,6 +97378,11 @@
 	        el[i].scrollTop = 0;
 	      }
 	      this.setState({ activeGameOpenDesc: !this.state.activeGameOpenDesc });
+	    }
+	  }, {
+	    key: 'handleChangeInput',
+	    value: function handleChangeInput(field, value) {
+	      this.setState(_defineProperty({}, field, value));
 	    }
 	  }, {
 	    key: 'handleChangeSort',
@@ -97701,7 +97719,7 @@
 	            ),
 	            _react2.default.createElement(
 	              'div',
-	              { className: 'game-search-filters' },
+	              { className: 'game-search-filters clearfix' },
 	              _react2.default.createElement(
 	                'div',
 	                { className: 'game-search-filter' },
@@ -97711,6 +97729,35 @@
 	                'div',
 	                { className: 'game-search-filter', style: { 'float': 'right' } },
 	                _react2.default.createElement(_reactToolbox.Dropdown, { onChange: comp.handleChangeTag, source: comp.tagOptions, value: comp.state.tag })
+	              )
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'clearfix' },
+	              _react2.default.createElement(
+	                'div',
+	                { className: '' },
+	                _react2.default.createElement(
+	                  'fieldset',
+	                  { style: { display: 'inline', border: 'none', margin: '0', padding: '0', width: '100%', fontSize: '1.275rem' } },
+	                  _react2.default.createElement(
+	                    'div',
+	                    { className: 'switch-toggle switch-candy large-4' },
+	                    _react2.default.createElement('input', { id: 'type-bgg', name: 'search_type', type: 'radio', value: 'bgg', checked: comp.state.search_type === 'bgg', onChange: comp.handleChangeInput.bind(comp, 'search_type', 'bgg') }),
+	                    _react2.default.createElement(
+	                      'label',
+	                      { htmlFor: 'type-bgg' },
+	                      'BGG Game Search'
+	                    ),
+	                    _react2.default.createElement('input', { id: 'type-dtc', name: 'search_type', type: 'radio', value: 'dtc', checked: comp.state.search_type === 'dtc', onChange: comp.handleChangeInput.bind(comp, 'search_type', 'dtc') }),
+	                    _react2.default.createElement(
+	                      'label',
+	                      { htmlFor: 'type-dtc' },
+	                      'DTC Game Library'
+	                    ),
+	                    _react2.default.createElement('a', null)
+	                  )
+	                )
 	              )
 	            )
 	          )
@@ -98511,6 +98558,8 @@
 	
 	var _button = __webpack_require__(244);
 	
+	var _lodash = __webpack_require__(554);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -98530,7 +98579,7 @@
 	    var comp = _this;
 	    _this.state = {
 	      popup_map: false,
-	      styles: Object.assign({ display: "inline-block", textTransform: "none", position: "relative", top: "-1px" }, props.styles)
+	      styles: _.assign({ display: "inline-block", textTransform: "none", position: "relative", top: "-1px" }, props.styles)
 	    };
 	    return _this;
 	  }
@@ -98554,7 +98603,7 @@
 	    key: 'render',
 	    value: function render() {
 	      var comp = this;
-	
+	      console.log(comp.props);
 	      return _react2.default.createElement(
 	        'div',
 	        { className: 'map-popup-cm', style: { display: "inline-block" } },
@@ -98671,7 +98720,7 @@
 	
 	    _this.tableTypes = [{ id: 'now', name: 'Now' }, { id: 'later', name: 'Later' }, { id: 'demo', name: 'Demo' }];
 	
-	    _this.tableLocations = [{ label: 'Grand Sierra Ballroom (Open)', value: 'Grand Sierra Ballroom' }, { label: 'Antigua (Open)', value: 'Antigua' }, { label: 'Boca (Events, Werewolf)', value: 'Boca' }, { label: 'Curaco (RPGs, War Games, Kids)', value: 'Curaco' }, { label: 'Bonaire (Publisher Demos and Events)', value: 'Bonaire' }, { label: 'Caribbean (Exhibitor Events)', value: 'Caribbean Ballroom' }, { label: 'Reception Lobby', value: 'Reception Lobby' }];
+	    _this.tableLocations = [{ label: 'Grand Sierra Ballroom (Open)', value: 'Grand Sierra Ballroom' }, { label: 'Antigua (Open)', value: 'Antigua' }, { label: 'Hall Foyer (Open)', value: 'Hall Foyer' }, { label: 'Boca (Events, Werewolf)', value: 'Boca' }, { label: 'Curaco (RPGs, War Games, Kids)', value: 'Curaco' }, { label: 'Bonaire (Publisher Demos and Events)', value: 'Bonaire' }, { label: 'Caribbean (Exhibitor Events)', value: 'Caribbean Ballroom' }];
 	
 	    _this.playtimeOptions = [{ label: 'Auto', value: '' }, { label: '30 (half hour)', value: '0.5 hour' }, { label: '60 (1 hour)', value: '1 hour' }, { label: '90 (1½ hours)', value: '1.5 hours' }, { label: '120 (2 hours)', value: '2 hours' }, { label: '150 (2½ hours)', value: '2.5 hours' }, { label: '180 (3 hours)', value: '3 hours' }, { label: '240 (4 hours)', value: '4 hours' }, { label: '300 (5+ hours)', value: '5+ hours' }];
 	
@@ -98816,7 +98865,7 @@
 	      //var start_date = d.format('YYYY-MM-DD');
 	      //var start_time = d.format('HH:mm:00');
 	      var dRounded = MomentRound(d, _moment2.default.duration(15, "minutes"), "ceil");
-	
+	      console.log(dRounded);
 	      var d_obj = dRounded.toDate();
 	
 	      comp.setState({
@@ -99025,7 +99074,7 @@
 	                _react2.default.createElement(
 	                  'span',
 	                  null,
-	                  '(',
+	                  '(recommended: ',
 	                  comp.state.game.players[0] + '-' + comp.state.game.players[1],
 	                  ')'
 	                )
@@ -99765,7 +99814,7 @@
 	    key: 'addIgnore',
 	    value: function addIgnore(bad_player_id) {
 	      var comp = this;
-	
+	      console.log(_config2.default.state.user);
 	      _config2.default.state.user.ignore.push(bad_player_id);
 	      _config2.default.state.user.ignore = _.uniq(_config2.default.state.user.ignore);
 	      if (comp.props.onToggleIgnore) {
@@ -100741,7 +100790,7 @@
 	            //if(isSelected){
 	            return _react2.default.createElement(
 	              'li',
-	              { key: "table-item-" + table.table_id, className: table.status + " " + (isMyTable ? "mytable" : "") },
+	              { key: "table-item-" + table.table_id, className: table.status + " " + (isMyTable ? "mytable" : table.joined == 1 ? "joined" : "") },
 	              _react2.default.createElement('i', { className: table.status === 'cancelled' ? "fa fa-calendar-times-o cancelled" : "fa " + calIcon }),
 	              table.lft == '1' ? _react2.default.createElement('i', { className: 'fa fa-graduation-cap' }) : '',
 	              _react2.default.createElement(
@@ -101048,7 +101097,7 @@
 	          ignore: json.data.ignore
 	        });
 	      }).catch(function (json) {
-	
+	        console.log(json);
 	        _ToastsAPI2.default.toast('error', null, 'Failed to get some settings.', { timeOut: 6000 });
 	      });
 	    }
@@ -101324,7 +101373,7 @@
 	    key: 'handleToggleIgnore',
 	    value: function handleToggleIgnore(bad_player_id) {
 	      var comp = this;
-	
+	      console.log(_config2.default.state.user.ignore, bad_player_id);
 	      if (_config2.default.state.user.ignore.indexOf(bad_player_id) < 0) {
 	        comp.addIgnore(bad_player_id);
 	      } else {
@@ -102273,7 +102322,7 @@
 	          game_popup: false
 	        });
 	      }).catch(function (json) {
-	
+	        console.log(json);
 	        _ToastsAPI2.default.toast('error', null, 'Error getting tables list.', { timeOut: 6000 });
 	      });
 	    }
@@ -102447,7 +102496,7 @@
 	            //if(isSelected){
 	            return _react2.default.createElement(
 	              'li',
-	              { key: "table-item-" + table.table_id, className: table.status + " " + (isMyTable ? "mytable" : "") },
+	              { key: "table-item-" + table.table_id, className: table.status + " " + (isMyTable ? "mytable" : table.joined == 1 ? "joined" : "") },
 	              _react2.default.createElement('i', { className: table.status === 'cancelled' ? "fa fa-calendar-times-o cancelled" : "fa " + calIcon }),
 	              table.lft == '1' ? _react2.default.createElement('i', { className: 'fa fa-graduation-cap' }) : '',
 	              _react2.default.createElement(
@@ -102815,6 +102864,517 @@
 	;
 	
 	exports.default = Privacy;
+
+/***/ }),
+/* 855 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _config = __webpack_require__(552);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	var _axios = __webpack_require__(525);
+	
+	var _axios2 = _interopRequireDefault(_axios);
+	
+	var _react = __webpack_require__(2);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _reactRouter = __webpack_require__(185);
+	
+	var _reactToolbox = __webpack_require__(243);
+	
+	var _button = __webpack_require__(244);
+	
+	var _reactTransitionGroup = __webpack_require__(551);
+	
+	var _lodash = __webpack_require__(554);
+	
+	var _moment = __webpack_require__(720);
+	
+	var _moment2 = _interopRequireDefault(_moment);
+	
+	var _Loaders = __webpack_require__(715);
+	
+	var _ToastsAPI = __webpack_require__(556);
+	
+	var _ToastsAPI2 = _interopRequireDefault(_ToastsAPI);
+	
+	var _GamePopup = __webpack_require__(847);
+	
+	var _GamePopup2 = _interopRequireDefault(_GamePopup);
+	
+	var _htmlEntities = __webpack_require__(839);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var entities = { xml: new _htmlEntities.XmlEntities(), html: new _htmlEntities.AllHtmlEntities() };
+	
+	var OfficialEvents = function (_React$Component) {
+	  _inherits(OfficialEvents, _React$Component);
+	
+	  function OfficialEvents(props) {
+	    _classCallCheck(this, OfficialEvents);
+	
+	    var _this = _possibleConstructorReturn(this, (OfficialEvents.__proto__ || Object.getPrototypeOf(OfficialEvents)).call(this, props));
+	
+	    var comp = _this;
+	    var mo = (0, _moment2.default)();
+	    var day = mo.format('YYYY-MM-DD');
+	
+	    _this.state = {
+	      loaded: false,
+	      currentDayObj: {},
+	      currentDayFull: day,
+	      tables: [],
+	      game_popup: false,
+	      link_popup: false
+	    };
+	
+	    _this.conDays = _config2.default.conDays;
+	
+	    _this.renderTableList = _this.renderTableList.bind(_this);
+	    _this.renderNoTables = _this.renderNoTables.bind(_this);
+	    _this.getTableList = _this.getTableList.bind(_this);
+	    return _this;
+	  }
+	
+	  _createClass(OfficialEvents, [{
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      var comp = this;
+	      var selectedObj = comp.conDays.filter(function (item) {
+	        return item.full == comp.state.currentDayFull;
+	      });
+	      if (!selectedObj.length) {
+	        selectedObj = comp.conDays;
+	      }
+	
+	      this.setState({
+	        currentDayFull: selectedObj[0].full
+	      });
+	      this.getTableList(selectedObj[0].full);
+	    }
+	  }, {
+	    key: 'componentWillReceiveProps',
+	    value: function componentWillReceiveProps(nextProps) {}
+	  }, {
+	    key: 'getTableList',
+	    value: function getTableList(fulldate) {
+	      var comp = this;
+	      comp.setState({ loaded: false, currentDayFull: fulldate });
+	      _axios2.default.post(_config2.default.api.getEventsByDay, {
+	        date: fulldate,
+	        t: new Date().getTime()
+	      }, {
+	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
+	      }).then(function (json) {
+	        comp.setState({
+	          loaded: true,
+	          tables: json.data.tables,
+	          game_popup: false
+	        });
+	      }).catch(function (json) {
+	        console.log(json);
+	        _ToastsAPI2.default.toast('error', null, 'Error getting events list.', { timeOut: 6000 });
+	      });
+	    }
+	  }, {
+	    key: 'handleSelectDay',
+	    value: function handleSelectDay(day) {
+	      var comp = this;
+	      var selectedObj = comp.conDays.filter(function (item) {
+	        return item.full == day;
+	      });
+	      var date = selectedObj[0].full;
+	
+	      comp.setState({ currentDayFull: day }, function () {
+	        comp.getTableList(date);
+	      });
+	    }
+	  }, {
+	    key: 'viewPlayers',
+	    value: function viewPlayers(table) {}
+	  }, {
+	    key: 'handleLeaveGame',
+	    value: function handleLeaveGame(table) {
+	      var comp = this;
+	      _axios2.default.post(_config2.default.api.leaveTable, {
+	        table_id: table.table_id,
+	        t: new Date().getTime()
+	      }, {
+	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
+	      }).then(function (json) {
+	        _ToastsAPI2.default.toast('success', 'Left game table', null, { timeout: 6000 });
+	        comp.getTableList(comp.state.currentDayFull);
+	      }).catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, json.response.data.message, { timeOut: 6000 });
+	      });
+	    }
+	  }, {
+	    key: 'handleJoinGame',
+	    value: function handleJoinGame(table) {
+	      var comp = this;
+	      if (!_config2.default.state.auth || _config2.default.state.user.grant_type === 'guest') {
+	        _ToastsAPI2.default.toast('error', "Sorry, guests can't reserve table spots.", null, { timeOut: 8000 });
+	        return;
+	      }
+	
+	      _axios2.default.post(_config2.default.api.joinTable, {
+	        table_id: table.table_id,
+	        t: new Date().getTime()
+	      }, {
+	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
+	      }).then(function (json) {
+	        _ToastsAPI2.default.toast('success', 'Joined game!', null, { timeout: 6000 });
+	        comp.getTableList(comp.state.currentDayFull);
+	      }).catch(function (json) {
+	        _ToastsAPI2.default.toast('error', null, json.response.data.message, { timeOut: 6000 });
+	      });
+	    }
+	  }, {
+	    key: 'handleGamePopup',
+	    value: function handleGamePopup(table) {
+	      var comp = this;
+	      comp.setState({
+	        game_popup: true,
+	        active_game: table
+	      });
+	    }
+	  }, {
+	    key: 'handleCloseGamePopup',
+	    value: function handleCloseGamePopup() {
+	      var comp = this;
+	      comp.setState({
+	        game_popup: false
+	      });
+	    }
+	  }, {
+	    key: 'handleLinkPopup',
+	    value: function handleLinkPopup(table_id) {
+	      var comp = this;
+	      comp.setState({
+	        link_popup: window.location.origin + '/list/dtc_event/' + table_id
+	      });
+	    }
+	  }, {
+	    key: 'handleCloseLinkPopup',
+	    value: function handleCloseLinkPopup() {
+	      var comp = this;
+	      comp.setState({
+	        link_popup: false
+	      });
+	    }
+	  }, {
+	    key: 'onToggleIgnore',
+	    value: function onToggleIgnore(type, bad_player_id) {
+	      var comp = this;
+	      var tables = _.cloneDeep(comp.state.tables);
+	
+	      var newtables = tables.map(function (g) {
+	        if (g.player_id == bad_player_id) {
+	          g.ignore = type === 'add';
+	        }
+	        return g;
+	      });
+	      comp.setState({ tables: tables });
+	    }
+	  }, {
+	    key: 'onToggleDNS',
+	    value: function onToggleDNS(type, bgg_id) {
+	      var comp = this;
+	      var tables = _.cloneDeep(comp.state.tables);
+	
+	      var newtables = tables.map(function (g) {
+	        if (g.bgg_id == bgg_id) {
+	          g.ignore = type === 'add';
+	        }
+	        return g;
+	      });
+	      comp.setState({ tables: tables });
+	    }
+	  }, {
+	    key: 'renderCalendar',
+	    value: function renderCalendar() {
+	      var comp = this;
+	      return comp.conDays.map(function (day, i) {
+	        var isSel = day.full == comp.state.currentDayFull ? ' active' : '';
+	        return _react2.default.createElement(
+	          'div',
+	          { className: "calendar-day" + isSel, key: "calendar-day-" + day.date, onClick: comp.handleSelectDay.bind(comp, day.full) },
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'calendar-day-inner' },
+	            _react2.default.createElement(
+	              'span',
+	              { className: 'calendar-day-date' },
+	              day.date
+	            ),
+	            _react2.default.createElement(
+	              'span',
+	              { className: 'calendar-day-name' },
+	              day.name
+	            )
+	          )
+	        );
+	      });
+	    }
+	  }, {
+	    key: 'renderTableList',
+	    value: function renderTableList() {
+	      var comp = this;
+	      var selectedObj = comp.conDays.filter(function (item) {
+	        return item.full == comp.state.currentDayFull;
+	      });
+	
+	      var thisDayList = comp.state.tables.filter(function (table, i) {
+	        var isSelected = (0, _moment2.default)(selectedObj[0].full, 'YYYY-MM-DD').isSame((0, _moment2.default)(table.start_datetime, 'YYYY-MM-DD HH:mm:ss'), 'day');
+	        if (table.ignore) {
+	          isSelected = false;
+	        }
+	        return isSelected;
+	      });
+	
+	      if (thisDayList.length < 1) {
+	        return comp.renderNoTables();
+	      } else {
+	        return _react2.default.createElement(
+	          'ul',
+	          { className: 'plans-timeline' },
+	          thisDayList.map(function (table, i) {
+	            var isMyTable = table.player_id === _config2.default.state.user.id;
+	            var calIcon = table.joined == 1 ? "fa-calendar-check-o" : "fa-calendar-o";
+	            //var isSelected = moment(selectedObj[0].full, 'YYYY-MM-DD').isSame(moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss'), 'day');
+	            //if(isSelected){
+	            return _react2.default.createElement(
+	              'li',
+	              { key: "table-item-" + table.table_id, className: table.status + " " + (isMyTable ? "mytable" : table.joined == 1 ? "joined" : "") },
+	              _react2.default.createElement('i', { className: table.status === 'cancelled' ? "fa fa-calendar-times-o cancelled" : "fa " + calIcon }),
+	              table.lft == '1' ? _react2.default.createElement('i', { className: 'fa fa-graduation-cap' }) : '',
+	              _react2.default.createElement(
+	                'div',
+	                { className: 'plans-item' },
+	                _react2.default.createElement(
+	                  'div',
+	                  { className: 'plans-item-head' },
+	                  _react2.default.createElement(
+	                    'a',
+	                    { href: '', onClick: function onClick(e) {
+	                        comp.handleGamePopup(table);e.preventDefault();
+	                      } },
+	                    table.title
+	                  )
+	                ),
+	                _react2.default.createElement(
+	                  'div',
+	                  { className: 'plans-item-body' },
+	                  _react2.default.createElement(
+	                    'p',
+	                    { className: 'plans-time' },
+	                    table.status === 'cancelled' ? 'Cancelled' : (0, _moment2.default)(table.start_datetime).fromNow()
+	                  ),
+	                  _react2.default.createElement(
+	                    'span',
+	                    { className: 'plan-tag' },
+	                    (0, _moment2.default)(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, h:mm a')
+	                  ),
+	                  table.playtime && table.playtime !== '0' ? _react2.default.createElement(
+	                    'span',
+	                    { className: 'plan-tag' },
+	                    'Takes ',
+	                    table.playtime + ' hours'
+	                  ) : '',
+	                  _react2.default.createElement(
+	                    'span',
+	                    { className: 'plan-tag' },
+	                    table.table_location
+	                  ),
+	                  _react2.default.createElement(
+	                    'span',
+	                    { className: "plan-tag" + (isMyTable ? " hosting" : " otherhost") },
+	                    'Host: ',
+	                    isMyTable ? "Me" : table.host_name
+	                  ),
+	                  table.allow_signups == 1 ? _react2.default.createElement(
+	                    'span',
+	                    { className: 'plan-tag' },
+	                    'Seats: ',
+	                    table.seats
+	                  ) : ''
+	                ),
+	                _react2.default.createElement(
+	                  'div',
+	                  { className: 'plans-btns' },
+	                  table.player_id !== _config2.default.state.user.id && table.allow_signups != 1 ? _react2.default.createElement(
+	                    'button',
+	                    { disabled: true },
+	                    'First Come (no sign up)'
+	                  ) : '',
+	                  table.player_id !== _config2.default.state.user.id && table.allow_signups == 1 && table.joined == 1 ? _react2.default.createElement(
+	                    'button',
+	                    { className: 'leave', onClick: comp.handleLeaveGame.bind(comp, table) },
+	                    'Leave'
+	                  ) : '',
+	                  table.player_id !== _config2.default.state.user.id && table.allow_signups == 1 && table.joined < 1 ? _react2.default.createElement(
+	                    'button',
+	                    { className: 'join', onClick: comp.handleJoinGame.bind(comp, table) },
+	                    'Add to Plans'
+	                  ) : ''
+	                )
+	              )
+	            );
+	            //}else{
+	            //return '';
+	            //}
+	          })
+	        );
+	      } // end if
+	    }
+	  }, {
+	    key: 'renderNoTables',
+	    value: function renderNoTables() {
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'table-search-list-empty' },
+	        _react2.default.createElement(
+	          'h3',
+	          null,
+	          'No games listed.'
+	        ),
+	        _react2.default.createElement(
+	          'p',
+	          null,
+	          'There are no games left planned for this day.'
+	        )
+	      );
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var comp = this;
+	      var table = comp.state.active_game;
+	      return _react2.default.createElement(
+	        'div',
+	        { id: 'page-my-plans', className: 'transition-item page-my-plans page-wrap' },
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'calendar-days' },
+	          comp.renderCalendar()
+	        ),
+	        _react2.default.createElement(
+	          'div',
+	          { className: "table-list-wrap" + (comp.state.loaded ? " loading" : "") },
+	          comp.state.tables && comp.state.tables.length > 0 ? comp.renderTableList() : comp.renderNoTables()
+	        ),
+	        _react2.default.createElement(_Loaders.LoadingInline, {
+	          active: !comp.state.loaded
+	        }),
+	        _react2.default.createElement(
+	          _reactToolbox.Dialog,
+	          {
+	            className: 'game-popup',
+	            title: '',
+	            type: 'normal',
+	            onEscKeyDown: comp.handleCloseGamePopup.bind(comp),
+	            onOverlayClick: comp.handleCloseGamePopup.bind(comp),
+	            active: comp.state.game_popup,
+	            actions: [{ label: "Close", onClick: comp.handleCloseGamePopup.bind(comp), primary: true, raised: true }]
+	          },
+	          comp.state.active_game ? _react2.default.createElement(
+	            'div',
+	            { className: 'dtc-event' },
+	            _react2.default.createElement(
+	              'h2',
+	              null,
+	              table.title
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              null,
+	              _react2.default.createElement(
+	                'span',
+	                { className: 'table-item-tag' },
+	                'Host: ',
+	                table.host_name
+	              )
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              null,
+	              _react2.default.createElement(
+	                'span',
+	                { className: 'table-item-tag' },
+	                (0, _moment2.default)(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, h:mm a')
+	              ),
+	              _react2.default.createElement(
+	                'span',
+	                { className: 'table-item-tag' },
+	                table.table_location
+	              )
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              null,
+	              table.allow_signups == 1 ? _react2.default.createElement(
+	                'span',
+	                { className: 'plan-tag' },
+	                'Seats: ',
+	                table.seats
+	              ) : '',
+	              table.playtime && table.playtime !== '0' ? _react2.default.createElement(
+	                'span',
+	                { className: 'plan-tag' },
+	                'Takes ',
+	                table.playtime + ' hours'
+	              ) : ''
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { style: { marginTop: '10px' } },
+	              entities.html.decode(entities.xml.decode(table.description))
+	            )
+	          ) : _react2.default.createElement('div', null)
+	        ),
+	        _react2.default.createElement(
+	          _reactToolbox.Dialog,
+	          {
+	            className: 'link-popup',
+	            title: '',
+	            type: 'small',
+	            onEscKeyDown: comp.handleCloseLinkPopup.bind(comp),
+	            onOverlayClick: comp.handleCloseLinkPopup.bind(comp),
+	            active: comp.state.link_popup !== false,
+	            actions: [{ label: "Close", onClick: comp.handleCloseLinkPopup.bind(comp), primary: true, raised: true }]
+	          },
+	          _react2.default.createElement(
+	            'a',
+	            { href: comp.state.link_popup },
+	            comp.state.link_popup
+	          )
+	        )
+	      );
+	    }
+	  }]);
+	
+	  return OfficialEvents;
+	}(_react2.default.Component);
+	
+	exports.default = OfficialEvents;
 
 /***/ })
 /******/ ]);

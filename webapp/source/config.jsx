@@ -46,6 +46,9 @@ const CONFIG = {
     joinTable: baseAPI+"tables/join",
     leaveTable: baseAPI+"tables/leave",
     lfp: baseAPI+"lfp",
+
+    getEventsByDay: baseAPI+"events/byday",
+
     homeLists: baseAPI+"lists/top_home"
   },
 
