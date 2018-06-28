@@ -5,7 +5,7 @@ abstract class Events
 {
   static function parse_csv_import($pdo, $filename)
   {
-    die();
+    //die();
     $baseurl = __DIR__.'/../../../templates/';
     $filepath = $baseurl . $filename;
 
