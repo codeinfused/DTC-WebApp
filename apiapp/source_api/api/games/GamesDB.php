@@ -94,9 +94,18 @@ abstract class GamesDB
     $exec_params = array();
 
     $dbCheck = $context->db->prepare(
-      "SELECT COUNT(gt.id) AS games, gt.bgg_id, db.*
+      // "SELECT COUNT(gt.id) AS games, gt.bgg_id, db.*
+      //   FROM game_tables gt
+      //   LEFT JOIN bgg_game_db db ON db.bgg_id = gt.bgg_id
+      //   GROUP BY gt.bgg_id
+      //   ORDER BY games DESC LIMIT 10"
+      "SELECT COUNT(gt.id)+IF(COUNT(gs.id)>1,1,0) AS games, gt.bgg_id, db.*
         FROM game_tables gt
         LEFT JOIN bgg_game_db db ON db.bgg_id = gt.bgg_id
+        LEFT JOIN game_signups gs ON gs.table_id = gt.id
+        WHERE gt.status = 'ready'
+        AND db.title IS NOT NULL
+        AND gt.start_datetime < NOW()
         GROUP BY gt.bgg_id
         ORDER BY games DESC LIMIT 10"
     );

@@ -118,14 +118,14 @@ abstract class Tables
   static function my_plans($pdo, $uid)
   {
     $dbCheck = $pdo->prepare(
-      "SELECT db.title, tb.id as table_id, tb.player_id, tb.table_type, tb.bgg_id, tb.seats, tb.table_location,
+      "SELECT db.title, tb.title as event_title, tb.id as table_id, tb.player_id, tb.host, tb.table_type, tb.subtype, tb.bgg_id, tb.seats, tb.table_location, tb.description,
       tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft, tb.private, tb.allow_signups, tb.status, tb.playtime, ROUND((db.minplaytime+db.maxplaytime)/2) as avgplay,
       CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as host_name,
       (SELECT count(id) FROM game_signups WHERE table_id=tb.id AND player_id=:uid) as joined,
       (SELECT count(*) FROM game_signups WHERE table_id=tb.id) as signups
       FROM game_tables tb
       LEFT JOIN game_signups gs ON gs.table_id = tb.id
-      JOIN bgg_game_db db ON tb.bgg_id = db.bgg_id
+      LEFT JOIN bgg_game_db db ON tb.bgg_id = db.bgg_id
       LEFT JOIN users u ON u.id = tb.player_id
       WHERE (tb.player_id=:uid OR gs.player_id=:uid)
       AND tb.start_datetime > NOW() - INTERVAL 20 MINUTE

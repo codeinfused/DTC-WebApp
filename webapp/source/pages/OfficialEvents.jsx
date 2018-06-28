@@ -30,10 +30,19 @@ class OfficialEvents extends React.Component
       currentDayFull: day,
       tables: [],
       game_popup: false,
-      link_popup: false
+      link_popup: false,
+      event_filters: ['dtc', 'panel', 'tournament', 'demo', '']
     };
 
     this.conDays = CONFIG.conDays;
+
+    this.eventFilters = {
+      'dtc': 'Dice Tower',
+      'panel': 'Panels',
+      'tournament': 'Tournaments',
+      'demo': 'Demos',
+      '': 'Other'
+    };
 
     this.renderTableList = this.renderTableList.bind(this);
     this.renderNoTables = this.renderNoTables.bind(this);
@@ -193,6 +202,19 @@ class OfficialEvents extends React.Component
     comp.setState({tables: tables});
   }
 
+  handleToggleEventFilter(key)
+  {
+    var comp = this;
+    var filters = comp.state.event_filters;
+    var i = filters.indexOf(key);
+    if(i > -1){
+      filters.splice(i, 1);
+    }else{
+      filters.push(key);
+    }
+    comp.setState({event_filters: filters});
+  }
+
 
   renderCalendar()
   {
@@ -210,6 +232,21 @@ class OfficialEvents extends React.Component
     });
   }
 
+  renderEventFilters()
+  {
+    var comp = this;
+    return (
+      <div className="events-filters">
+        {Object.keys(comp.eventFilters).map(function(key, i){
+          var filterText = comp.eventFilters[key];
+          var isOn = comp.state.event_filters.indexOf(key) > -1 ? ' active' : '';
+          return (
+            <div className={"event-filter"+isOn} key={"filter-"+key} onClick={comp.handleToggleEventFilter.bind(comp, key)}><span>{filterText}</span></div>
+          );
+        })}
+      </div>
+    )
+  }
 
   renderTableList()
   {
@@ -229,12 +266,13 @@ class OfficialEvents extends React.Component
         <ul className="plans-timeline">
           {thisDayList.map(function(table, i)
           {
+            if(comp.state.event_filters.indexOf(table.subtype)<0){ return; }
             var isMyTable = table.player_id === CONFIG.state.user.id;
             var calIcon = table.joined==1 ? "fa-calendar-check-o" : "fa-calendar-o";
             //var isSelected = moment(selectedObj[0].full, 'YYYY-MM-DD').isSame(moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss'), 'day');
             //if(isSelected){
               return (
-                <li key={"table-item-"+table.table_id} className={table.status+" "+(isMyTable?"mytable":table.joined==1?"joined":"")}>
+                <li key={"table-item-"+table.table_id} className={"dtc-event "+table.status+" "+(isMyTable?"mytable":table.joined==1?"joined":"")}>
                   <i className={table.status==='cancelled' ? "fa fa-calendar-times-o cancelled" : "fa "+calIcon}></i>
                   {table.lft=='1' ? (<i className="fa fa-graduation-cap"></i>) : ''}
                   <div className="plans-item">
@@ -243,7 +281,7 @@ class OfficialEvents extends React.Component
                       <p className="plans-time">{table.status==='cancelled' ? 'Cancelled' : moment(table.start_datetime).fromNow()}</p>
                       {/* <span className="plan-tag">{moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, MMM Do YYYY, h:mm a')}</span> */}
                       <span className="plan-tag">{moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, h:mm a')}</span>
-                      {table.playtime && table.playtime!=='0' ? (<span className="plan-tag">Takes {table.playtime + ' hours'}</span>) : ''}
+                      {table.playtime && table.playtime!=='0' ? (<span className="plan-tag">Takes {table.playtime}</span>) : ''}
                       <span className="plan-tag">{table.table_location}</span>
                       <span className={"plan-tag" + (isMyTable ? " hosting" : " otherhost")}>Host: {(isMyTable ? "Me" : table.host_name)}</span>
                       {table.allow_signups==1 ? (<span className="plan-tag">Seats: {table.seats}</span>) : ''}
@@ -283,6 +321,7 @@ class OfficialEvents extends React.Component
       <div id="page-my-plans" className="transition-item page-my-plans page-wrap">
 
         <div className="calendar-days">{comp.renderCalendar()}</div>
+        {/* {comp.renderEventFilters()} */}
         <div className={"table-list-wrap" + (comp.state.loaded ? " loading" : "")}>
           {(comp.state.tables && comp.state.tables.length > 0) ? comp.renderTableList() : comp.renderNoTables()}
         </div>
@@ -307,8 +346,8 @@ class OfficialEvents extends React.Component
               <h2>{table.title}</h2>
               <div><span className="table-item-tag">Host: {table.host_name}</span></div>
               <div><span className="table-item-tag">{moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, h:mm a')}</span><span className="table-item-tag">{table.table_location}</span></div>
-              <div>{table.allow_signups==1 ? (<span className="plan-tag">Seats: {table.seats}</span>) : ''}{table.playtime && table.playtime!=='0' ? (<span className="plan-tag">Takes {table.playtime + ' hours'}</span>) : ''}</div>
-              <div style={{marginTop: '10px'}}>{entities.html.decode(entities.xml.decode(table.description))}</div>
+              <div>{table.allow_signups==1 ? (<span className="plan-tag">Seats: {table.seats}</span>) : ''}{table.playtime && table.playtime!=='0' ? (<span className="plan-tag">Takes {table.playtime}</span>) : ''}</div>
+              <div style={{marginTop: '10px'}}>{entities.html.decode(entities.xml.decode(table.description))}<p style={{fontStyle:'italic', color:'#aaa'}}><strong>Note:</strong> adding this to your plans does not gaurantee a seat at the event. Sign up at the DTC Headquarters table.</p></div>
             </div>
           : <div />}
         </Dialog>

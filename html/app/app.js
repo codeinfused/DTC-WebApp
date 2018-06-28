@@ -145,11 +145,11 @@
 	
 	var _ScheduledList2 = _interopRequireDefault(_ScheduledList);
 	
-	var _OfficialEvents = __webpack_require__(855);
+	var _OfficialEvents = __webpack_require__(854);
 	
 	var _OfficialEvents2 = _interopRequireDefault(_OfficialEvents);
 	
-	var _Privacy = __webpack_require__(854);
+	var _Privacy = __webpack_require__(855);
 	
 	var _Privacy2 = _interopRequireDefault(_Privacy);
 	
@@ -97459,7 +97459,7 @@
 	
 	      return _react2.default.createElement(
 	        'div',
-	        { className: 'game-search-list clearfix' },
+	        { className: 'game-search-list clearfix', style: { top: '75px' } },
 	        comp.state.games.map(function (game, i) {
 	          var notifyActive = _config2.default.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
 	          var wtpActive = _config2.default.state.user.wtp.indexOf(game.bgg_id) > -1 ? " active" : "";
@@ -97736,7 +97736,7 @@
 	              { className: 'clearfix' },
 	              _react2.default.createElement(
 	                'div',
-	                { className: '' },
+	                { className: 'hidden', style: { display: 'none' } },
 	                _react2.default.createElement(
 	                  'fieldset',
 	                  { style: { display: 'inline', border: 'none', margin: '0', padding: '0', width: '100%', fontSize: '1.275rem' } },
@@ -98603,7 +98603,6 @@
 	    key: 'render',
 	    value: function render() {
 	      var comp = this;
-	      console.log(comp.props);
 	      return _react2.default.createElement(
 	        'div',
 	        { className: 'map-popup-cm', style: { display: "inline-block" } },
@@ -98755,6 +98754,11 @@
 	      private: false
 	    };
 	
+	    var d = (0, _moment2.default)(_this.state.start_date);
+	    var t = (0, _moment2.default)(_this.state.start_time);
+	    var tRounded = MomentRound(t, _moment2.default.duration(15, "minutes"), "round");
+	    _this.state.start_datetime = d.format('YYYY-MM-DD') + ' ' + tRounded.format('HH:mm:00');
+	
 	    _this.getGameData = _this.getGameData.bind(_this);
 	    _this.handleSubmitTable = _this.handleSubmitTable.bind(_this);
 	    _this.handleCloseDialog = _this.handleCloseDialog.bind(_this);
@@ -98865,7 +98869,6 @@
 	      //var start_date = d.format('YYYY-MM-DD');
 	      //var start_time = d.format('HH:mm:00');
 	      var dRounded = MomentRound(d, _moment2.default.duration(15, "minutes"), "ceil");
-	      console.log(dRounded);
 	      var d_obj = dRounded.toDate();
 	
 	      comp.setState({
@@ -100559,6 +100562,8 @@
 	
 	var _GamePopup2 = _interopRequireDefault(_GamePopup);
 	
+	var _htmlEntities = __webpack_require__(839);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -100566,6 +100571,8 @@
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var entities = { xml: new _htmlEntities.XmlEntities(), html: new _htmlEntities.AllHtmlEntities() };
 	
 	var MyPlans = function (_React$Component) {
 	  _inherits(MyPlans, _React$Component);
@@ -100586,7 +100593,8 @@
 	      currentTableId: -1,
 	      tables: [],
 	      game_popup: false,
-	      link_popup: false
+	      link_popup: false,
+	      event_popup: false
 	    };
 	
 	    _this.conDays = _config2.default.conDays;
@@ -100618,6 +100626,23 @@
 	  }, {
 	    key: 'componentWillReceiveProps',
 	    value: function componentWillReceiveProps(nextProps) {}
+	  }, {
+	    key: 'handleEventPopup',
+	    value: function handleEventPopup(table) {
+	      var comp = this;
+	      comp.setState({
+	        event_popup: true,
+	        active_event: table
+	      });
+	    }
+	  }, {
+	    key: 'handleCloseEventPopup',
+	    value: function handleCloseEventPopup() {
+	      var comp = this;
+	      comp.setState({
+	        event_popup: false
+	      });
+	    }
 	  }, {
 	    key: 'handleGamePopup',
 	    value: function handleGamePopup(bgg_id) {
@@ -100790,7 +100815,7 @@
 	            //if(isSelected){
 	            return _react2.default.createElement(
 	              'li',
-	              { key: "table-item-" + table.table_id, className: table.status + " " + (isMyTable ? "mytable" : table.joined == 1 ? "joined" : "") },
+	              { key: "table-item-" + table.table_id, className: table.table_type + " " + table.status + " " + (isMyTable ? "mytable" : table.joined == 1 ? "joined" : "") },
 	              _react2.default.createElement('i', { className: table.status === 'cancelled' ? "fa fa-calendar-times-o cancelled" : "fa " + calIcon }),
 	              table.lft == '1' ? _react2.default.createElement('i', { className: 'fa fa-graduation-cap' }) : '',
 	              _react2.default.createElement(
@@ -100802,9 +100827,13 @@
 	                  _react2.default.createElement(
 	                    'a',
 	                    { href: '', onClick: function onClick(e) {
-	                        comp.handleGamePopup(table.bgg_id);e.preventDefault();
+	                        if (table.bgg_id) {
+	                          comp.handleGamePopup(table.bgg_id);
+	                        } else {
+	                          comp.handleEventPopup(table);
+	                        }e.preventDefault();
 	                      } },
-	                    table.title
+	                    table.title ? table.title : table.event_title
 	                  )
 	                ),
 	                _react2.default.createElement(
@@ -100818,9 +100847,9 @@
 	                  _react2.default.createElement(
 	                    'span',
 	                    { className: 'plan-tag' },
-	                    (0, _moment2.default)(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, M/D/Y, h:mm a')
+	                    (0, _moment2.default)(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, h:mm a')
 	                  ),
-	                  _react2.default.createElement(
+	                  !table.playtime && !table.avgplay ? '' : _react2.default.createElement(
 	                    'span',
 	                    { className: 'plan-tag' },
 	                    'Takes ',
@@ -100829,20 +100858,25 @@
 	                  _react2.default.createElement(
 	                    'span',
 	                    { className: 'plan-tag' },
-	                    table.table_location + ' ' + (table.table_sublocation_alpha || '') + '-' + (table.table_sublocation_num || '')
+	                    table.table_location + (table.table_sublocation_alpha ? ' ' + table.table_sublocation_alpha + '-' + table.table_sublocation_num : '')
 	                  ),
 	                  _react2.default.createElement(
 	                    'span',
 	                    { className: "plan-tag" + (isMyTable ? " hosting" : " otherhost") },
-	                    isMyTable ? table.private == 1 ? "Unlisted" : "Host: Me" : "Host: " + table.host_name
+	                    isMyTable ? table.private == 1 ? "Unlisted" : "Host: Me" : "Host: " + (table.host ? table.host : table.host_name)
 	                  ),
-	                  table.allow_signups == 1 ? _react2.default.createElement(
+	                  table.allow_signups == 1 && table.table_type !== 'dtc-event' ? _react2.default.createElement(
 	                    'span',
 	                    { className: 'plan-tag' },
 	                    table.signups,
 	                    ' of ',
 	                    table.seats,
 	                    ' seats taken'
+	                  ) : table.table_type === 'dtc_event' ? _react2.default.createElement(
+	                    'span',
+	                    { className: 'plan-tag' },
+	                    'Seats: ',
+	                    table.seats
 	                  ) : ''
 	                ),
 	                _react2.default.createElement(
@@ -100858,7 +100892,7 @@
 	                    { onClick: comp.handleLeaveGame.bind(comp, table) },
 	                    'Leave'
 	                  ) : '',
-	                  table.allow_signups == 1 ? _react2.default.createElement(
+	                  table.allow_signups == 1 && table.table_type !== 'dtc-event' ? _react2.default.createElement(
 	                    'button',
 	                    { className: 'players', onClick: _config2.default.state.index.openTableDialog.bind(_config2.default.state.index, table.table_id) },
 	                    'Players'
@@ -100870,7 +100904,7 @@
 	                      } },
 	                    _react2.default.createElement(_reactToolbox.FontIcon, { value: 'edit' })
 	                  ) : '',
-	                  table.status !== 'cancelled' ? _react2.default.createElement(
+	                  table.status !== 'cancelled' && table.table_type !== 'dtc-event' ? _react2.default.createElement(
 	                    'button',
 	                    { className: 'edit has-icon', onClick: comp.handleLinkPopup.bind(comp, table.table_id) },
 	                    _react2.default.createElement(_reactToolbox.FontIcon, { value: 'link' })
@@ -100907,6 +100941,8 @@
 	    key: 'render',
 	    value: function render() {
 	      var comp = this;
+	      var table = comp.state.active_event;
+	
 	      return _react2.default.createElement(
 	        'div',
 	        { id: 'page-my-plans', className: 'transition-item page-my-plans page-wrap' },
@@ -100970,6 +101006,82 @@
 	            { href: comp.state.link_popup },
 	            comp.state.link_popup
 	          )
+	        ),
+	        _react2.default.createElement(
+	          _reactToolbox.Dialog,
+	          {
+	            className: 'event-popup',
+	            title: '',
+	            type: 'normal',
+	            onEscKeyDown: comp.handleCloseEventPopup.bind(comp),
+	            onOverlayClick: comp.handleCloseEventPopup.bind(comp),
+	            active: comp.state.event_popup,
+	            actions: [{ label: "Close", onClick: comp.handleCloseEventPopup.bind(comp), primary: true, raised: true }]
+	          },
+	          comp.state.active_event ? _react2.default.createElement(
+	            'div',
+	            { className: 'dtc-event' },
+	            _react2.default.createElement(
+	              'h2',
+	              null,
+	              table.event_title
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              null,
+	              _react2.default.createElement(
+	                'span',
+	                { className: 'table-item-tag' },
+	                'Host: ',
+	                table.host
+	              )
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              null,
+	              _react2.default.createElement(
+	                'span',
+	                { className: 'table-item-tag' },
+	                (0, _moment2.default)(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, h:mm a')
+	              ),
+	              _react2.default.createElement(
+	                'span',
+	                { className: 'table-item-tag' },
+	                table.table_location
+	              )
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              null,
+	              table.allow_signups == 1 ? _react2.default.createElement(
+	                'span',
+	                { className: 'plan-tag' },
+	                'Seats: ',
+	                table.seats
+	              ) : '',
+	              table.playtime && table.playtime !== '0' ? _react2.default.createElement(
+	                'span',
+	                { className: 'plan-tag' },
+	                'Takes ',
+	                table.playtime
+	              ) : ''
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { style: { marginTop: '10px' } },
+	              entities.html.decode(entities.xml.decode(table.description)),
+	              _react2.default.createElement(
+	                'p',
+	                { style: { fontStyle: 'italic', color: '#aaa' } },
+	                _react2.default.createElement(
+	                  'strong',
+	                  null,
+	                  'Note:'
+	                ),
+	                ' adding this to your plans does not gaurantee a seat at the event. Sign up at the DTC Headquarters table.'
+	              )
+	            )
+	          ) : _react2.default.createElement('div', null)
 	        )
 	      );
 	    }
@@ -102709,192 +102821,6 @@
 	
 	var _button = __webpack_require__(244);
 	
-	var _Loaders = __webpack_require__(715);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var Privacy = function (_React$Component) {
-	  _inherits(Privacy, _React$Component);
-	
-	  function Privacy(props) {
-	    _classCallCheck(this, Privacy);
-	
-	    var _this = _possibleConstructorReturn(this, (Privacy.__proto__ || Object.getPrototypeOf(Privacy)).call(this, props));
-	
-	    _this.state = {
-	      loader: false
-	    };
-	    return _this;
-	  }
-	
-	  _createClass(Privacy, [{
-	    key: 'render',
-	    value: function render() {
-	      var comp = this;
-	
-	      return _react2.default.createElement(
-	        'div',
-	        { id: 'page-privacy', className: 'transition-item page-privacy page-wrap page-basic' },
-	        _react2.default.createElement(
-	          'h2',
-	          null,
-	          'DTC App Privacy Policy'
-	        ),
-	        _react2.default.createElement(
-	          'p',
-	          null,
-	          'Last updated: 5/4/2018'
-	        ),
-	        _react2.default.createElement(
-	          'p',
-	          null,
-	          'If you want to create game tables or reserve space at another player\'s table, you\'ll need to be authenticated through either facebook or google on dtcapp.com (this "Site").'
-	        ),
-	        _react2.default.createElement(
-	          'p',
-	          null,
-	          'This page informs you of our policies regarding the collection, use and disclosure of Personal Information we receive from users of the Site by logging in.'
-	        ),
-	        _react2.default.createElement(
-	          'p',
-	          null,
-	          'We use your Personal Information only for authentication and improving the Site. By using the Site, you agree to the collection and use of information in accordance with this policy.'
-	        ),
-	        _react2.default.createElement(
-	          'h2',
-	          null,
-	          'Information Collection And Use'
-	        ),
-	        _react2.default.createElement(
-	          'p',
-	          null,
-	          'While using our Site, we may ask you to provide us with certain personally identifiable information that can be used to contact or identify you. Personally identifiable information may include, but is not limited to your name ("Personal Information") and email address.'
-	        ),
-	        _react2.default.createElement(
-	          'h2',
-	          null,
-	          'Log Data'
-	        ),
-	        _react2.default.createElement(
-	          'p',
-	          null,
-	          'Like many site operators, we collect basic information that your browser sends whenever you visit our Site ("Log Data"). This Log Data may include information such as your computer\'s Internet Protocol ("IP") address, browser type, browser version, the pages of our Site that you visit, the time and date of your visit, the time spent on those pages and other statistics.'
-	        ),
-	        _react2.default.createElement(
-	          'p',
-	          null,
-	          'In addition, we may use third party services such as Google Analytics that collect, monitor and analyze this usage data.'
-	        ),
-	        _react2.default.createElement(
-	          'h2',
-	          null,
-	          'Communications'
-	        ),
-	        _react2.default.createElement(
-	          'p',
-	          null,
-	          'We may use your Personal Information to contact you with information that relates to improving your experience with the Site, and in response to actions you take on the Site such as asking for notifications of game tables.'
-	        ),
-	        _react2.default.createElement(
-	          'h2',
-	          null,
-	          'Cookies'
-	        ),
-	        _react2.default.createElement(
-	          'p',
-	          null,
-	          'Cookies are files with small amount of data, which may include an anonymous unique identifier. Cookies are sent to your browser from a web site and stored on your computer\'s hard drive. Like most sites, we use "cookies" to preserve your logged in state. You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent. However, if you do not accept cookies, you will only be able to use the Site as a guest.'
-	        ),
-	        _react2.default.createElement(
-	          'h2',
-	          null,
-	          'Security'
-	        ),
-	        _react2.default.createElement(
-	          'p',
-	          null,
-	          'The security of your Personal Information is important, but remember that no method of transmission over the Internet, or method of electronic storage, is 100% secure. While we strive to use commercially acceptable means to protect your Personal Information, we cannot guarantee its absolute security.'
-	        ),
-	        _react2.default.createElement(
-	          'h2',
-	          null,
-	          'Changes To This Privacy Policy'
-	        ),
-	        _react2.default.createElement(
-	          'p',
-	          null,
-	          'This Privacy Policy is effective as of 5/4/2018 and will remain in effect except with respect to any changes in its provisions in the future, which will be in effect immediately after being posted on this page.'
-	        ),
-	        _react2.default.createElement(
-	          'p',
-	          null,
-	          'We reserve the right to update or change our Privacy Policy at any time and you should check this Privacy Policy periodically. Your continued use of the Service after we post any modifications to the Privacy Policy on this page will constitute your acknowledgment of the modifications and your consent to abide and be bound by the modified Privacy Policy.'
-	        ),
-	        _react2.default.createElement(
-	          'p',
-	          null,
-	          'If we make any material changes to this Privacy Policy, we will notify you either through the email address you have provided us, or by placing a notice on our website.'
-	        ),
-	        _react2.default.createElement(
-	          'h2',
-	          null,
-	          'Contact Us'
-	        ),
-	        _react2.default.createElement(
-	          'p',
-	          null,
-	          'If you have any questions about this Privacy Policy, please contact us.'
-	        ),
-	        _react2.default.createElement(_Loaders.LoadingInline, {
-	          active: comp.state.loader
-	        })
-	      );
-	    }
-	  }]);
-	
-	  return Privacy;
-	}(_react2.default.Component);
-	
-	;
-	
-	exports.default = Privacy;
-
-/***/ }),
-/* 855 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _config = __webpack_require__(552);
-	
-	var _config2 = _interopRequireDefault(_config);
-	
-	var _axios = __webpack_require__(525);
-	
-	var _axios2 = _interopRequireDefault(_axios);
-	
-	var _react = __webpack_require__(2);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	var _reactRouter = __webpack_require__(185);
-	
-	var _reactToolbox = __webpack_require__(243);
-	
-	var _button = __webpack_require__(244);
-	
 	var _reactTransitionGroup = __webpack_require__(551);
 	
 	var _lodash = __webpack_require__(554);
@@ -102943,10 +102869,19 @@
 	      currentDayFull: day,
 	      tables: [],
 	      game_popup: false,
-	      link_popup: false
+	      link_popup: false,
+	      event_filters: ['dtc', 'panel', 'tournament', 'demo', '']
 	    };
 	
 	    _this.conDays = _config2.default.conDays;
+	
+	    _this.eventFilters = {
+	      'dtc': 'Dice Tower',
+	      'panel': 'Panels',
+	      'tournament': 'Tournaments',
+	      'demo': 'Demos',
+	      '': 'Other'
+	    };
 	
 	    _this.renderTableList = _this.renderTableList.bind(_this);
 	    _this.renderNoTables = _this.renderNoTables.bind(_this);
@@ -103109,6 +103044,19 @@
 	      comp.setState({ tables: tables });
 	    }
 	  }, {
+	    key: 'handleToggleEventFilter',
+	    value: function handleToggleEventFilter(key) {
+	      var comp = this;
+	      var filters = comp.state.event_filters;
+	      var i = filters.indexOf(key);
+	      if (i > -1) {
+	        filters.splice(i, 1);
+	      } else {
+	        filters.push(key);
+	      }
+	      comp.setState({ event_filters: filters });
+	    }
+	  }, {
 	    key: 'renderCalendar',
 	    value: function renderCalendar() {
 	      var comp = this;
@@ -103135,6 +103083,28 @@
 	      });
 	    }
 	  }, {
+	    key: 'renderEventFilters',
+	    value: function renderEventFilters() {
+	      var comp = this;
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'events-filters' },
+	        Object.keys(comp.eventFilters).map(function (key, i) {
+	          var filterText = comp.eventFilters[key];
+	          var isOn = comp.state.event_filters.indexOf(key) > -1 ? ' active' : '';
+	          return _react2.default.createElement(
+	            'div',
+	            { className: "event-filter" + isOn, key: "filter-" + key, onClick: comp.handleToggleEventFilter.bind(comp, key) },
+	            _react2.default.createElement(
+	              'span',
+	              null,
+	              filterText
+	            )
+	          );
+	        })
+	      );
+	    }
+	  }, {
 	    key: 'renderTableList',
 	    value: function renderTableList() {
 	      var comp = this;
@@ -103157,13 +103127,16 @@
 	          'ul',
 	          { className: 'plans-timeline' },
 	          thisDayList.map(function (table, i) {
+	            if (comp.state.event_filters.indexOf(table.subtype) < 0) {
+	              return;
+	            }
 	            var isMyTable = table.player_id === _config2.default.state.user.id;
 	            var calIcon = table.joined == 1 ? "fa-calendar-check-o" : "fa-calendar-o";
 	            //var isSelected = moment(selectedObj[0].full, 'YYYY-MM-DD').isSame(moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss'), 'day');
 	            //if(isSelected){
 	            return _react2.default.createElement(
 	              'li',
-	              { key: "table-item-" + table.table_id, className: table.status + " " + (isMyTable ? "mytable" : table.joined == 1 ? "joined" : "") },
+	              { key: "table-item-" + table.table_id, className: "dtc-event " + table.status + " " + (isMyTable ? "mytable" : table.joined == 1 ? "joined" : "") },
 	              _react2.default.createElement('i', { className: table.status === 'cancelled' ? "fa fa-calendar-times-o cancelled" : "fa " + calIcon }),
 	              table.lft == '1' ? _react2.default.createElement('i', { className: 'fa fa-graduation-cap' }) : '',
 	              _react2.default.createElement(
@@ -103197,7 +103170,7 @@
 	                    'span',
 	                    { className: 'plan-tag' },
 	                    'Takes ',
-	                    table.playtime + ' hours'
+	                    table.playtime
 	                  ) : '',
 	                  _react2.default.createElement(
 	                    'span',
@@ -103340,13 +103313,23 @@
 	                'span',
 	                { className: 'plan-tag' },
 	                'Takes ',
-	                table.playtime + ' hours'
+	                table.playtime
 	              ) : ''
 	            ),
 	            _react2.default.createElement(
 	              'div',
 	              { style: { marginTop: '10px' } },
-	              entities.html.decode(entities.xml.decode(table.description))
+	              entities.html.decode(entities.xml.decode(table.description)),
+	              _react2.default.createElement(
+	                'p',
+	                { style: { fontStyle: 'italic', color: '#aaa' } },
+	                _react2.default.createElement(
+	                  'strong',
+	                  null,
+	                  'Note:'
+	                ),
+	                ' adding this to your plans does not gaurantee a seat at the event. Sign up at the DTC Headquarters table.'
+	              )
 	            )
 	          ) : _react2.default.createElement('div', null)
 	        ),
@@ -103375,6 +103358,192 @@
 	}(_react2.default.Component);
 	
 	exports.default = OfficialEvents;
+
+/***/ }),
+/* 855 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _config = __webpack_require__(552);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	var _axios = __webpack_require__(525);
+	
+	var _axios2 = _interopRequireDefault(_axios);
+	
+	var _react = __webpack_require__(2);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _reactRouter = __webpack_require__(185);
+	
+	var _reactToolbox = __webpack_require__(243);
+	
+	var _button = __webpack_require__(244);
+	
+	var _Loaders = __webpack_require__(715);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Privacy = function (_React$Component) {
+	  _inherits(Privacy, _React$Component);
+	
+	  function Privacy(props) {
+	    _classCallCheck(this, Privacy);
+	
+	    var _this = _possibleConstructorReturn(this, (Privacy.__proto__ || Object.getPrototypeOf(Privacy)).call(this, props));
+	
+	    _this.state = {
+	      loader: false
+	    };
+	    return _this;
+	  }
+	
+	  _createClass(Privacy, [{
+	    key: 'render',
+	    value: function render() {
+	      var comp = this;
+	
+	      return _react2.default.createElement(
+	        'div',
+	        { id: 'page-privacy', className: 'transition-item page-privacy page-wrap page-basic' },
+	        _react2.default.createElement(
+	          'h2',
+	          null,
+	          'DTC App Privacy Policy'
+	        ),
+	        _react2.default.createElement(
+	          'p',
+	          null,
+	          'Last updated: 5/4/2018'
+	        ),
+	        _react2.default.createElement(
+	          'p',
+	          null,
+	          'If you want to create game tables or reserve space at another player\'s table, you\'ll need to be authenticated through either facebook or google on dtcapp.com (this "Site").'
+	        ),
+	        _react2.default.createElement(
+	          'p',
+	          null,
+	          'This page informs you of our policies regarding the collection, use and disclosure of Personal Information we receive from users of the Site by logging in.'
+	        ),
+	        _react2.default.createElement(
+	          'p',
+	          null,
+	          'We use your Personal Information only for authentication and improving the Site. By using the Site, you agree to the collection and use of information in accordance with this policy.'
+	        ),
+	        _react2.default.createElement(
+	          'h2',
+	          null,
+	          'Information Collection And Use'
+	        ),
+	        _react2.default.createElement(
+	          'p',
+	          null,
+	          'While using our Site, we may ask you to provide us with certain personally identifiable information that can be used to contact or identify you. Personally identifiable information may include, but is not limited to your name ("Personal Information") and email address.'
+	        ),
+	        _react2.default.createElement(
+	          'h2',
+	          null,
+	          'Log Data'
+	        ),
+	        _react2.default.createElement(
+	          'p',
+	          null,
+	          'Like many site operators, we collect basic information that your browser sends whenever you visit our Site ("Log Data"). This Log Data may include information such as your computer\'s Internet Protocol ("IP") address, browser type, browser version, the pages of our Site that you visit, the time and date of your visit, the time spent on those pages and other statistics.'
+	        ),
+	        _react2.default.createElement(
+	          'p',
+	          null,
+	          'In addition, we may use third party services such as Google Analytics that collect, monitor and analyze this usage data.'
+	        ),
+	        _react2.default.createElement(
+	          'h2',
+	          null,
+	          'Communications'
+	        ),
+	        _react2.default.createElement(
+	          'p',
+	          null,
+	          'We may use your Personal Information to contact you with information that relates to improving your experience with the Site, and in response to actions you take on the Site such as asking for notifications of game tables.'
+	        ),
+	        _react2.default.createElement(
+	          'h2',
+	          null,
+	          'Cookies'
+	        ),
+	        _react2.default.createElement(
+	          'p',
+	          null,
+	          'Cookies are files with small amount of data, which may include an anonymous unique identifier. Cookies are sent to your browser from a web site and stored on your computer\'s hard drive. Like most sites, we use "cookies" to preserve your logged in state. You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent. However, if you do not accept cookies, you will only be able to use the Site as a guest.'
+	        ),
+	        _react2.default.createElement(
+	          'h2',
+	          null,
+	          'Security'
+	        ),
+	        _react2.default.createElement(
+	          'p',
+	          null,
+	          'The security of your Personal Information is important, but remember that no method of transmission over the Internet, or method of electronic storage, is 100% secure. While we strive to use commercially acceptable means to protect your Personal Information, we cannot guarantee its absolute security.'
+	        ),
+	        _react2.default.createElement(
+	          'h2',
+	          null,
+	          'Changes To This Privacy Policy'
+	        ),
+	        _react2.default.createElement(
+	          'p',
+	          null,
+	          'This Privacy Policy is effective as of 5/4/2018 and will remain in effect except with respect to any changes in its provisions in the future, which will be in effect immediately after being posted on this page.'
+	        ),
+	        _react2.default.createElement(
+	          'p',
+	          null,
+	          'We reserve the right to update or change our Privacy Policy at any time and you should check this Privacy Policy periodically. Your continued use of the Service after we post any modifications to the Privacy Policy on this page will constitute your acknowledgment of the modifications and your consent to abide and be bound by the modified Privacy Policy.'
+	        ),
+	        _react2.default.createElement(
+	          'p',
+	          null,
+	          'If we make any material changes to this Privacy Policy, we will notify you either through the email address you have provided us, or by placing a notice on our website.'
+	        ),
+	        _react2.default.createElement(
+	          'h2',
+	          null,
+	          'Contact Us'
+	        ),
+	        _react2.default.createElement(
+	          'p',
+	          null,
+	          'If you have any questions about this Privacy Policy, please contact us.'
+	        ),
+	        _react2.default.createElement(_Loaders.LoadingInline, {
+	          active: comp.state.loader
+	        })
+	      );
+	    }
+	  }]);
+	
+	  return Privacy;
+	}(_react2.default.Component);
+	
+	;
+	
+	exports.default = Privacy;
 
 /***/ })
 /******/ ]);

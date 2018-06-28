@@ -10,7 +10,7 @@ abstract class Events
       tb.start_datetime, tb.playtime, tb.status, tb.allow_signups, tb.title, tb.description,
       (SELECT count(id) FROM game_signups WHERE table_id=tb.id AND player_id=:uid) as joined
       FROM game_tables tb
-      WHERE tb.table_type='dtc_event'
+      WHERE tb.table_type='dtc-event'
       AND tb.start_datetime LIKE :date
       AND tb.start_datetime > NOW() - INTERVAL 30 MINUTE
       AND tb.status='ready'

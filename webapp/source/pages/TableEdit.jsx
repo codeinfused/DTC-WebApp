@@ -101,6 +101,11 @@ class TableEdit extends React.Component
       private: false
     };
 
+    var d = moment(this.state.start_date);
+    var t = moment(this.state.start_time);
+    var tRounded = MomentRound(t, moment.duration(15, "minutes"), "round");
+    this.state.start_datetime = d.format('YYYY-MM-DD') +' '+ tRounded.format('HH:mm:00');
+
     this.getGameData = this.getGameData.bind(this);
     this.handleSubmitTable = this.handleSubmitTable.bind(this);
     this.handleCloseDialog = this.handleCloseDialog.bind(this);
@@ -211,7 +216,6 @@ class TableEdit extends React.Component
     //var start_date = d.format('YYYY-MM-DD');
     //var start_time = d.format('HH:mm:00');
     var dRounded = MomentRound(d, moment.duration(15, "minutes"), "ceil");
-    console.log(dRounded);
     var d_obj = dRounded.toDate();
 
     comp.setState({

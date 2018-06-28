@@ -44,14 +44,7 @@ abstract class Events
       "library gathering of games",
       "convention opens",
       "exhibitor hall opens",
-      "church service",
       "library"
-    ];
-
-    $titlesSubs = [
-      "tournament",
-      "panel"
-
     ];
 
     $row = 1;
@@ -77,6 +70,8 @@ abstract class Events
       if( strpos_arr($Ltitle, $titlesIgnore) !== false ){ continue; }
 
       $subtype = '';
+      if( strpos($Ltitle, 'championship') !== false ){ $subtype = 'tournament'; }
+      if( strpos($Ltitle, 'qualifier') !== false ){ $subtype = 'tournament'; }
       if( strpos($Ltitle, 'tournament') !== false ){ $subtype = 'tournament'; }
       if( strpos($Ltitle, 'panel') !== false ){ $subtype = 'panel'; }
       if( strpos($Ltitle, 'demo') !== false ){ $subtype = 'demo'; }
@@ -91,7 +86,7 @@ abstract class Events
 
       $length = 0;
       if(!empty($dateend) && !empty($datestart)){
-        $length = strtotime($dateend) - strtotime($datestart);
+        $length = abs(strtotime($dateend) - strtotime($datestart));
         $length = round(($length/60/60)*2) / 2;
       }
 
@@ -110,13 +105,13 @@ abstract class Events
     foreach($events as $i => $event)
     {
       $dbCheck = $pdo->prepare(
-        "INSERT INTO game_tables SET table_type='dtc_event', seats=:seats, table_location=:table_location, start_datetime=:start_datetime, playtime=:playtime, title=:title, description=:description, host=:host, subtype=:subtype"
+        "INSERT INTO game_tables SET table_type='dtc-event', allow_signups=1, seats=:seats, table_location=:table_location, start_datetime=:start_datetime, playtime=:playtime, title=:title, description=:description, host=:host, subtype=:subtype"
       );
       $dbCheck->execute(array(
         ':seats' => $event['seats'],
         ':table_location' => $event['room'],
         ':start_datetime' => $event['start'],
-        ':playtime' => $event['length'],
+        ':playtime' => (!empty($event['length']) ? $event['length'].' hours' : null),
         ':title' => $event['title'],
         ':description' => $event['desc'],
         ':host' => $event['host'],

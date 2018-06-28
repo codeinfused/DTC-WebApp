@@ -417,7 +417,7 @@ class SearchGames extends React.Component
     }
 
     return (
-      <div className="game-search-list clearfix">
+      <div className="game-search-list clearfix" style={{top:'75px'}}>
         {comp.state.games.map(function(game, i)
         {
           var notifyActive = CONFIG.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
@@ -546,7 +546,7 @@ class SearchGames extends React.Component
               </div>
             </div>
             <div className="clearfix">
-              <div className="">
+              <div className="hidden" style={{display:'none'}}>
                 <fieldset style={{display:'inline', border:'none', margin:'0', padding:'0', width:'100%', fontSize:'1.275rem'}}>
                   <div className="switch-toggle switch-candy large-4">
                     <input id='type-bgg' name="search_type" type="radio" value='bgg' checked={comp.state.search_type==='bgg'} onChange={comp.handleChangeInput.bind(comp, 'search_type', 'bgg')} />

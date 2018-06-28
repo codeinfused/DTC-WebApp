@@ -120,6 +120,9 @@ ul.plans-timeline li > .fa-graduation-cap{
 ul.plans-timeline li.joined > .fa{
   background: #4aade0;
 }
+ul.plans-timeline li.dtc-event.joined > .fa{
+  background: #79648e;
+}
 
 ul.plans-timeline li > .plans-overlap{
   position: absolute;
@@ -157,6 +160,9 @@ ul.plans-timeline .cancelled .plans-item{ opacity: 0.6; background: #f1e8e8; }
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: left;
+}
+.dtc-event .plans-item .plans-item-head{
+  background: #79648e;
 }
 .plans-item .plans-item-head a{ color: #fff; text-decoration: underline; }
 .plans-item .plans-item-body{

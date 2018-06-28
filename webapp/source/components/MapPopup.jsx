@@ -34,7 +34,6 @@ class MapPopup extends React.Component
   render()
   {
     var comp = this;
-    console.log(comp.props);
     return (
       <div className="map-popup-cm" style={{display:"inline-block"}}>
         <Button
