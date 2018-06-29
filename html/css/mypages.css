@@ -186,10 +186,24 @@ ul.plans-timeline .cancelled .plans-item{ opacity: 0.6; background: #f1e8e8; }
 }
 
 p.plans-time {
-  margin: 0 0 8px;
+  display: inline-block;
+  margin: 0 12px 10px 1px;
   font-weight: 100;
   font-size: 1.8rem;
   color: #666;
+}
+.plans-time + span.plan-tag {
+  background: #ffffff;
+  color: #444;
+  box-shadow: 0 0 7px rgba(0,0,0,0.175);
+  margin-bottom: 8px;
+  top: -2px;
+  position: relative;
+  display: inline;
+}
+.plans-time + span.plan-tag:after {
+  white-space: pre;
+  content: "\A";
 }
 
 .plans-btns{
@@ -276,7 +290,7 @@ p.plans-time {
 }
 
 .my-settings-item .account-option{
-  margin: 16px auto;
+  margin: 16px auto 2px;
 }
 
 .my-game-list .game-item-action{

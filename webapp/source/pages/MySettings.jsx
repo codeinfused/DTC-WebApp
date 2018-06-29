@@ -366,14 +366,15 @@ class MySettings extends React.Component
             <img src={CONFIG.state.user.thumb ? CONFIG.state.user.thumb : '/images/profile-generic.jpg'} />
           </div>
 
-          {/* <div className="my-settings-item">
-            <Switch label='Allow Phone Notifications' checked={comp.state.allow_notifications} onChange={comp.handleChangeNotifications.bind(comp)} />
-          </div> */}
-
           <div className="my-settings-item">
-            <h3>Account Login</h3>
+            <h3>Your Account</h3>
             <span className="my-current-account">Currently: <span>{CONFIG.state.user.grant_type}</span></span>
+            {/* <div><Switch label='Show My Profile Photo In Tables' check={comp.state.show_photo} onChange={comp.handleChangeInput.bind(comp)}</div> */}
+            <Switch label='Allow Phone Notifications' checked={comp.state.allow_notifications} onChange={comp.handleChangeNotifications.bind(comp)} />
             <div className="account-option">
+              <button type="button" className="btn-login btn-login-logout metro" onClick={CONFIG.handleLogout}>Log out to switch accounts</button>
+            </div>
+            {/* <div className="account-option">
               <FacebookLogin
                 appId="202475036823066"
                 textButton="Sign in with Facebook"
@@ -398,11 +399,11 @@ class MySettings extends React.Component
                 onRequest={()=>{comp.setState({appLoading:true});}}
                 className="btn-login btn-login-google"
               />
-            </div>
+            </div> */}
           </div>
 
           <div className="my-settings-item">
-            <h3>My Game Settings</h3>
+            <h3>My Game Preferences</h3>
             <p><em>Your "want to play" and alert settings on games.</em></p>
             <div className="page-game-search my-game-list my-wtp-list clearfix">
               {comp.state.wtp.map(function(game){

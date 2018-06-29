@@ -168,7 +168,7 @@ class MyTables extends React.Component
                   </span>
                 </div>
                 <div className="table-item-details">
-                  {table.table_type==='future' ? (<span className="table-item-tag">{moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, M/D/Y, h:mm a')}</span>) : ''}
+                  {table.table_type==='future' ? (<span className="table-item-tag">{moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, h:mm a')}</span>) : ''}
                   <span className="table-item-tag">Takes {table.playtime ? table.playtime : Math.round((Math.round(table.avgplay/6)/10)*2)/2 + ' hours'}</span>
                   {table.private==1 ? (<span className="table-item-tag">Unlisted Table</span>) : ''}
                   {table.table_type==='future' && table.private!=1 ? (<span className="table-item-tag">{table.signups} of {table.seats} seats taken</span>) : ''}

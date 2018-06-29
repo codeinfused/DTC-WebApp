@@ -42,11 +42,11 @@ class About extends React.Component
         </ul>
 
         <h2>Who Made This?</h2>
-        <p>My name is Mike, and I created this DTC App because I love Dice Tower Con. With the con growing in size each year, I wanted a way to easily find the games I want to play. There's plenty of improvements I want to make, and it'll only get better the more people that use it, making finding games more widespread!</p>
-        <p>If you've enjoyed using this app to meet players, track me down for a high five.</p>
+        <p>My name is Mike, and I created this in my spare time because I love Dice Tower Con. As DTC continues growing in size, I wanted to make an alternative way for players to find the games they want to play.</p>
+        <p>I plan to keep improving when I can; so if you've enjoyed using this app, track me down for a high five.</p>
         <p><span className="about-mike-photo"><img src="/images/mike.jpg" /></span></p>
 
-        <p>If you want to help with the costs of running this server, adding more features, or my coffee programming fuels... I welcome any support!</p>
+        <p>If you want to help with the costs of running this server, adding more features, or my coffee programming fuel... I welcome any support!</p>
         <p><a className="dbox-donation-button" href="https://donorbox.org/dtcapp?amount=5" target="_donate">Buy Mike a Coffee</a></p>
 
         <p><a href="/privacy" style={{color:'#fff'}}>View Privacy Policy</a></p>

@@ -99,6 +99,14 @@ const CONFIG = {
     });
   },
 
+  handleLogout: function()
+  {
+    Cookies.remove('auth');
+    Cookies.remove('PHPSESSID');
+    Cookies.remove();
+    window.location.reload();
+  },
+
   checkApiResponse: function(json)
   {
 

@@ -73,6 +73,9 @@ button.btn-login-facebook::before{ content: "\f09a"; }
 button.btn-login-google{ background: #DD4A36; }
 button.btn-login-google::before{ content: "\f1a0"; }
 
+button.btn-login-logout{ background: #c7594a; }
+button.btn-login-logout::before{ content: "\f08b"; }
+
 button.btn-login-guest::before{ content: "\f2bd"; }
 
 button.btn-home-start-table::before { content: "\f145"; font-size: 1.7rem; }

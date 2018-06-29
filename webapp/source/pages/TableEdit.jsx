@@ -36,8 +36,8 @@ class TableEdit extends React.Component
     this.sublocs_num = this.sublocs_num.slice(1);
 
     this.tableTypes = [
-      {id: 'now', name: 'Now'},
-      {id: 'later', name: 'Later'},
+      {id: 'now', name: 'Play Now!'},
+      {id: 'later', name: 'Schedule Later'},
       {id: 'demo', name: 'Demo'}
     ];
 
@@ -319,9 +319,9 @@ class TableEdit extends React.Component
                   <legend>Type of Table</legend>
                   <div className="switch-toggle switch-candy large-4">
                     <input id='type-now' name="table_type" type="radio" value='now' checked={comp.state.table_type==='now'} onChange={comp.handleChangeInput.bind(comp, 'table_type', 'now')} />
-                    <label htmlFor='type-now'>Now</label>
+                    <label htmlFor='type-now'>Play Now</label>
                     <input id='type-later' name="table_type" type="radio" value='future' checked={comp.state.table_type==='future'} onChange={comp.handleChangeInput.bind(comp, 'table_type', 'future')} />
-                    <label htmlFor='type-later'>Later</label>
+                    <label htmlFor='type-later'>Schedule</label>
                     <a></a>
                   </div>
                 </fieldset>

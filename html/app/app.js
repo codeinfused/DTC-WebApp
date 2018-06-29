@@ -57191,6 +57191,13 @@
 	    });
 	  },
 	
+	  handleLogout: function handleLogout() {
+	    _jsCookie2.default.remove('auth');
+	    _jsCookie2.default.remove('PHPSESSID');
+	    _jsCookie2.default.remove();
+	    window.location.reload();
+	  },
+	
 	  checkApiResponse: function checkApiResponse(json) {},
 	
 	  handleChangeNotifications: function handleChangeNotifications(val) {
@@ -98481,12 +98488,12 @@
 	        _react2.default.createElement(
 	          'p',
 	          null,
-	          'My name is Mike, and I created this DTC App because I love Dice Tower Con. With the con growing in size each year, I wanted a way to easily find the games I want to play. There\'s plenty of improvements I want to make, and it\'ll only get better the more people that use it, making finding games more widespread!'
+	          'My name is Mike, and I created this in my spare time because I love Dice Tower Con. As DTC continues growing in size, I wanted to make an alternative way for players to find the games they want to play.'
 	        ),
 	        _react2.default.createElement(
 	          'p',
 	          null,
-	          'If you\'ve enjoyed using this app to meet players, track me down for a high five.'
+	          'I plan to keep improving when I can; so if you\'ve enjoyed using this app, track me down for a high five.'
 	        ),
 	        _react2.default.createElement(
 	          'p',
@@ -98500,7 +98507,7 @@
 	        _react2.default.createElement(
 	          'p',
 	          null,
-	          'If you want to help with the costs of running this server, adding more features, or my coffee programming fuels... I welcome any support!'
+	          'If you want to help with the costs of running this server, adding more features, or my coffee programming fuel... I welcome any support!'
 	        ),
 	        _react2.default.createElement(
 	          'p',
@@ -98717,7 +98724,7 @@
 	    _this.sublocs_num = Array.apply(null, { length: 36 }).map(Number.call, Number);
 	    _this.sublocs_num = _this.sublocs_num.slice(1);
 	
-	    _this.tableTypes = [{ id: 'now', name: 'Now' }, { id: 'later', name: 'Later' }, { id: 'demo', name: 'Demo' }];
+	    _this.tableTypes = [{ id: 'now', name: 'Play Now!' }, { id: 'later', name: 'Schedule Later' }, { id: 'demo', name: 'Demo' }];
 	
 	    _this.tableLocations = [{ label: 'Grand Sierra Ballroom (Open)', value: 'Grand Sierra Ballroom' }, { label: 'Antigua (Open)', value: 'Antigua' }, { label: 'Hall Foyer (Open)', value: 'Hall Foyer' }, { label: 'Boca (Events, Werewolf)', value: 'Boca' }, { label: 'Curaco (RPGs, War Games, Kids)', value: 'Curaco' }, { label: 'Bonaire (Publisher Demos and Events)', value: 'Bonaire' }, { label: 'Caribbean (Exhibitor Events)', value: 'Caribbean Ballroom' }];
 	
@@ -98992,13 +98999,13 @@
 	                  _react2.default.createElement(
 	                    'label',
 	                    { htmlFor: 'type-now' },
-	                    'Now'
+	                    'Play Now'
 	                  ),
 	                  _react2.default.createElement('input', { id: 'type-later', name: 'table_type', type: 'radio', value: 'future', checked: comp.state.table_type === 'future', onChange: comp.handleChangeInput.bind(comp, 'table_type', 'future') }),
 	                  _react2.default.createElement(
 	                    'label',
 	                    { htmlFor: 'type-later' },
-	                    'Later'
+	                    'Schedule'
 	                  ),
 	                  _react2.default.createElement('a', null)
 	                )
@@ -100362,7 +100369,7 @@
 	                table.table_type === 'future' ? _react2.default.createElement(
 	                  'span',
 	                  { className: 'table-item-tag' },
-	                  (0, _moment2.default)(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, M/D/Y, h:mm a')
+	                  (0, _moment2.default)(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, h:mm a')
 	                ) : '',
 	                _react2.default.createElement(
 	                  'span',
@@ -101531,7 +101538,7 @@
 	            _react2.default.createElement(
 	              'h3',
 	              null,
-	              'Account Login'
+	              'Your Account'
 	            ),
 	            _react2.default.createElement(
 	              'span',
@@ -101543,39 +101550,15 @@
 	                _config2.default.state.user.grant_type
 	              )
 	            ),
+	            _react2.default.createElement(_reactToolbox.Switch, { label: 'Allow Phone Notifications', checked: comp.state.allow_notifications, onChange: comp.handleChangeNotifications.bind(comp) }),
 	            _react2.default.createElement(
 	              'div',
 	              { className: 'account-option' },
-	              _react2.default.createElement(_reactFacebookLogin2.default, {
-	                appId: '202475036823066',
-	                textButton: 'Sign in with Facebook',
-	                autoLoad: false,
-	                fields: 'first_name,last_name,email,picture.type(normal)',
-	                callback: this.facebookResponse,
-	                onClick: function onClick() {
-	                  comp.setState({ appLoading: true });
-	                },
-	                icon: false,
-	                redirectUri: window.location.href,
-	                cssClass: 'btn-login btn-login-facebook'
-	              })
-	            ),
-	            _react2.default.createElement(
-	              'div',
-	              { className: 'account-option' },
-	              _react2.default.createElement(_reactGoogleLogin2.default, {
-	                clientId: '1018275567135-e9q9n0aoc1l7bn8doq8q394t1so9gn5b.apps.googleusercontent.com',
-	                buttonText: 'Sign in with Google',
-	                scope: 'profile email',
-	                autoLoad: false,
-	                uxMode: 'popup',
-	                onSuccess: this.googleResponse,
-	                onFailure: this.googleDenied,
-	                onRequest: function onRequest() {
-	                  comp.setState({ appLoading: true });
-	                },
-	                className: 'btn-login btn-login-google'
-	              })
+	              _react2.default.createElement(
+	                'button',
+	                { type: 'button', className: 'btn-login btn-login-logout metro', onClick: _config2.default.handleLogout },
+	                'Log out to switch accounts'
+	              )
 	            )
 	          ),
 	          _react2.default.createElement(
@@ -101584,7 +101567,7 @@
 	            _react2.default.createElement(
 	              'h3',
 	              null,
-	              'My Game Settings'
+	              'My Game Preferences'
 	            ),
 	            _react2.default.createElement(
 	              'p',
@@ -102636,7 +102619,7 @@
 	                  _react2.default.createElement(
 	                    'span',
 	                    { className: 'plan-tag' },
-	                    (0, _moment2.default)(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, M/D/Y, h:mm a')
+	                    (0, _moment2.default)(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, h:mm a')
 	                  ),
 	                  _react2.default.createElement(
 	                    'span',
