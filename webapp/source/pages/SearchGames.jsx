@@ -89,6 +89,7 @@ class SearchGames extends React.Component
     this.notificationEngine = this.notificationEngine.bind(this);
     this.handleChangeSort = this.handleChangeSort.bind(this);
     this.handleChangeTag = this.handleChangeTag.bind(this);
+    this.handleChangeInput = this.handleChangeInput.bind(this);
     this.handleToggleDescription = this.handleToggleDescription.bind(this);
     this.addWTP = this.addWTP.bind(this);
   }
@@ -305,7 +306,7 @@ class SearchGames extends React.Component
 
     axios.post(CONFIG.bgg.search, {
       term: comp.state.searchText.trim(),
-      db: CONFIG.state.searchDB,
+      db: comp.state.search_type, //CONFIG.state.searchDB,
       page: comp.state.currentGamePage,
       sort: comp.state.sortBy,
       tag: comp.state.tag,
@@ -350,7 +351,9 @@ class SearchGames extends React.Component
 
   handleChangeInput(field, value)
   {
-    this.setState({[field]: value});
+    var comp = this;
+    CONFIG.state.last_currentGamePage = 0;
+    this.setState({[field]: value, loader: true, currentGamePage: 0}, ()=>{comp.searchGames();});
   }
 
   handleChangeSort(val)
@@ -417,7 +420,7 @@ class SearchGames extends React.Component
     }
 
     return (
-      <div className="game-search-list clearfix" style={{top:'75px'}}>
+      <div className="game-search-list clearfix">
         {comp.state.games.map(function(game, i)
         {
           var notifyActive = CONFIG.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
@@ -452,10 +455,19 @@ class SearchGames extends React.Component
                       </p>
                     </div>
                   </div>
+                  {comp.state.search_type=='dtc' ? (<div className="game-item-lib"><span>In Library: </span><span className="game-item-lib-ct">{game.lib}</span></div>) : ''}
                 </div>
               </div>
               <div className="game-item-bottom-wrap">
-                <div className={"game-item-description"+(comp.state.activeGameOpenDesc ? " open" : "")} onClick={comp.handleToggleDescription}>{entities.html.decode(entities.xml.decode(game.desc))}<div className="desc-overlay"></div></div>
+                <div className={"game-item-description"+(comp.state.activeGameOpenDesc ? " open" : "")} onClick={comp.handleToggleDescription}>
+                  {entities.html.decode(entities.xml.decode(game.desc))}
+                  <div className="game-item-tags">
+                    {game.tags.map(function(tag, i){
+                      return (<div key={'bggtag-'+i} className="plan-tag">{tag}</div>);
+                    })}
+                  </div>
+                  <div className="desc-overlay"></div>
+                </div>
                 <div className="game-item-actions">
                   {(!CONFIG.state.auth || CONFIG.state.user.grant_type==='guest') ? (
                     <div className="game-item-action">
@@ -546,7 +558,7 @@ class SearchGames extends React.Component
               </div>
             </div>
             <div className="clearfix">
-              <div className="hidden" style={{display:'none'}}>
+              <div style={{marginTop:'2px'}}>
                 <fieldset style={{display:'inline', border:'none', margin:'0', padding:'0', width:'100%', fontSize:'1.275rem'}}>
                   <div className="switch-toggle switch-candy large-4">
                     <input id='type-bgg' name="search_type" type="radio" value='bgg' checked={comp.state.search_type==='bgg'} onChange={comp.handleChangeInput.bind(comp, 'search_type', 'bgg')} />

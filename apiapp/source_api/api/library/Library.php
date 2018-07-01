@@ -1,9 +1,18 @@
 <?php
 namespace api\library;
-
+use api\games\Games;
 
 abstract class Library
 {
+
+  static function parse_geeklist_import($context)
+  {
+    $bggapi = $context->get('bgg_api');
+    $pdo = $context->db;
+
+    echo "geeklist_import\n";
+    return Games::curl_get_geeklist($context, '219847');
+  }
 
   static function next_library_bgg_single($context)
   {

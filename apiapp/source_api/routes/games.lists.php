@@ -53,8 +53,10 @@ $app->post('/games/search/', function($req, $resp, $args) use ($app)
 
   if(empty($table)){ $table = 'bgg'; }
 
-  if($table==='library'){
-    $games_list = GamesDB::search_library_games($this, $body);
+  if($table==='dtc'){
+    //$games_list = GamesDB::search_library_games($this, $body);
+    $body['isLibrary'] = true;
+    $games_list = GamesDB::search_games_by_term($this, $body);
   }else if($table==='bgg'){
     $games_list = GamesDB::search_games_by_term($this, $body);
   }

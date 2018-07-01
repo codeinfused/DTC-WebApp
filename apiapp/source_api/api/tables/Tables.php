@@ -289,7 +289,7 @@ abstract class Tables
       // --------------------
       // unfinished notification system for newly created tables (notify players with WTP)
       // --------------------
-      $gamereq = $pdo->prepare("SELECT title, start_datetime FROM bgg_game_db WHERE bgg_id=:bgg_id LIMIT 1");
+      $gamereq = $pdo->prepare("SELECT title FROM bgg_game_db WHERE bgg_id=:bgg_id LIMIT 1");
       $gamereq->execute(array(':bgg_id'=>$data['bgg_id']));
       $game_title = $gamereq->fetchColumn();
 

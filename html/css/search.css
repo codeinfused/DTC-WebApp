@@ -91,7 +91,7 @@
 
 .game-search-list{
   position: absolute;
-  top: 100px; left: 0; right: 0; bottom: 0px;
+  top: 108px; left: 0; right: 0; bottom: 0px;
   padding: 0px 0;
   overflow: auto;
 }
@@ -300,6 +300,19 @@
   color: #afafaf;
 }
 
+.game-item-lib{
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  padding: 2px;
+  color: #aaa;
+  font-size: 1.1rem;
+}
+.game-item-lib .game-item-lib-ct{
+  color: #fff;
+  font-weight: 900;
+}
+
 
 
 .game-item.small-view .game-item-top-wrap{
@@ -354,6 +367,9 @@
 
 .game-item-tags{
   padding: 18px 18px 0;
+}
+.game-item-description .game-item-tags{
+  padding: 0px 0px 10px;
 }
 .game-item-description{
   padding: 0 16px;

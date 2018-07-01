@@ -21,6 +21,22 @@ $app->post('/library/events/import/', function($req, $resp, $args) use ($app)
   Events::parse_csv_import($pdo, $importFilename);
 });
 
+$app->post('/library/import/', function($req, $resp, $args) use ($app)
+{
+  $token = Auth::checkAuthorization($this->db, $req);
+  if( is_error($token) ){
+    return $resp->withStatus((int)$token->get_code())->withJson($token->json());
+  }
+
+  $body = $req->getParsedBody();
+  $secret = $body['secret'];
+  if($secret !== 'dtclfgapp'){ echo 'failed'; return; }
+
+  echo "start\n";
+  $games = Library::parse_geeklist_import($this);
+  return $resp->withJson($games);
+});
+
 $app->post('/library/update/single/', function($req, $resp, $args) use ($app)
 {
   $token = Auth::checkAuthorization($this->db, $request);

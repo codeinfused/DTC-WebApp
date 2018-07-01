@@ -42,7 +42,7 @@ $app->get('/table_data/[{table_id}]', function($req, $resp, $args) use ($app)
   }
 
   $table = Tables::get_all_table_data_by_id($this->db, $table_id, $token->data->uid);
-  if( is_error($game) ){
+  if( is_error($table) ){
     return $resp->withStatus((int)$table->get_code())->withJson($table->json());
   }
 

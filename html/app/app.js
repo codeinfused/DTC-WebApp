@@ -97115,6 +97115,7 @@
 	    _this.notificationEngine = _this.notificationEngine.bind(_this);
 	    _this.handleChangeSort = _this.handleChangeSort.bind(_this);
 	    _this.handleChangeTag = _this.handleChangeTag.bind(_this);
+	    _this.handleChangeInput = _this.handleChangeInput.bind(_this);
 	    _this.handleToggleDescription = _this.handleToggleDescription.bind(_this);
 	    _this.addWTP = _this.addWTP.bind(_this);
 	    return _this;
@@ -97342,7 +97343,7 @@
 	
 	      _axios2.default.post(_config2.default.bgg.search, {
 	        term: comp.state.searchText.trim(),
-	        db: _config2.default.state.searchDB,
+	        db: comp.state.search_type, //CONFIG.state.searchDB,
 	        page: comp.state.currentGamePage,
 	        sort: comp.state.sortBy,
 	        tag: comp.state.tag,
@@ -97389,7 +97390,13 @@
 	  }, {
 	    key: 'handleChangeInput',
 	    value: function handleChangeInput(field, value) {
-	      this.setState(_defineProperty({}, field, value));
+	      var _setState;
+	
+	      var comp = this;
+	      _config2.default.state.last_currentGamePage = 0;
+	      this.setState((_setState = {}, _defineProperty(_setState, field, value), _defineProperty(_setState, 'loader', true), _defineProperty(_setState, 'currentGamePage', 0), _setState), function () {
+	        comp.searchGames();
+	      });
 	    }
 	  }, {
 	    key: 'handleChangeSort',
@@ -97466,7 +97473,7 @@
 	
 	      return _react2.default.createElement(
 	        'div',
-	        { className: 'game-search-list clearfix', style: { top: '75px' } },
+	        { className: 'game-search-list clearfix' },
 	        comp.state.games.map(function (game, i) {
 	          var notifyActive = _config2.default.state.user.notify.indexOf(game.bgg_id) > -1 ? " active" : "";
 	          var wtpActive = _config2.default.state.user.wtp.indexOf(game.bgg_id) > -1 ? " active" : "";
@@ -97530,7 +97537,21 @@
 	                      ' minutes'
 	                    )
 	                  )
-	                )
+	                ),
+	                comp.state.search_type == 'dtc' ? _react2.default.createElement(
+	                  'div',
+	                  { className: 'game-item-lib' },
+	                  _react2.default.createElement(
+	                    'span',
+	                    null,
+	                    'In Library: '
+	                  ),
+	                  _react2.default.createElement(
+	                    'span',
+	                    { className: 'game-item-lib-ct' },
+	                    game.lib
+	                  )
+	                ) : ''
 	              )
 	            ),
 	            _react2.default.createElement(
@@ -97540,6 +97561,17 @@
 	                'div',
 	                { className: "game-item-description" + (comp.state.activeGameOpenDesc ? " open" : ""), onClick: comp.handleToggleDescription },
 	                entities.html.decode(entities.xml.decode(game.desc)),
+	                _react2.default.createElement(
+	                  'div',
+	                  { className: 'game-item-tags' },
+	                  game.tags.map(function (tag, i) {
+	                    return _react2.default.createElement(
+	                      'div',
+	                      { key: 'bggtag-' + i, className: 'plan-tag' },
+	                      tag
+	                    );
+	                  })
+	                ),
 	                _react2.default.createElement('div', { className: 'desc-overlay' })
 	              ),
 	              _react2.default.createElement(
@@ -97743,7 +97775,7 @@
 	              { className: 'clearfix' },
 	              _react2.default.createElement(
 	                'div',
-	                { className: 'hidden', style: { display: 'none' } },
+	                { style: { marginTop: '2px' } },
 	                _react2.default.createElement(
 	                  'fieldset',
 	                  { style: { display: 'inline', border: 'none', margin: '0', padding: '0', width: '100%', fontSize: '1.275rem' } },

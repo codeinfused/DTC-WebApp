@@ -9,7 +9,8 @@ abstract class GamesDB
     'limit' => 10,
     'term' => 'firefly',
     'tag' => '',
-    'sort' => 'bggrate'
+    'sort' => 'bggrate',
+    'db' => 'bgg'
   );
 
   static function parse_game_result($game_results)
@@ -29,7 +30,8 @@ abstract class GamesDB
         'tags' => explode(',', $game['tags']),
         'wtp' => $game['wtp'],
         'lfp' => $game['lfp'],
-        'scheduled' => $game['scheduled']
+        'scheduled' => $game['scheduled'],
+        'lib' => $game['library']
       );
     }
     return $game_list;
@@ -129,16 +131,20 @@ abstract class GamesDB
     }
     $exec_params[':term'] = '%'.$opts['term'].'%';
 
+    $library_sql = $opts['db']=='dtc' ? "INNER JOIN library_dtc2018 lib ON lib.bgg_id = db.bgg_id" : "";
+    $library_sel = $opts['db']=='dtc' ? "lib.count AS library" : "null AS library";
+
     $sortby_sql = self::parse_sort_by($opts['sort']);
 
     $dbCheck = $context->db->prepare(
       "SELECT
-        SQL_CALC_FOUND_ROWS *,
+        SQL_CALC_FOUND_ROWS db.*, $library_sel,
         (SELECT count(id) FROM game_wtp gw WHERE gw.bgg_id=db.bgg_id) as wtp,
-        (SELECT count(id) FROM game_tables gt WHERE gt.bgg_id=db.bgg_id AND table_type='now' AND status='ready' AND private=0 AND start_datetime > NOW() - INTERVAL 20 MINUTE) as lfp,
-        (SELECT count(id) FROM game_tables gt2 WHERE gt2.bgg_id=db.bgg_id AND table_type='future' AND status='ready' AND private=0 AND start_datetime > NOW()) as scheduled
+        (SELECT count(id) FROM game_tables gt WHERE gt.bgg_id=db.bgg_id AND gt.table_type='now' AND gt.status='ready' AND gt.private=0 AND gt.start_datetime > NOW() - INTERVAL 20 MINUTE) as lfp,
+        (SELECT count(id) FROM game_tables gt2 WHERE gt2.bgg_id=db.bgg_id AND gt2.table_type='future' AND gt2.status='ready' AND gt2.private=0 AND gt2.start_datetime > NOW()) as scheduled
         FROM bgg_game_db db
-        WHERE title LIKE :term AND title != 'EXPANSION' AND title IS NOT NULL $tag_sql $sortby_sql
+        $library_sql
+        WHERE db.title LIKE :term AND db.title != 'EXPANSION' AND db.title IS NOT NULL $tag_sql $sortby_sql
         LIMIT ".($opts['page']*$opts['limit']).",{$opts['limit']}"
     );
     $dbCheck->execute($exec_params);

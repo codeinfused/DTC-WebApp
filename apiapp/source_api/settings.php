@@ -20,7 +20,8 @@ $slim_app_settings = [
     'search' => 'https://www.boardgamegeek.com/xmlapi2/search',
     'game' => 'https://www.boardgamegeek.com/xmlapi2/thing',
     'collection' => 'https://www.boardgamegeek.com/xmlapi2/collection',
-    'hot' => 'https://www.boardgamegeek.com/xmlapi2/hot'
+    'hot' => 'https://www.boardgamegeek.com/xmlapi2/hot',
+    'geeklist' => 'https://www.boardgamegeek.com/xmlapi/geeklist'
   ]
 ];
 

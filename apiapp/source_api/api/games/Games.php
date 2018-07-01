@@ -320,4 +320,77 @@ abstract class Games
     */
   }
 
+  static function curl_get_geeklist($context, $geeklist)
+  {
+    $bggapi = $context->get('bgg_api');
+    $pdo = $context->db;
+
+    $context->curl->get(array(
+      "url" => $bggapi['geeklist'].'/'.$geeklist,
+      "showHeaders" => false,
+      "autofollow" => true,
+      // "data" => array(
+      //   'subtype' => 'boardgame',
+      //   'excludesubtype' => 'boardgameexpansion',
+      //   'own' => 1,
+      //   'brief' => 1,
+      //   'username' => $username
+      // )
+    ));
+
+    $listxml = simplexml_load_string($context->curl->html);
+
+    $listxml_parent = $listxml->getName();
+
+    // if parent node is "message" (queued), or found collection is "games"
+    if(empty($listxml->item))
+    {
+      if($listxml_parent === 'message'){
+        $listobj = json_decode(json_encode(array('message'=>$listxml)));
+      }else{
+        $listobj = json_encode(array(
+          'error'=>'No collection found on this geeklist.'
+        ));
+      }
+    }else{
+      $listobj = json_decode(json_encode($listxml));
+    }
+
+    // $games_list_ids = array();
+    // foreach($listobj->item as $listgame){ $games_list_ids[] = $listgame->{'@attributes'}->objectid; }
+    // $games_list_ids = implode(',', $games_list_ids);
+
+    $games = array();
+    foreach($listobj->item as $listgame)
+    {
+      $body = is_string($listgame->body) ? $listgame->body : "";
+      $matched = preg_match_all("((\d+) copies)", $body, $base_ct);
+      $ct = $matched > 0 ? $base_ct[1][0] : 1;
+
+      $games[] = array(
+        'bgg_id' => $listgame->{'@attributes'}->objectid,
+        'details' => $body,
+        'count' => $ct
+      );
+    }
+
+    foreach($games as $game)
+    {
+      $dbCheck = $pdo->prepare(
+        "INSERT INTO library_dtc2018 SET bgg_id=:bggid, details=:details, count=:count"
+      );
+      $dbCheck->execute(array(
+        ':bggid' => $game['bgg_id'],
+        ':details' => $game['details'],
+        ':count' => $game['count']
+      ));
+      //$dbCheck->closeCursor();
+    }
+
+    return array(
+      'game_ids' => $games,
+      'objects' => $listobj
+    );
+  }
+
 } // end class
