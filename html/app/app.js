@@ -97746,6 +97746,31 @@
 	            { id: 'form-game-search', onSubmit: comp.handleSearchGames },
 	            _react2.default.createElement(
 	              'div',
+	              { className: 'game-search-type clearfix' },
+	              _react2.default.createElement(
+	                'fieldset',
+	                { style: { display: 'inline', border: 'none', margin: '0', padding: '0', width: '100%', fontSize: '1.275rem' } },
+	                _react2.default.createElement(
+	                  'div',
+	                  { className: 'switch-toggle switch-candy large-4' },
+	                  _react2.default.createElement('input', { id: 'type-bgg', name: 'search_type', type: 'radio', value: 'bgg', checked: comp.state.search_type === 'bgg', onChange: comp.handleChangeInput.bind(comp, 'search_type', 'bgg') }),
+	                  _react2.default.createElement(
+	                    'label',
+	                    { htmlFor: 'type-bgg' },
+	                    'BGG Game Search'
+	                  ),
+	                  _react2.default.createElement('input', { id: 'type-dtc', name: 'search_type', type: 'radio', value: 'dtc', checked: comp.state.search_type === 'dtc', onChange: comp.handleChangeInput.bind(comp, 'search_type', 'dtc') }),
+	                  _react2.default.createElement(
+	                    'label',
+	                    { htmlFor: 'type-dtc' },
+	                    'DTC Game Library'
+	                  ),
+	                  _react2.default.createElement('a', null)
+	                )
+	              )
+	            ),
+	            _react2.default.createElement(
+	              'div',
 	              { className: 'game-search-box' },
 	              _react2.default.createElement('input', { ref: function ref(input) {
 	                  comp.searchInput = input;
@@ -97768,35 +97793,6 @@
 	                'div',
 	                { className: 'game-search-filter', style: { 'float': 'right' } },
 	                _react2.default.createElement(_reactToolbox.Dropdown, { onChange: comp.handleChangeTag, source: comp.tagOptions, value: comp.state.tag })
-	              )
-	            ),
-	            _react2.default.createElement(
-	              'div',
-	              { className: 'clearfix' },
-	              _react2.default.createElement(
-	                'div',
-	                { style: { marginTop: '2px' } },
-	                _react2.default.createElement(
-	                  'fieldset',
-	                  { style: { display: 'inline', border: 'none', margin: '0', padding: '0', width: '100%', fontSize: '1.275rem' } },
-	                  _react2.default.createElement(
-	                    'div',
-	                    { className: 'switch-toggle switch-candy large-4' },
-	                    _react2.default.createElement('input', { id: 'type-bgg', name: 'search_type', type: 'radio', value: 'bgg', checked: comp.state.search_type === 'bgg', onChange: comp.handleChangeInput.bind(comp, 'search_type', 'bgg') }),
-	                    _react2.default.createElement(
-	                      'label',
-	                      { htmlFor: 'type-bgg' },
-	                      'BGG Game Search'
-	                    ),
-	                    _react2.default.createElement('input', { id: 'type-dtc', name: 'search_type', type: 'radio', value: 'dtc', checked: comp.state.search_type === 'dtc', onChange: comp.handleChangeInput.bind(comp, 'search_type', 'dtc') }),
-	                    _react2.default.createElement(
-	                      'label',
-	                      { htmlFor: 'type-dtc' },
-	                      'DTC Game Library'
-	                    ),
-	                    _react2.default.createElement('a', null)
-	                  )
-	                )
 	              )
 	            )
 	          )

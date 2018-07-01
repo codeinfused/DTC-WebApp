@@ -7,6 +7,9 @@
   z-index: 60;
   /* background: rgba(255,255,255,0.25); */
 }
+.game-search-type {
+  margin-bottom: 4px;
+}
 .game-search-box {
   position: relative;
   width: 100%;
