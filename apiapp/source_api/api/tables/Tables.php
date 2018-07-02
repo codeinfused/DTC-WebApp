@@ -160,7 +160,7 @@ abstract class Tables
 
   static function list_tables($pdo, $bgg_id, $table_type, $uid)
   {
-    if($table_type==='table'){
+    if($table_type==='table'){  // show a specific table
       $dbCheck = $pdo->prepare(
         "SELECT db.title, tb.id as table_id, tb.player_id, CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as host_name, tb.table_type, tb.bgg_id, tb.seats, tb.table_location, tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft,
         COUNT(gs.id) AS signups, tb.allow_signups, tb.status, tb.playtime, ROUND((db.minplaytime+db.maxplaytime)/2) as avgplay,
@@ -172,10 +172,9 @@ abstract class Tables
         WHERE tb.id=:bgg_id
         AND tb.start_datetime > NOW() - INTERVAL 20 MINUTE
         AND tb.status='ready'
-        AND tb.private='0'
         GROUP BY tb.id
         ORDER BY tb.start_datetime ASC"
-      );
+      ); // AND tb.private='0' (removed for ability to link private)
       $dbCheck->execute(array(':bgg_id' => $bgg_id, ':uid'=>$uid));
     }else{
       $dbCheck = $pdo->prepare(
@@ -286,33 +285,6 @@ abstract class Tables
         ));
       }
 
-      // --------------------
-      // unfinished notification system for newly created tables (notify players with WTP)
-      // --------------------
-      $gamereq = $pdo->prepare("SELECT title FROM bgg_game_db WHERE bgg_id=:bgg_id LIMIT 1");
-      $gamereq->execute(array(':bgg_id'=>$data['bgg_id']));
-      $game_title = $gamereq->fetchColumn();
-
-      $userreq = $pdo->prepare("SELECT player_id FROM game_wtp WHERE bgg_id=:bgg_id AND notify_flag=1");
-      $userreq->execute(array(':bgg_id'=>$data['bgg_id']));
-      $users = $userreq->fetchAll();
-
-      $title = $data['table_type']==='now' ? 'Players Wanted Alert' : 'New Scheduled Game Alert';
-      $message = $game_title . ' at: ';
-      $table_fields = '';
-      $table_preps = '(?, ?, ?, ?, ?, ?, NOW())';
-
-      if(count($users) > 0)
-      {
-        foreach($users as $user){
-
-        }
-        // $req = $pdo->prepare(
-        //   "INSERT INTO notifications n (user_id, title, message, game_title, game_start, reference_id, created_date) VALUES
-        //   ( created_date=NOW())
-        // ");
-      }
-
       $table_id = $new_table_id;
     }
     else{  /* EDITING EXISTING */
@@ -337,6 +309,41 @@ abstract class Tables
       self::join_reserved_spots($pdo, $table_id, $reserved_max);
     }else{
       self::delete_reserved_spots($pdo, $table_id, 1, 7);
+    }
+
+    if($inserting === true)
+    {
+      // --------------------
+      // unfinished notification system for newly created tables (notify players with WTP)
+      // --------------------
+
+      $gamereq = $pdo->prepare("SELECT title FROM bgg_game_db WHERE bgg_id=:bgg_id LIMIT 1");
+      $gamereq->execute(array(':bgg_id'=>$data['bgg_id']));
+      $game_title = $gamereq->fetchColumn();
+
+      $userreq = $pdo->prepare("SELECT player_id FROM game_wtp WHERE bgg_id=:bgg_id AND notify_flag=1");
+      $userreq->execute(array(':bgg_id'=>$data['bgg_id']));
+      $users = $userreq->fetchAll();
+
+      $title = $data['table_type']==='now' ? 'Players Wanted Alert' : 'New Scheduled Game Alert';
+      $message = $game_title . ' at: ';
+      $table_fields = '';
+      $table_preps = '(?, ?, ?, ?, ?, ?, NOW())';
+
+      if(count($users) > 0)
+      {
+        foreach($users as $user){
+          // $req = $pdo->prepare(
+          //   "INSERT INTO notifications n (user_id, title, message, game_title, game_start, reference_id, created_date) VALUES
+          //   ( created_date=NOW())
+          // ");
+        }
+
+      }
+
+    }else{
+      // send notifcation of edit, if changed
+
     }
 
     return array('success'=>true);
