@@ -99852,7 +99852,7 @@
 	    key: 'addIgnore',
 	    value: function addIgnore(bad_player_id) {
 	      var comp = this;
-	
+	      console.log(_config2.default.state.user);
 	      _config2.default.state.user.ignore.push(bad_player_id);
 	      _config2.default.state.user.ignore = _.uniq(_config2.default.state.user.ignore);
 	      if (comp.props.onToggleIgnore) {
@@ -101244,7 +101244,7 @@
 	          ignore: json.data.ignore
 	        });
 	      }).catch(function (json) {
-	
+	        console.log(json);
 	        _ToastsAPI2.default.toast('error', null, 'Failed to get some settings.', { timeOut: 6000 });
 	      });
 	    }
@@ -101520,7 +101520,7 @@
 	    key: 'handleToggleIgnore',
 	    value: function handleToggleIgnore(bad_player_id) {
 	      var comp = this;
-	
+	      console.log(_config2.default.state.user.ignore, bad_player_id);
 	      if (_config2.default.state.user.ignore.indexOf(bad_player_id) < 0) {
 	        comp.addIgnore(bad_player_id);
 	      } else {
@@ -102199,7 +102199,7 @@
 	        _react2.default.createElement(
 	          'h2',
 	          null,
-	          'Players Wanted For:'
+	          'Players Wanted Signs:'
 	        ),
 	        comp.state.tables.map(function (table, i) {
 	          return _react2.default.createElement(
@@ -102258,7 +102258,12 @@
 	                { className: 'table-item-tag' },
 	                'Host: ',
 	                table.host_name
-	              )
+	              ),
+	              table.lft == '1' ? _react2.default.createElement(
+	                'span',
+	                { className: 'table-item-tag' },
+	                'Teacher Needed'
+	              ) : ''
 	            )
 	          );
 	        })
@@ -102445,7 +102450,7 @@
 	          game_popup: false
 	        });
 	      }).catch(function (json) {
-	
+	        console.log(json);
 	        _ToastsAPI2.default.toast('error', null, 'Error getting tables list.', { timeOut: 6000 });
 	      });
 	    }
@@ -102936,7 +102941,7 @@
 	          game_popup: false
 	        });
 	      }).catch(function (json) {
-	
+	        console.log(json);
 	        _ToastsAPI2.default.toast('error', null, 'Error getting events list.', { timeOut: 6000 });
 	      });
 	    }

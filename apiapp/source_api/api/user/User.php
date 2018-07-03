@@ -30,8 +30,8 @@ abstract class User
       FROM notifications nt
       LEFT JOIN game_tables gt ON gt.id = nt.reference_id
       LEFT JOIN bgg_game_db db ON db.bgg_id = gt.bgg_id
-      LEFT JOIN users u ON u.id = gt.player_id
-      WHERE user_id=:uid AND dismissed=0 AND created_date > NOW() - INTERVAL 24 HOUR LIMIT 99");
+      LEFT JOIN users u ON u.id = nt.player_id
+      WHERE nt.player_id=:uid AND dismissed=0 AND created_date > NOW() - INTERVAL 24 HOUR LIMIT 99");
     $req->execute(array(":uid"=>$uid));
     $wtps = $req->fetchAll();
     $req->closeCursor();
@@ -42,10 +42,10 @@ abstract class User
   static function dismissNotification($pdo, $uid, $alert_id)
   {
     if($alert_id==='all'){
-      $req = $pdo->prepare("DELETE FROM notifications WHERE user_id=:uid");
+      $req = $pdo->prepare("DELETE FROM notifications WHERE player_id=:uid");
       $req->execute(array(':uid'=>$uid, ':alert_id'=>$alert_id));
     }else{
-      $req = $pdo->prepare("DELETE FROM notifications WHERE user_id=:uid AND id=:alert_id");
+      $req = $pdo->prepare("DELETE FROM notifications WHERE player_id=:uid AND id=:alert_id");
       $req->execute(array(':uid'=>$uid, ':alert_id'=>$alert_id));
     }
     $req->closeCursor();

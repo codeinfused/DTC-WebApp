@@ -110,7 +110,7 @@ class PlayersWanted extends React.Component
 
     return (
       <div className="table-list">
-        <h2>Players Wanted For:</h2>
+        <h2>Players Wanted Signs:</h2>
           {comp.state.tables.map(function(table, i)
           {
             return (
@@ -128,6 +128,7 @@ class PlayersWanted extends React.Component
                   <span className="table-item-tag">Takes {table.playtime ? table.playtime : Math.round((Math.round(table.avgplay/6)/10)*2)/2 + ' hours'}</span>
                   <div></div>
                   <span className="table-item-tag">Host: {table.host_name}</span>
+                  {table.lft=='1' ? (<span className="table-item-tag">Teacher Needed</span>) : ''}
                 </div>
               </div>
             );

@@ -261,19 +261,30 @@ abstract class Tables
     }
 
     $inserting = false;
-    if(!empty($data['table_id'])){
+    if(!empty($data['table_id']))
+    {
+      // editing an existing table
+      // $old_table_req = $pdo->prepare("SELECT * FROM game_tables WHERE id=:tid");
+      // $old_table_req->execute(array(':tid'=>$data['table_id']));
+      // $old_table = $old_table_req->fetch();
+      // $old_table_req->closeCursor();
+
       $exec_params[':table_id'] = $data['table_id'];
       $dbCheck = $pdo->prepare(
         "UPDATE game_tables SET bgg_id=:bid, table_type=:table_type, seats=:seats, table_location=:table_location, start_datetime=:start_datetime, lft=:lft, private=:private, playtime=:playtime, allow_signups=:allow_signups, table_sublocation_alpha=:subloc_alpha, table_sublocation_num=:subloc_num WHERE id=:table_id AND player_id=:uid"
       );
     }else{
+      // inserting a new table
       $inserting = true;
       $dbCheck = $pdo->prepare(
         "INSERT INTO game_tables SET player_id=:uid, bgg_id=:bid, table_type=:table_type, seats=:seats, table_location=:table_location, start_datetime=:start_datetime, lft=:lft, private=:private, playtime=:playtime, allow_signups=:allow_signups, table_sublocation_alpha=:subloc_alpha, table_sublocation_num=:subloc_num"
       );
     }
     $dbCheck->execute($exec_params);
+    $dbCheck->closeCursor();
 
+    // Handle the host joining own table
+    // ---------------
     if($inserting === true)
     {
       $new_table_id = $pdo->lastInsertId();
@@ -286,9 +297,9 @@ abstract class Tables
       }
 
       $table_id = $new_table_id;
-    }
-    else{  /* EDITING EXISTING */
 
+    }else{
+      /* EXISTING */
       $table_id = $data['table_id'];
 
       if($data['joined']===1){
@@ -302,8 +313,10 @@ abstract class Tables
         ));
       }
 
-    } // end checks if new/edit
+    } // end join self
 
+    // if table has reservations set, modify those
+    // ---------------
     if(!empty($data['reserved'])){
       $reserved_max = intval($data['reserved']);
       self::join_reserved_spots($pdo, $table_id, $reserved_max);
@@ -311,39 +324,107 @@ abstract class Tables
       self::delete_reserved_spots($pdo, $table_id, 1, 7);
     }
 
+    // send notifications for either new table or edited data
+    // ---------------
     if($inserting === true)
     {
-      // --------------------
-      // unfinished notification system for newly created tables (notify players with WTP)
-      // --------------------
-
       $gamereq = $pdo->prepare("SELECT title FROM bgg_game_db WHERE bgg_id=:bgg_id LIMIT 1");
       $gamereq->execute(array(':bgg_id'=>$data['bgg_id']));
       $game_title = $gamereq->fetchColumn();
+      $gamereq->closeCursor();
 
-      $userreq = $pdo->prepare("SELECT player_id FROM game_wtp WHERE bgg_id=:bgg_id AND notify_flag=1");
-      $userreq->execute(array(':bgg_id'=>$data['bgg_id']));
+      $userreq = $pdo->prepare("SELECT player_id FROM game_wtp WHERE bgg_id=:bgg_id AND notify_flag=1 AND player_id!=:my_id");
+      $userreq->execute(array(
+        ':bgg_id'=>$data['bgg_id'],
+        ':my_id'=>$uid
+      ));
       $users = $userreq->fetchAll();
+      $userreq->closeCursor();
 
-      $title = $data['table_type']==='now' ? 'Players Wanted Alert' : 'New Scheduled Game Alert';
-      $message = $game_title . ' at: ';
-      $table_fields = '';
-      $table_preps = '(?, ?, ?, ?, ?, ?, NOW())';
+      //$title = $data['table_type']==='now' ? 'Players Wanted Alert' : 'New Scheduled Game Alert';
+      $dt_start = strtotime($data['start_datetime']);
+      $timemsg = date('D g:i a', $dt_start);
+      $title = "New Table: ".$game_title;
+      $message = $game_title . ", " . $timemsg . ", " . $data['table_location'] . ' ' .$data['table_sublocation_alpha'].$data['table_sublocation_num'];
 
-      if(count($users) > 0)
+      $prep_fields = '(`player_id`, `dismissed`, `title`, `message`, `reference_id`, `reference_type`, `game_title`, `game_start`, `notify_type`)';
+      $prep_values = array(
+        /* player_id is merged later */
+        '0', // dismissed
+        $title, // title
+        $message, // message
+        $table_id, // reference_id
+        'table', // reference_type
+        $game_title, // game_title,
+        $data['start_datetime'], // game_start,
+        'new_table' // notify_type
+      );
+
+      if(count($users) > 0 && $data['private']==false)
       {
         foreach($users as $user){
-          // $req = $pdo->prepare(
-          //   "INSERT INTO notifications n (user_id, title, message, game_title, game_start, reference_id, created_date) VALUES
-          //   ( created_date=NOW())
-          // ");
+          // prepend playerid to prepared values
+          $values[] = '"' . implode('", "', array_merge(array($user['player_id']), $prep_values)) . '"';
         }
 
+        $val_sql = '(' . implode('), (', $values) . ')';
+        $req = $pdo->prepare(
+          "INSERT INTO notifications $prep_fields VALUES $val_sql"
+        );
+        //$req->execute(array(":vals"=>$val_sql));
+        $req->execute();
+        $req->closeCursor();
       }
 
     }else{
       // send notifcation of edit, if changed
+      $gamereq = $pdo->prepare("SELECT title FROM bgg_game_db WHERE bgg_id=:bgg_id LIMIT 1");
+      $gamereq->execute(array(':bgg_id'=>$data['bgg_id']));
+      $game_title = $gamereq->fetchColumn();
+      $gamereq->closeCursor();
 
+      $userreq = $pdo->prepare("SELECT player_id FROM game_signups WHERE table_id = :table_id AND player_id != :my_id");
+      $userreq->execute(array(
+        ':table_id'=>$table_id,
+        ':my_id'=>$uid
+      ));
+      $users = $userreq->fetchAll();
+      $userreq->closeCursor();
+
+      //$title = $data['table_type']==='now' ? 'Players Wanted Alert' : 'New Scheduled Game Alert';
+      $dt_start = strtotime($data['start_datetime']);
+      $timemsg = date('D g:i a', $dt_start);
+      $title = "Table Changed: ".$game_title;
+      $message = $game_title . " was changed to: " . $timemsg . ", " . $data['table_location'] . ' ' .$data['table_sublocation_alpha'].$data['table_sublocation_num'];
+
+      $prep_fields = '(`player_id`, `dismissed`, `title`, `message`, `reference_id`, `reference_type`, `game_title`, `game_start`, `notify_type`)';
+      $prep_values = array(
+        /* player_id is merged later */
+        '0', // dismissed
+        $title, // title
+        $message, // message
+        $table_id, // reference_id
+        'table', // reference_type
+        $game_title, // game_title,
+        $data['start_datetime'], // game_start,
+        'edit_table' // notify_type
+      );
+
+      if(count($users) > 0)
+      {
+        foreach($users as $user){
+          // prepend playerid to prepared values
+          $values[] = '"' . implode('", "', array_merge(array($user['player_id']), $prep_values)) . '"';
+        }
+
+        $val_sql = '(' . implode('), (', $values) . ')';
+        $req = $pdo->prepare(
+          "INSERT INTO notifications $prep_fields VALUES $val_sql"
+        );
+        //$req->execute(array(":vals"=>$val_sql));
+        $req->execute();
+        $req->closeCursor();
+      }
     }
 
     return array('success'=>true);
@@ -357,6 +438,7 @@ abstract class Tables
       ':table_id' => $table_id
     ));
     $current_reserves = $dbCheck->fetch();
+    $dbCheck->closeCursor();
 
     if($current_reserves['ct'] < $howmany){
       for($i=$current_reserves['ct']+2; $i<$howmany+2; $i++){
@@ -375,6 +457,7 @@ abstract class Tables
       ':min' => $min,
       ':max' => $max
     ));
+    $dbCheck->closeCursor();
   }
 
   static function refresh_table($pdo, $uid, $data)
@@ -388,16 +471,23 @@ abstract class Tables
       "UPDATE game_tables SET start_datetime=:start_datetime WHERE id=:table_id AND player_id=:uid AND table_type='now' LIMIT 1"
     );
     $dbCheck->execute($exec_params);
+    $dbCheck->closeCursor();
     return array('success'=>true);
   }
 
   static function cancel_table($pdo, $uid, $data)
   {
+    $old_table_req = $pdo->prepare("SELECT * FROM game_tables WHERE id=:tid");
+    $old_table_req->execute(array(':tid'=>$data['table_id']));
+    $old_table = $old_table_req->fetch();
+    $old_table_req->closeCursor();
+
     $dbCheck = $pdo->prepare("UPDATE game_tables SET status='cancelled' WHERE id=:table_id AND player_id=:uid LIMIT 1");
     $dbCheck->execute(array(
       ':table_id' => $data['table_id'],
       ':uid' => $uid
     ));
+    $dbCheck->closeCursor();
 
     $dbCheck = $pdo->prepare("SELECT COUNT(*) FROM game_signups WHERE table_id=:table_id");
     $dbCheck->execute(array(':table_id' => $data['table_id']));
@@ -409,7 +499,59 @@ abstract class Tables
         ':table_id' => $data['table_id'],
         ':uid' => $uid
       ));
+      $dbCheck->closeCursor();
     }
+
+    //if($signups > 0)
+    //{
+      $gamereq = $pdo->prepare("SELECT title FROM bgg_game_db WHERE bgg_id=:bgg_id LIMIT 1");
+      $gamereq->execute(array(':bgg_id'=>$old_table['bgg_id']));
+      $game_title = $gamereq->fetchColumn();
+      $gamereq->closeCursor();
+
+      $userreq = $pdo->prepare("SELECT player_id FROM game_signups WHERE table_id = :table_id AND player_id != :my_id");
+      $userreq->execute(array(
+        ':table_id'=>$data['table_id'],
+        ':my_id'=>$uid
+      ));
+      $users = $userreq->fetchAll();
+      $userreq->closeCursor();
+
+      //$title = $data['table_type']==='now' ? 'Players Wanted Alert' : 'New Scheduled Game Alert';
+      $dt_start = strtotime($old_table['start_datetime']);
+      $timemsg = date('D g:i a', $dt_start);
+      $title = "Table Cancelled: ".$game_title;
+      $message = $game_title . " on " . $timemsg . " was cancelled.";
+
+      $prep_fields = '(`player_id`, `dismissed`, `title`, `message`, `reference_id`, `reference_type`, `game_title`, `game_start`, `notify_type`)';
+      $prep_values = array(
+        /* player_id is merged later */
+        '0', // dismissed
+        $title, // title
+        $message, // message
+        $data['table_id'], // reference_id
+        'table', // reference_type
+        $game_title, // game_title,
+        $old_table['start_datetime'], // game_start,
+        'cancel_table' // notify_type
+      );
+
+      if(count($users) > 0)
+      {
+        foreach($users as $user){
+          // prepend playerid to prepared values
+          $values[] = '"' . implode('", "', array_merge(array($user['player_id']), $prep_values)) . '"';
+        }
+
+        $val_sql = '(' . implode('), (', $values) . ')';
+        $req = $pdo->prepare(
+          "INSERT INTO notifications $prep_fields VALUES $val_sql"
+        );
+        //$req->execute(array(":vals"=>$val_sql));
+        $req->execute();
+        $req->closeCursor();
+      }
+    //}
 
     return array('success'=>true);
   }
