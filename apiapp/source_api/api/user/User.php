@@ -26,12 +26,39 @@ abstract class User
 
   static function getNotifications($pdo, $uid)
   {
-    $req = $pdo->prepare("SELECT nt.id, nt.title, db.title as game_title, nt.message, nt.reference_id, nt.created_date, gt.start_datetime, gt.table_type, nt.link, CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as host_name
+    $req = $pdo->prepare("DELETE FROM notifications WHERE player_id=:uid AND game_start < NOW() - INTERVAL 20 MINUTE");
+    $req->execute(array(":uid"=>$uid));
+    $req->closeCursor();
+
+    $req = $pdo->prepare("SELECT nt.id, nt.title, db.title as game_title, nt.message, nt.reference_id, nt.reference_type, nt.created_date, gt.start_datetime, gt.table_type, nt.link, nt.notify_type, nt.dismissed
       FROM notifications nt
       LEFT JOIN game_tables gt ON gt.id = nt.reference_id
       LEFT JOIN bgg_game_db db ON db.bgg_id = gt.bgg_id
       LEFT JOIN users u ON u.id = nt.player_id
-      WHERE nt.player_id=:uid AND dismissed=0 AND created_date > NOW() - INTERVAL 24 HOUR LIMIT 99");
+      WHERE nt.player_id=:uid AND dismissed=0 AND created_date > NOW() - INTERVAL 48 HOUR LIMIT 50");
+    $req->execute(array(":uid"=>$uid));
+    $wtps = $req->fetchAll();
+    $req->closeCursor();
+
+    $req = $pdo->prepare("UPDATE notifications SET dismissed=1 WHERE player_id=:uid");
+    $req->execute(array(":uid"=>$uid));
+    $req->closeCursor();
+
+    return array('alerts' => $wtps);
+  }
+
+  static function getAllMyNotifications($pdo, $uid)
+  {
+    $req = $pdo->prepare("DELETE FROM notifications WHERE player_id=:uid AND game_start < NOW() - INTERVAL 20 MINUTE");
+    $req->execute(array(":uid"=>$uid));
+    $req->closeCursor();
+
+    $req = $pdo->prepare("SELECT nt.id, nt.title, db.title as game_title, nt.message, nt.reference_id, nt.created_date, gt.start_datetime, gt.table_type, nt.link, nt.notify_type, nt.dismissed
+      FROM notifications nt
+      LEFT JOIN game_tables gt ON gt.id = nt.reference_id
+      LEFT JOIN bgg_game_db db ON db.bgg_id = gt.bgg_id
+      LEFT JOIN users u ON u.id = nt.player_id
+      WHERE nt.player_id=:uid ORDER BY nt.created_date ASC LIMIT 50");
     $req->execute(array(":uid"=>$uid));
     $wtps = $req->fetchAll();
     $req->closeCursor();
@@ -43,7 +70,7 @@ abstract class User
   {
     if($alert_id==='all'){
       $req = $pdo->prepare("DELETE FROM notifications WHERE player_id=:uid");
-      $req->execute(array(':uid'=>$uid, ':alert_id'=>$alert_id));
+      $req->execute(array(':uid'=>$uid));
     }else{
       $req = $pdo->prepare("DELETE FROM notifications WHERE player_id=:uid AND id=:alert_id");
       $req->execute(array(':uid'=>$uid, ':alert_id'=>$alert_id));

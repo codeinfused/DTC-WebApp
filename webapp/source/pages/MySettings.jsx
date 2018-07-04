@@ -367,10 +367,11 @@ class MySettings extends React.Component
           </div>
 
           <div className="my-settings-item">
-            <h3>Your Account</h3>
+            <h3 style={{marginBottom:'3px'}}>Your Account</h3>
             <span className="my-current-account">Currently: <span>{CONFIG.state.user.grant_type}</span></span>
             {/* <div><Switch label='Show My Profile Photo In Tables' check={comp.state.show_photo} onChange={comp.handleChangeInput.bind(comp)}</div> */}
             <Switch label='Allow Phone Notifications' checked={comp.state.allow_notifications} onChange={comp.handleChangeNotifications.bind(comp)} />
+            <span>For iPhones, only works in Chrome</span>
             <div className="account-option">
               <button type="button" className="btn-login btn-login-logout metro" onClick={CONFIG.handleLogout}>Log out to switch accounts</button>
             </div>

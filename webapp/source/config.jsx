@@ -31,8 +31,11 @@ const CONFIG = {
     notify: baseAPI+"user/me/notify",
     dns: baseAPI+"user/me/dns",
     ignore: baseAPI+"user/me/ignore",
+
     getAlerts: baseAPI+"user/getalerts",
+    getAllMyAlerts: baseAPI+"user/getallmyalerts",
     myAlertSettings: baseAPI+"user/myalertgames",
+    cancelAlert: baseAPI+"user/cancelalert",
 
     tablePlayers: baseAPI+"tables/players",
     getSchedulesByDay: baseAPI+"tables/byday",
@@ -88,7 +91,9 @@ const CONFIG = {
         browserHistory.push('/home');
       }
 
-      comp.state.index.getNewAlerts();
+      setTimeout(function(){
+        comp.state.index.getNewAlerts();
+      }, 6000);
 
     }).catch(function(json){
       var err = json.response ? json.response.data.message : "Could not restore session.";
@@ -137,49 +142,78 @@ const CONFIG = {
   },
 
 
+  // checkNotificationPermission(enabling)
+  // {
+  //   var comp = this;
+  //   //if (!"Notification" in window) {
+  //   //ToastsAPI.toast('error', null, 'Your browser cannot send phone notifications.', {timeout:6000});
+  //   if ('serviceWorker' in navigator && 'Notification' in window) {
+  //     if (Notification.permission === 'granted'){
+  //       navigator.serviceWorker.register('/sw.js').then(function(swReg) {
+  //         //console.log('Service Worker is registered', swReg);
+  //         comp.notifier = swReg;
+  //         if(enabling===true){
+  //           comp.sendNotification('DTC Notifications', "Notifications are enabled.");
+  //         }
+  //       }).catch(function(error) {
+  //         //console.error('Service Worker Error', error);
+  //       });
+  //     }else{
+  //       // notification not granted yet
+  //       navigator.serviceWorker.register('/sw.js');
+  //       Notification.requestPermission(function(result) {
+  //         if (result === 'granted') {
+  //           navigator.serviceWorker.ready.then(function(registration) {
+  //             comp.notifier = registration;
+  //             comp.sendNotification('DTC Notifications', "Notifications are enabled.");
+  //           });
+  //         }
+  //       });
+  //     }
+  //   } else {
+  //     //console.warn('Push messaging is not supported');
+  //   }
+  // },
+  //
+
   checkNotificationPermission(enabling)
   {
     var comp = this;
-    //if (!"Notification" in window) {
-    //ToastsAPI.toast('error', null, 'Your browser cannot send phone notifications.', {timeout:6000});
     if ('serviceWorker' in navigator && 'Notification' in window) {
       if (Notification.permission === 'granted'){
-        navigator.serviceWorker.register('/sw.js').then(function(swReg) {
-          //console.log('Service Worker is registered', swReg);
-          comp.notifier = swReg;
-          if(enabling===true){
-            comp.sendNotification('DTC Notifications', "Notifications are enabled.");
-          }
-        }).catch(function(error) {
-          //console.error('Service Worker Error', error);
-        });
+        if(enabling===true){
+          comp.sendNotification({}, 'DTC Notifications', "Notifications are enabled.");
+        }
       }else{
         // notification not granted yet
-        navigator.serviceWorker.register('/sw.js');
         Notification.requestPermission(function(result) {
           if (result === 'granted') {
-            navigator.serviceWorker.ready.then(function(registration) {
-              comp.notifier = registration;
-              comp.sendNotification('DTC Notifications', "Notifications are enabled.");
-            });
+            comp.checkNotificationPermission(enabling);
           }
         });
       }
     } else {
-      //console.warn('Push messaging is not supported');
+      console.warn('Push messaging is not supported');
     }
   },
 
 
-  sendNotification(title, message)
+  sendNotification(obj, title, message)
   {
     var comp = this;
-    if ('serviceWorker' in navigator && 'Notification' in window && Notification.permission === "granted") {
-      comp.notifier.showNotification(title, {
-        body: message,
+    //if ('serviceWorker' in navigator && 'Notification' in window && Notification.permission === "granted") {
+    if ('Notification' in window && Notification.permission === "granted") {
+      var notification = new Notification(title, {
         icon: "/apple-touch-icon-192.png",
+        body: message,
         vibrate: 400
       });
+      notification.onclick = function(e){
+        if(obj && obj.reference_type==='table'){
+          window.location = '/list/table/' + obj.reference_id;
+        }
+        notification.close();
+      };
     }
   },
 

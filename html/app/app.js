@@ -283,21 +283,25 @@
 	    value: function getNewAlerts() {
 	      var comp = this;
 	      var req = _config2.default.api.getAlerts;
-	
-	      (0, _axios2.default)({
-	        method: 'post',
-	        url: req,
-	        responseType: 'json',
-	        data: { t: new Date().getTime() },
-	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
-	      }).then(function (json) {
-	        if (json.data && json.data.alerts) {
-	          comp.setState({ alerts: json.data.alerts });
-	        }
-	        setTimeout(comp.getNewAlerts, 120000);
-	      }).catch(function () {
-	        setTimeout(comp.getNewAlerts, 120000);
-	      });
+	      if (_config2.default.state.user.allow_notifications == '1') {
+	        (0, _axios2.default)({
+	          method: 'post',
+	          url: req,
+	          responseType: 'json',
+	          data: { t: new Date().getTime() },
+	          headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
+	        }).then(function (json) {
+	          if (json.data && json.data.alerts) {
+	            //comp.setState({alerts: json.data.alerts});
+	            json.data.alerts.forEach(function (alert, i) {
+	              _config2.default.sendNotification(alert, alert.title, alert.message);
+	            });
+	          }
+	        }).catch(function () {
+	          //
+	        });
+	      }
+	      setTimeout(comp.getNewAlerts, 60000);
 	    }
 	  }, {
 	    key: 'openTableDialog',
@@ -57126,8 +57130,11 @@
 	    notify: baseAPI + "user/me/notify",
 	    dns: baseAPI + "user/me/dns",
 	    ignore: baseAPI + "user/me/ignore",
+	
 	    getAlerts: baseAPI + "user/getalerts",
+	    getAllMyAlerts: baseAPI + "user/getallmyalerts",
 	    myAlertSettings: baseAPI + "user/myalertgames",
+	    cancelAlert: baseAPI + "user/cancelalert",
 	
 	    tablePlayers: baseAPI + "tables/players",
 	    getSchedulesByDay: baseAPI + "tables/byday",
@@ -57181,7 +57188,9 @@
 	        _reactRouter.browserHistory.push('/home');
 	      }
 	
-	      comp.state.index.getNewAlerts();
+	      setTimeout(function () {
+	        comp.state.index.getNewAlerts();
+	      }, 6000);
 	    }).catch(function (json) {
 	      var err = json.response ? json.response.data.message : "Could not restore session.";
 	      _ToastsAPI2.default.toast('error', null, err, { timeOut: 6000 });
@@ -57222,45 +57231,76 @@
 	      _ToastsAPI2.default.toast('error', null, json.response.data.message, { timeOut: 8000 }); // json.response.data.message
 	    });
 	  },
+	
+	
+	  // checkNotificationPermission(enabling)
+	  // {
+	  //   var comp = this;
+	  //   //if (!"Notification" in window) {
+	  //   //ToastsAPI.toast('error', null, 'Your browser cannot send phone notifications.', {timeout:6000});
+	  //   if ('serviceWorker' in navigator && 'Notification' in window) {
+	  //     if (Notification.permission === 'granted'){
+	  //       navigator.serviceWorker.register('/sw.js').then(function(swReg) {
+	  //         //console.log('Service Worker is registered', swReg);
+	  //         comp.notifier = swReg;
+	  //         if(enabling===true){
+	  //           comp.sendNotification('DTC Notifications', "Notifications are enabled.");
+	  //         }
+	  //       }).catch(function(error) {
+	  //         //console.error('Service Worker Error', error);
+	  //       });
+	  //     }else{
+	  //       // notification not granted yet
+	  //       navigator.serviceWorker.register('/sw.js');
+	  //       Notification.requestPermission(function(result) {
+	  //         if (result === 'granted') {
+	  //           navigator.serviceWorker.ready.then(function(registration) {
+	  //             comp.notifier = registration;
+	  //             comp.sendNotification('DTC Notifications', "Notifications are enabled.");
+	  //           });
+	  //         }
+	  //       });
+	  //     }
+	  //   } else {
+	  //     //console.warn('Push messaging is not supported');
+	  //   }
+	  // },
+	  //
+	
 	  checkNotificationPermission: function checkNotificationPermission(enabling) {
 	    var comp = this;
-	    //if (!"Notification" in window) {
-	    //ToastsAPI.toast('error', null, 'Your browser cannot send phone notifications.', {timeout:6000});
 	    if ('serviceWorker' in navigator && 'Notification' in window) {
 	      if (Notification.permission === 'granted') {
-	        navigator.serviceWorker.register('/sw.js').then(function (swReg) {
-	          //console.log('Service Worker is registered', swReg);
-	          comp.notifier = swReg;
-	          if (enabling === true) {
-	            comp.sendNotification('DTC Notifications', "Notifications are enabled.");
-	          }
-	        }).catch(function (error) {
-	          //console.error('Service Worker Error', error);
-	        });
+	        if (enabling === true) {
+	          comp.sendNotification({}, 'DTC Notifications', "Notifications are enabled.");
+	        }
 	      } else {
 	        // notification not granted yet
-	        navigator.serviceWorker.register('/sw.js');
 	        Notification.requestPermission(function (result) {
 	          if (result === 'granted') {
-	            navigator.serviceWorker.ready.then(function (registration) {
-	              comp.notifier = registration;
-	              comp.sendNotification('DTC Notifications', "Notifications are enabled.");
-	            });
+	            comp.checkNotificationPermission(enabling);
 	          }
 	        });
 	      }
 	    } else {
-	      //console.warn('Push messaging is not supported');
+	      console.warn('Push messaging is not supported');
 	    }
 	  },
-	  sendNotification: function sendNotification(title, message) {
+	  sendNotification: function sendNotification(obj, title, message) {
 	    var comp = this;
-	    if ('serviceWorker' in navigator && 'Notification' in window && Notification.permission === "granted") {
-	      comp.notifier.showNotification(title, {
-	        body: message,
+	    //if ('serviceWorker' in navigator && 'Notification' in window && Notification.permission === "granted") {
+	    if ('Notification' in window && Notification.permission === "granted") {
+	      var notification = new Notification(title, {
 	        icon: "/apple-touch-icon-192.png",
+	        body: message,
 	        vibrate: 400
 	      });
+	      notification.onclick = function (e) {
+	        if (obj && obj.reference_type === 'table') {
+	          window.location = '/list/table/' + obj.reference_id;
+	        }
+	        notification.close();
+	      };
 	    }
 	  },
 	
@@ -99852,7 +99892,7 @@
 	    key: 'addIgnore',
 	    value: function addIgnore(bad_player_id) {
 	      var comp = this;
-	      console.log(_config2.default.state.user);
+	
 	      _config2.default.state.user.ignore.push(bad_player_id);
 	      _config2.default.state.user.ignore = _.uniq(_config2.default.state.user.ignore);
 	      if (comp.props.onToggleIgnore) {
@@ -101244,7 +101284,7 @@
 	          ignore: json.data.ignore
 	        });
 	      }).catch(function (json) {
-	        console.log(json);
+	
 	        _ToastsAPI2.default.toast('error', null, 'Failed to get some settings.', { timeOut: 6000 });
 	      });
 	    }
@@ -101520,7 +101560,7 @@
 	    key: 'handleToggleIgnore',
 	    value: function handleToggleIgnore(bad_player_id) {
 	      var comp = this;
-	      console.log(_config2.default.state.user.ignore, bad_player_id);
+	
 	      if (_config2.default.state.user.ignore.indexOf(bad_player_id) < 0) {
 	        comp.addIgnore(bad_player_id);
 	      } else {
@@ -101565,7 +101605,7 @@
 	            { className: 'my-settings-item' },
 	            _react2.default.createElement(
 	              'h3',
-	              null,
+	              { style: { marginBottom: '3px' } },
 	              'Your Account'
 	            ),
 	            _react2.default.createElement(
@@ -101579,6 +101619,11 @@
 	              )
 	            ),
 	            _react2.default.createElement(_reactToolbox.Switch, { label: 'Allow Phone Notifications', checked: comp.state.allow_notifications, onChange: comp.handleChangeNotifications.bind(comp) }),
+	            _react2.default.createElement(
+	              'span',
+	              null,
+	              'For iPhones, only works in Chrome'
+	            ),
 	            _react2.default.createElement(
 	              'div',
 	              { className: 'account-option' },
@@ -101826,106 +101871,71 @@
 	
 	    _this.state = {
 	      loaded: true,
-	      cancelDialogActive: false,
-	      currentTableId: -1,
-	      tables: []
+	      alerts: []
 	    };
 	
-	    _this.renderTableList = _this.renderTableList.bind(_this);
-	    _this.renderNoTables = _this.renderNoTables.bind(_this);
-	    _this.getTableList = _this.getTableList.bind(_this);
-	    _this.handleToggleCancel = _this.handleToggleCancel.bind(_this);
-	    _this.deleteTable = _this.deleteTable.bind(_this);
+	    _this.renderAlertList = _this.renderAlertList.bind(_this);
+	    _this.getAlertList = _this.getAlertList.bind(_this);
+	    _this.deleteAlert = _this.deleteAlert.bind(_this);
 	    return _this;
 	  }
 	
 	  _createClass(MyAlerts, [{
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
-	      //this.getTableList();
+	      this.getAlertList();
 	    }
 	  }, {
 	    key: 'componentWillReceiveProps',
 	    value: function componentWillReceiveProps(nextProps) {}
 	  }, {
-	    key: 'getTableList',
-	    value: function getTableList() {
+	    key: 'getAlertList',
+	    value: function getAlertList() {
 	      var comp = this;
-	      _axios2.default.post(_config2.default.api.myTables, {
+	      _axios2.default.post(_config2.default.api.getAllMyAlerts, {
 	        t: new Date().getTime()
 	      }, {
 	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
 	      }).then(function (json) {
 	        comp.setState({
 	          loaded: true,
-	          tables: json.data.tables
+	          alerts: json.data.alerts
 	        });
 	      }).catch(function (json) {
-	        _ToastsAPI2.default.toast('error', null, 'Error getting table list.', { timeOut: 6000 });
+	        _ToastsAPI2.default.toast('error', null, 'Error getting list.', { timeOut: 6000 });
 	      });
 	    }
 	  }, {
-	    key: 'deleteTable',
-	    value: function deleteTable() {
+	    key: 'deleteAlert',
+	    value: function deleteAlert(alert_id) {
 	      var comp = this;
-	      _axios2.default.post(_config2.default.api.cancelTable, {
-	        table_id: comp.state.currentTableId,
+	      _axios2.default.post(_config2.default.api.cancelAlert, {
+	        alert_id: alert_id,
 	        t: new Date().getTime()
 	      }, {
 	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
 	      }).then(function (json) {
-	        _ToastsAPI2.default.toast('success', 'Table cancelled.', null, { timeout: 6000 });
-	        comp.setState({ cancelDialogActive: false });
-	        comp.getTableList();
+	        //ToastsAPI.toast('success', 'Alert cancelled.', null, {timeout:6000});
+	        //comp.setState({cancelDialogActive: false});
+	        comp.getAlertList();
 	      }).catch(function (json) {
 	        _ToastsAPI2.default.toast('error', null, json.response.data.message, { timeOut: 6000 });
 	      });
 	    }
 	  }, {
-	    key: 'handleConfirmCancel',
-	    value: function handleConfirmCancel(table) {
-	      this.setState({
-	        currentTableId: table.table_id,
-	        cancelDialogActive: true
-	      });
-	    }
-	  }, {
-	    key: 'handleToggleCancel',
-	    value: function handleToggleCancel() {
-	      this.setState({ cancelDialogActive: false });
-	    }
-	  }, {
-	    key: 'refreshTable',
-	    value: function refreshTable(table) {
+	    key: 'viewTable',
+	    value: function viewTable(table_id) {
 	      var comp = this;
-	      _axios2.default.post(_config2.default.api.refreshTable, {
-	        table_id: table.table_id,
-	        t: new Date().getTime()
-	      }, {
-	        headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
-	      }).then(function (json) {
-	        _ToastsAPI2.default.toast('success', 'Table updated.', null, { timeout: 6000 });
-	        comp.getTableList();
-	      }).catch(function (json) {
-	        _ToastsAPI2.default.toast('error', null, json.response.data.message, { timeOut: 6000 });
-	      });
+	      _reactRouter.browserHistory.push('/list/table/' + table_id);
 	    }
 	  }, {
-	    key: 'viewPlayers',
-	    value: function viewPlayers(table) {}
-	  }, {
-	    key: 'renderTableList',
-	    value: function renderTableList() {
+	    key: 'renderAlertList',
+	    value: function renderAlertList() {
 	      var comp = this;
 	
 	      return _react2.default.createElement(
 	        'div',
-	        { className: 'table-list' },
-	        _react2.default.createElement(
-	          'h2',
-	          null,
-	          'My Tables'
-	        ),
+	        { className: 'table-list', style: { padding: "0px" } },
 	        _react2.default.createElement(
 	          _reactTransitionGroup.CSSTransitionGroup,
 	          {
@@ -101933,84 +101943,49 @@
 	            transitionEnterTimeout: 500,
 	            transitionLeaveTimeout: 500
 	          },
-	          comp.state.tables.map(function (table, i) {
+	          comp.state.alerts.map(function (alert, i) {
 	            return _react2.default.createElement(
 	              'div',
-	              { className: 'table-item', key: "table-item-" + table.table_id },
+	              { className: 'table-item', key: "alert-item-" + alert.id },
 	              _react2.default.createElement(
 	                'div',
 	                { className: 'table-item-header' },
 	                _react2.default.createElement(
 	                  'span',
 	                  { className: 'table-item-title' },
-	                  table.title
+	                  alert.title
 	                ),
 	                _react2.default.createElement(
 	                  'span',
-	                  { className: "table-item-when " + table.status },
-	                  table.status === 'cancelled' ? 'Cancelled' : (0, _moment2.default)(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').fromNow()
+	                  { className: "table-item-when " + alert.notify_type },
+	                  alert.notify_type === 'cancel_table' ? 'Cancelled' : (0, _moment2.default)(alert.start_datetime, 'YYYY-MM-DD HH:mm:ss').fromNow()
 	                )
 	              ),
 	              _react2.default.createElement(
 	                'div',
 	                { className: 'table-item-details' },
-	                table.table_type === 'future' ? _react2.default.createElement(
-	                  'span',
-	                  { className: 'table-item-tag' },
-	                  table.signups,
-	                  ' of ',
-	                  table.seats,
-	                  ' seats taken'
-	                ) : '',
 	                _react2.default.createElement(
 	                  'span',
 	                  { className: 'table-item-tag' },
-	                  table.table_location
-	                ),
-	                table.table_type === 'future' ? _react2.default.createElement(
-	                  'span',
-	                  { className: 'table-item-tag' },
-	                  (0, _moment2.default)(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, MMM Do YYYY, h:mm a')
-	                ) : ''
+	                  alert.message
+	                )
 	              ),
-	              table.status === 'cancelled' ? '' : _react2.default.createElement(
+	              _react2.default.createElement(
 	                'div',
 	                { className: 'table-item-actions' },
 	                _react2.default.createElement(
 	                  'button',
-	                  { className: 'delete', onClick: comp.handleConfirmCancel.bind(comp, table) },
+	                  { className: 'delete', onClick: comp.deleteAlert.bind(comp, alert.id) },
 	                  _react2.default.createElement(_reactToolbox.FontIcon, { value: 'close' })
 	                ),
-	                table.table_type === 'now' ? _react2.default.createElement(
+	                alert.alert_type !== 'cancel_table' ? _react2.default.createElement(
 	                  'button',
-	                  { onClick: comp.refreshTable.bind(comp, table) },
-	                  'Refresh this listing'
-	                ) : _react2.default.createElement(
-	                  'button',
-	                  { onClick: comp.viewPlayers.bind(comp, table) },
-	                  'View your players'
-	                )
+	                  { onClick: comp.viewTable.bind(comp, alert.table_id) },
+	                  'View Table'
+	                ) : ''
 	              )
 	            );
 	          })
-	        )
-	      );
-	    }
-	  }, {
-	    key: 'renderNoTables',
-	    value: function renderNoTables() {
-	      return _react2.default.createElement(
-	        'div',
-	        { className: 'game-search-list-empty' },
-	        _react2.default.createElement(
-	          'h3',
-	          null,
-	          'No hosted tables.'
-	        ),
-	        _react2.default.createElement(
-	          'p',
-	          null,
-	          'Either you haven\'t made any tables yet, or your other games have already happened.'
 	        )
 	      );
 	    }
@@ -102024,9 +101999,17 @@
 	        _react2.default.createElement(
 	          'h2',
 	          null,
-	          'Game Alerts Coming Soon'
+	          'Game Alerts'
 	        ),
-	        _react2.default.createElement('div', { className: "alert-list-wrap" + (comp.state.loader ? " loading" : "") }),
+	        _react2.default.createElement(
+	          'div',
+	          { className: "alert-list-wrap" + (comp.state.loader ? " loading" : "") },
+	          comp.state.alerts && comp.state.alerts.length > 0 ? comp.renderAlertList() : _react2.default.createElement(
+	            'p',
+	            null,
+	            'No new alerts on upcoming games yet.'
+	          )
+	        ),
 	        _react2.default.createElement(_Loaders.LoadingInline, {
 	          active: !comp.state.loaded
 	        })
@@ -102450,7 +102433,7 @@
 	          game_popup: false
 	        });
 	      }).catch(function (json) {
-	        console.log(json);
+	
 	        _ToastsAPI2.default.toast('error', null, 'Error getting tables list.', { timeOut: 6000 });
 	      });
 	    }
@@ -102941,7 +102924,7 @@
 	          game_popup: false
 	        });
 	      }).catch(function (json) {
-	        console.log(json);
+	
 	        _ToastsAPI2.default.toast('error', null, 'Error getting events list.', { timeOut: 6000 });
 	      });
 	    }

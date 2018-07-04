@@ -20,21 +20,17 @@ class MyAlerts extends React.Component
 
     this.state = {
       loaded: true,
-      cancelDialogActive: false,
-      currentTableId: -1,
-      tables: []
+      alerts: []
     };
 
-    this.renderTableList = this.renderTableList.bind(this);
-    this.renderNoTables = this.renderNoTables.bind(this);
-    this.getTableList = this.getTableList.bind(this);
-    this.handleToggleCancel = this.handleToggleCancel.bind(this);
-    this.deleteTable = this.deleteTable.bind(this);
+    this.renderAlertList = this.renderAlertList.bind(this);
+    this.getAlertList = this.getAlertList.bind(this);
+    this.deleteAlert = this.deleteAlert.bind(this);
   }
 
   componentDidMount()
   {
-    //this.getTableList();
+    this.getAlertList();
   }
 
   componentWillReceiveProps(nextProps)
@@ -42,122 +38,83 @@ class MyAlerts extends React.Component
 
   }
 
-  getTableList()
+  getAlertList()
   {
     var comp = this;
-    axios.post(CONFIG.api.myTables, {
+    axios.post(CONFIG.api.getAllMyAlerts, {
       t: (new Date()).getTime()
     }, {
       headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
-    }).then(function(json){
+    }).then(function(json)
+    {
       comp.setState({
         loaded: true,
-        tables: json.data.tables
+        alerts: json.data.alerts
       });
     }).catch(function(json){
-      ToastsAPI.toast('error', null, 'Error getting table list.', {timeOut:6000});
+      ToastsAPI.toast('error', null, 'Error getting list.', {timeOut:6000});
     });
   }
 
-  deleteTable()
+  deleteAlert(alert_id)
   {
     var comp = this;
-    axios.post(CONFIG.api.cancelTable, {
-      table_id: comp.state.currentTableId,
+    axios.post(CONFIG.api.cancelAlert, {
+      alert_id: alert_id,
       t: (new Date()).getTime()
     }, {
       headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
     }).then(function(json){
-      ToastsAPI.toast('success', 'Table cancelled.', null, {timeout:6000});
-      comp.setState({cancelDialogActive: false});
-      comp.getTableList();
+      //ToastsAPI.toast('success', 'Alert cancelled.', null, {timeout:6000});
+      //comp.setState({cancelDialogActive: false});
+      comp.getAlertList();
     }).catch(function(json){
       ToastsAPI.toast('error', null, json.response.data.message, {timeOut:6000});
     });
   }
 
-  handleConfirmCancel(table)
-  {
-    this.setState({
-      currentTableId: table.table_id,
-      cancelDialogActive: true
-    })
-  }
-
-  handleToggleCancel(){ this.setState({cancelDialogActive: false}); }
-
-
-  refreshTable(table)
+  viewTable(table_id)
   {
     var comp = this;
-    axios.post(CONFIG.api.refreshTable, {
-      table_id: table.table_id,
-      t: (new Date()).getTime()
-    }, {
-      headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
-    }).then(function(json){
-      ToastsAPI.toast('success', 'Table updated.', null, {timeout:6000});
-      comp.getTableList();
-    }).catch(function(json){
-      ToastsAPI.toast('error', null, json.response.data.message, {timeOut:6000});
-    });
-  }
-
-  viewPlayers(table)
-  {
-
+    browserHistory.push('/list/table/'+table_id);
   }
 
 
-  renderTableList()
+  renderAlertList()
   {
     var comp = this;
 
     return (
-      <div className="table-list">
-        <h2>My Tables</h2>
+      <div className="table-list" style={{padding:"0px"}}>
         <CSSTransitionGroup
           transitionName="router"
           transitionEnterTimeout={500}
           transitionLeaveTimeout={500}
         >
-          {comp.state.tables.map(function(table, i)
+          {comp.state.alerts.map(function(alert, i)
           {
             return (
-              <div className="table-item" key={"table-item-"+table.table_id}>
+              <div className="table-item" key={"alert-item-"+alert.id}>
                 <div className="table-item-header">
-                  <span className="table-item-title">{table.title}</span>
-                  <span className={"table-item-when " + table.status}>
-                    {table.status === 'cancelled' ? 'Cancelled' : moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').fromNow()}
+                  <span className="table-item-title">{alert.title}</span>
+                  <span className={"table-item-when " + alert.notify_type}>
+                    {alert.notify_type === 'cancel_table' ? 'Cancelled' : moment(alert.start_datetime, 'YYYY-MM-DD HH:mm:ss').fromNow()}
                   </span>
                 </div>
                 <div className="table-item-details">
-                  {table.table_type==='future' ? (<span className="table-item-tag">{table.signups} of {table.seats} seats taken</span>) : ''}
-                  <span className="table-item-tag">{table.table_location}</span>
-                  {table.table_type==='future' ? (<span className="table-item-tag">{moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, MMM Do YYYY, h:mm a')}</span>) : ''}
+                  <span className="table-item-tag">{alert.message}</span>
                 </div>
-                {table.status === 'cancelled' ? '' : (
-                  <div className="table-item-actions">
-                    <button className='delete' onClick={comp.handleConfirmCancel.bind(comp, table)}><FontIcon value='close' /></button>
-                    {table.table_type==='now' ? (
-                      <button onClick={comp.refreshTable.bind(comp, table)}>Refresh this listing</button>
-                    ) : (
-                      <button onClick={comp.viewPlayers.bind(comp, table)}>View your players</button>
-                    )}
-                  </div>
-                )}
+                <div className="table-item-actions">
+                  <button className='delete' onClick={comp.deleteAlert.bind(comp, alert.id)}><FontIcon value='close' /></button>
+                  {alert.alert_type!=='cancel_table' ? (
+                    <button onClick={comp.viewTable.bind(comp, alert.table_id)}>View Table</button>
+                  ) : ''}
+                </div>
               </div>
             );
           })}
         </CSSTransitionGroup>
       </div>
-    );
-  }
-
-  renderNoTables()
-  {
-    return (
-      <div className="game-search-list-empty"><h3>No hosted tables.</h3><p>Either you haven't made any tables yet, or your other games have already happened.</p></div>
     );
   }
 
@@ -167,9 +124,9 @@ class MyAlerts extends React.Component
     return (
       <div id="page-my-alerts" className="transition-item page-my-alerts page-wrap">
 
-        <h2>Game Alerts Coming Soon</h2>
+        <h2>Game Alerts</h2>
         <div className={"alert-list-wrap" + (comp.state.loader ? " loading" : "")}>
-          {/* {(comp.state.tables && comp.state.tables.length > 0) ? comp.renderTableList() : comp.renderNoTables()} */}
+          {(comp.state.alerts && comp.state.alerts.length > 0) ? comp.renderAlertList() : <p>No new alerts on upcoming games yet.</p>}
         </div>
 
         <LoadingInline

@@ -17,6 +17,19 @@ $app->post('/user/myalertgames', function($req, $resp, $args) use ($app)
   return $resp->withJson($alerts);
 });
 
+$app->post('/user/getallmyalerts', function($req, $resp, $args) use ($app)
+{
+  $body = $req->getParsedBody();
+
+  $token = Auth::checkAuthorization($this->db, $req);
+  if( is_error($token) ){
+    return $resp->withStatus((int)$token->get_code())->withJson($token->json());
+  }
+
+  $alerts = User::getAllMyNotifications($this->db, $token->data->uid);
+  return $resp->withJson($alerts);
+});
+
 $app->post('/user/getalerts', function($req, $resp, $args) use ($app)
 {
   $body = $req->getParsedBody();
@@ -29,6 +42,30 @@ $app->post('/user/getalerts', function($req, $resp, $args) use ($app)
   $alerts = User::getNotifications($this->db, $token->data->uid);
   return $resp->withJson($alerts);
 });
+
+$app->post('/user/cancelalert', function($req, $resp, $args) use ($app)
+{
+  $body = $req->getParsedBody();
+  $alert_id = $body['alert_id'];
+
+  if(empty($alert_id)){
+    $err = new \ApiError('406');
+    return $resp->withStatus(406)->withJson($err->json());
+  }
+
+  $token = Auth::checkAuthorization($this->db, $req);
+  if( is_error($token) ){
+    return $resp->withStatus((int)$token->get_code())->withJson($token->json());
+  }
+
+  User::dismissNotification($this->db, $token->data->uid, $alert_id);
+
+  return $resp->withJson(array('success'=>true));
+});
+
+
+
+
 
 $app->post('/user/setnotify', function($req, $resp, $args) use ($app)
 {

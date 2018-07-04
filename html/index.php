@@ -5,7 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
 <head>
   <?php require_once('../apiapp/conf.php'); ?>
-  <?php $ver = "3.13"; ?>
+  <?php $ver = "3.14"; ?>
 
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">

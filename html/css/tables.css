@@ -197,7 +197,7 @@ label[data-react-toolbox="switch"]{
   box-shadow: 0 0 10px rgba(0,0,0,0.4);
   z-index: 20;
 }
-span.table-item-when.cancelled {
+span.table-item-when.cancelled, span.table-item-when.cancel_table {
   background: #bb5c5c;
   color: #fff;
 }

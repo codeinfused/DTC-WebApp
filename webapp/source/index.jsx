@@ -151,21 +151,25 @@ class AppLayout extends React.Component
   {
     var comp = this;
     var req = CONFIG.api.getAlerts;
-
-    axios({
-      method: 'post',
-      url: req,
-      responseType: 'json',
-      data: { t: (new Date()).getTime() },
-      headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
-    }).then(function(json){
-      if(json.data && json.data.alerts){
-        comp.setState({alerts: json.data.alerts});
-      }
-      setTimeout(comp.getNewAlerts, 120000);
-    }).catch(function(){
-      setTimeout(comp.getNewAlerts, 120000);
-    });
+    if(CONFIG.state.user.allow_notifications=='1'){
+      axios({
+        method: 'post',
+        url: req,
+        responseType: 'json',
+        data: { t: (new Date()).getTime() },
+        headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
+      }).then(function(json){
+        if(json.data && json.data.alerts){
+          //comp.setState({alerts: json.data.alerts});
+          json.data.alerts.forEach(function(alert, i){
+            CONFIG.sendNotification(alert, alert.title, alert.message);
+          });
+        }
+      }).catch(function(){
+        //
+      });
+    }
+    setTimeout(comp.getNewAlerts, 60000);
   }
 
 

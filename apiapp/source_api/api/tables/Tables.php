@@ -344,8 +344,9 @@ abstract class Tables
       //$title = $data['table_type']==='now' ? 'Players Wanted Alert' : 'New Scheduled Game Alert';
       $dt_start = strtotime($data['start_datetime']);
       $timemsg = date('D g:i a', $dt_start);
+      if($data['table_type']==='now'){ $timemsg = 'NOW'; }
       $title = "New Table: ".$game_title;
-      $message = $game_title . ", " . $timemsg . ", " . $data['table_location'] . ' ' .$data['table_sublocation_alpha'].$data['table_sublocation_num'];
+      $message = "Starts " . $timemsg . ", " . $data['table_location'] . ' ' .$data['table_sublocation_alpha'].$data['table_sublocation_num'];
 
       $prep_fields = '(`player_id`, `dismissed`, `title`, `message`, `reference_id`, `reference_type`, `game_title`, `game_start`, `notify_type`)';
       $prep_values = array(
@@ -395,7 +396,7 @@ abstract class Tables
       $dt_start = strtotime($data['start_datetime']);
       $timemsg = date('D g:i a', $dt_start);
       $title = "Table Changed: ".$game_title;
-      $message = $game_title . " was changed to: " . $timemsg . ", " . $data['table_location'] . ' ' .$data['table_sublocation_alpha'].$data['table_sublocation_num'];
+      $message = "Now at: " . $timemsg . ", " . $data['table_location'] . ' ' .$data['table_sublocation_alpha'].$data['table_sublocation_num'];
 
       $prep_fields = '(`player_id`, `dismissed`, `title`, `message`, `reference_id`, `reference_type`, `game_title`, `game_start`, `notify_type`)';
       $prep_values = array(
