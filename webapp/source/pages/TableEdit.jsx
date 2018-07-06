@@ -31,7 +31,7 @@ class TableEdit extends React.Component
       '2018-07-08 23:00:00'
     ];
 
-    this.sublocs_alpha = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q'];
+    this.sublocs_alpha = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V'];
     this.sublocs_num = Array.apply(null, {length: 36}).map(Number.call, Number);
     this.sublocs_num = this.sublocs_num.slice(1);
 

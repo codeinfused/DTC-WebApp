@@ -98788,7 +98788,7 @@
 	
 	    _this.dateRange = ['2018-07-04 08:00:00', '2018-07-08 23:00:00'];
 	
-	    _this.sublocs_alpha = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q'];
+	    _this.sublocs_alpha = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V'];
 	    _this.sublocs_num = Array.apply(null, { length: 36 }).map(Number.call, Number);
 	    _this.sublocs_num = _this.sublocs_num.slice(1);
 	
