@@ -14,11 +14,11 @@ const CONFIG = {
   },
 
   conDays: [
-    {full:'2018-07-04', date:'4', name:'Wed'},
-    {full:'2018-07-05', date:'5', name:'Thu'},
-    {full:'2018-07-06', date:'6', name:'Fri'},
-    {full:'2018-07-07', date:'7', name:'Sat'},
-    {full:'2018-07-08', date:'8', name:'Sun'}
+    {full:'2019-07-03', date:'3', name:'Wed'},
+    {full:'2019-07-04', date:'4', name:'Thu'},
+    {full:'2019-07-05', date:'5', name:'Fri'},
+    {full:'2019-07-06', date:'6', name:'Sat'},
+    {full:'2019-07-07', date:'7', name:'Sun'}
   ],
 
   api: {

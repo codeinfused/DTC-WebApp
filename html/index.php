@@ -5,7 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
 <head>
   <?php require_once('../apiapp/conf.php'); ?>
-  <?php $ver = "3.15"; ?>
+  <?php $ver = "3.2"; ?>
 
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -97,5 +97,6 @@
 
   <script defer src="/vendors/axios.js"></script>
   <script defer src='<?php if(APP_ENV==='LOCAL'){ echo "/app/app.js"; }else{ echo "/app/app.min.js?v=<?php echo $ver; ?>"; } ?>'></script>
+
 </body>
 </html>

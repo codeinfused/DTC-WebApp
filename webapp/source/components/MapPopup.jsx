@@ -12,7 +12,7 @@ class MapPopup extends React.Component
     var comp = this;
     this.state = {
       popup_map: false,
-      styles: _.assign({display:"inline-block", textTransform:"none", position:"relative", top:"-1px"}, props.styles)
+      styles: _.assign({display:"inline-block", textTransform:"none", position:"relative", top:"-1px", fontSize:"1.3rem"}, props.styles)
     };
   }
 
@@ -38,6 +38,7 @@ class MapPopup extends React.Component
       <div className="map-popup-cm" style={{display:"inline-block"}}>
         <Button
           label="View DTC Floor Map"
+          icon="map"
           onClick={comp.handleOpenMap.bind(comp)}
           style={comp.state.styles}
           raised={comp.props.raised}

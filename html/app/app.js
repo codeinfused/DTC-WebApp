@@ -457,7 +457,7 @@
 	          ),
 	          pathpage === 'root' ? '' : _react2.default.createElement(_reactToolbox.AppBar, {
 	            className: 'app-headerbar',
-	            title: 'Dice Tower Con',
+	            title: 'Dice Tower Con \'19',
 	            leftIcon: 'menu',
 	            rightIcon: _react2.default.createElement(_reactToolbox.FontIcon, { value: 'arrow_back' }),
 	            onLeftIconClick: comp.toggleSideMenu.bind(comp),
@@ -57118,7 +57118,7 @@
 	    game: baseAPI + "games/"
 	  },
 	
-	  conDays: [{ full: '2018-07-04', date: '4', name: 'Wed' }, { full: '2018-07-05', date: '5', name: 'Thu' }, { full: '2018-07-06', date: '6', name: 'Fri' }, { full: '2018-07-07', date: '7', name: 'Sat' }, { full: '2018-07-08', date: '8', name: 'Sun' }],
+	  conDays: [{ full: '2019-07-03', date: '3', name: 'Wed' }, { full: '2019-07-04', date: '4', name: 'Thu' }, { full: '2019-07-05', date: '5', name: 'Fri' }, { full: '2019-07-06', date: '6', name: 'Sat' }, { full: '2019-07-07', date: '7', name: 'Sun' }],
 	
 	  api: {
 	    url: baseAPI,
@@ -98517,7 +98517,8 @@
 	            'Grab a "Players Wanted" sign to help others find your table!'
 	          )
 	        ),
-	        _react2.default.createElement(_MapPopup2.default, { styles: { fontSize: "1.3rem", height: "2.6rem", lineHeight: "2.6rem", marginLeft: "0.1rem", marginTop: "1rem" }, raised: true }),
+	        _react2.default.createElement(_MapPopup2.default, { styles: { marginTop: "1rem" }, raised: true }),
+	        _react2.default.createElement(_button.Button, { icon: 'comment', label: 'Feedback or Suggestions?', target: '_blank', href: 'https://fdier.co/4zOY4x', raised: true, style: { textTransform: 'none', fontSize: '1.3rem', marginTop: '1rem' } }),
 	        _react2.default.createElement(
 	          'h2',
 	          null,
@@ -98654,7 +98655,7 @@
 	    var comp = _this;
 	    _this.state = {
 	      popup_map: false,
-	      styles: _.assign({ display: "inline-block", textTransform: "none", position: "relative", top: "-1px" }, props.styles)
+	      styles: _.assign({ display: "inline-block", textTransform: "none", position: "relative", top: "-1px", fontSize: "1.3rem" }, props.styles)
 	    };
 	    return _this;
 	  }
@@ -98683,6 +98684,7 @@
 	        { className: 'map-popup-cm', style: { display: "inline-block" } },
 	        _react2.default.createElement(_button.Button, {
 	          label: 'View DTC Floor Map',
+	          icon: 'map',
 	          onClick: comp.handleOpenMap.bind(comp),
 	          style: comp.state.styles,
 	          raised: comp.props.raised,
@@ -99892,7 +99894,7 @@
 	    key: 'addIgnore',
 	    value: function addIgnore(bad_player_id) {
 	      var comp = this;
-	
+	      console.log(_config2.default.state.user);
 	      _config2.default.state.user.ignore.push(bad_player_id);
 	      _config2.default.state.user.ignore = _.uniq(_config2.default.state.user.ignore);
 	      if (comp.props.onToggleIgnore) {
@@ -101284,7 +101286,7 @@
 	          ignore: json.data.ignore
 	        });
 	      }).catch(function (json) {
-	
+	        console.log(json);
 	        _ToastsAPI2.default.toast('error', null, 'Failed to get some settings.', { timeOut: 6000 });
 	      });
 	    }
@@ -101560,7 +101562,7 @@
 	    key: 'handleToggleIgnore',
 	    value: function handleToggleIgnore(bad_player_id) {
 	      var comp = this;
-	
+	      console.log(_config2.default.state.user.ignore, bad_player_id);
 	      if (_config2.default.state.user.ignore.indexOf(bad_player_id) < 0) {
 	        comp.addIgnore(bad_player_id);
 	      } else {
@@ -102433,7 +102435,7 @@
 	          game_popup: false
 	        });
 	      }).catch(function (json) {
-	
+	        console.log(json);
 	        _ToastsAPI2.default.toast('error', null, 'Error getting tables list.', { timeOut: 6000 });
 	      });
 	    }
@@ -102924,7 +102926,7 @@
 	          game_popup: false
 	        });
 	      }).catch(function (json) {
-	
+	        console.log(json);
 	        _ToastsAPI2.default.toast('error', null, 'Error getting events list.', { timeOut: 6000 });
 	      });
 	    }

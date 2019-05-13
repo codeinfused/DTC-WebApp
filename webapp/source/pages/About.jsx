@@ -32,7 +32,9 @@ class About extends React.Component
           <li>Grab a "Players Wanted" sign to help others find your table!</li>
         </ul>
 
-        <MapPopup styles={{fontSize:"1.3rem", height:"2.6rem", lineHeight:"2.6rem", marginLeft:"0.1rem", marginTop:"1rem"}} raised />
+        <MapPopup styles={{marginTop:"1rem"}} raised />
+
+        <Button icon="comment" label='Feedback or Suggestions?' target='_blank' href="https://fdier.co/4zOY4x" raised style={{textTransform:'none',fontSize:'1.3rem',marginTop:'1rem'}} />
 
         <h2>Thanks to BGG!</h2>
         <p>All the board game data used here is from the amazing folks at <a href="http://boardgamegeek.com" target="_blank" style={{color:'#fff'}}>boardgamegeek.com</a>, thanks to their open API service!</p>

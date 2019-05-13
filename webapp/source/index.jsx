@@ -272,7 +272,7 @@ class AppLayout extends React.Component
           {pathpage==='root' ? '' : (
              <AppBar
                className="app-headerbar"
-               title="Dice Tower Con"
+               title="Dice Tower Con '19"
                leftIcon="menu"
                rightIcon={<FontIcon value='arrow_back' />}
                onLeftIconClick={comp.toggleSideMenu.bind(comp)}
