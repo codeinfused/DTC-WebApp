@@ -27,8 +27,8 @@ class TableEdit extends React.Component
     var action = false;
 
     this.dateRange = [
-      '2018-07-04 08:00:00',
-      '2018-07-08 23:00:00'
+      '2019-07-03 08:00:00',
+      '2019-07-07 23:00:00'
     ];
 
     this.sublocs_alpha = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V'];
