@@ -15,6 +15,9 @@ $slim_app_settings = [
       'path' => __DIR__ . '/../logs/app.log',
       'level' => \Monolog\Logger::DEBUG,
     ],
+
+    'cdn' => 'https://cdn.dtcapp.com'
+
   ],
   'bgg_api' => [
     'search' => 'https://www.boardgamegeek.com/xmlapi2/search',

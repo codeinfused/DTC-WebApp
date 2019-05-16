@@ -3,6 +3,9 @@ namespace api\games;
 
 abstract class Games
 {
+  static $image_full_path = "";
+  static $image_resize_path = __DIR__."/../../../../../tmp_resized_images/";
+  static $image_resize_width = 640;
 
   static function check_default($val, $def=null)
   {
@@ -24,6 +27,48 @@ abstract class Games
     }
   }
 
+
+  static function bgg_resize_image($source)
+  {
+    preg_match("/\/(\w+)\.\w{3,4}$/", $source, $name_match);
+    $filename = $name_match[1] . ".jpg";
+
+    $img = file_get_contents($source);
+    $img_tmp = imagecreatefromstring($img);
+
+    $width = imagesx($img_tmp);
+    $height = imagesy($img_tmp);
+
+    $newwidth = self::$image_resize_width;
+    $aspect = $newwidth / $width;
+    $newheight = $height * $aspect;
+
+    $new_img = imagecreatetruecolor($newwidth, $newheight);
+    imagecopyresized($new_img, $img_tmp, 0, 0, 0, 0, $newwidth, $newheight, $width, $height);
+    imagejpeg($new_img, self::$image_resize_path . $filename); //save image as jpg
+    imagedestroy($img_tmp);
+    imagedestroy($new_img);
+
+    return $filename;
+  }
+
+
+  static function bgg_clone__missing_images($context, $iter=0)
+  {
+    set_time_limit(0);
+    $iter++;
+    $dbCheck = $context->db->query("SELECT id, image, image_cdn FROM bgg_game_db WHERE image IS NOT NULL AND image_cdn IS NULL");
+    $game_rows = $dbCheck->fetchAll();
+    $dbCheck->closeCursor();
+
+    foreach($game_rows as $row)
+    {
+      $filename = self::bgg_resize_image($row['image']);
+      $dbUpdate = $context->db->prepare("UPDATE bgg_game_db SET image_cdn = :newfile WHERE id = :dbid");
+      $dbUpdate->execute(array(':newfile'=>$filename, ':dbid'=>$row['id']));
+    }
+  }
+
   static function bgg_clone__process_next($context, $iter=0)
   {
     set_time_limit(0);
@@ -39,8 +84,8 @@ abstract class Games
       // die('done, ended at ID: '.$game_max_unset);
     //}
 
-    $dbCheck = $context->db->query("UPDATE bgg_game_db SET update_queue=0 WHERE update_queue=2");
-    $dbCheck->closeCursor();
+    //$dbCheck = $context->db->query("UPDATE bgg_game_db SET update_queue=0 WHERE update_queue=2");
+    //$dbCheck->closeCursor();
 
     $dbCheck = $context->db->query("SELECT bgg_id FROM bgg_game_db WHERE update_queue=1 LIMIT 50");
     $game_rows = $dbCheck->fetchAll();
@@ -94,7 +139,7 @@ abstract class Games
       }
     }
 
-    sleep(2);
+    sleep(1);
 
     $full_games = null;
     $game_ids = null;
@@ -116,6 +161,7 @@ abstract class Games
 
     $listxml = simplexml_load_string($context->curl->html);
     $listobj = json_decode(json_encode($listxml));
+    $done = 0;
 
     foreach($listobj->url as $listgame){
       //$games_list[] = self::game_xml_to_json($listgame);
@@ -125,17 +171,19 @@ abstract class Games
 
       if(!empty($matched[1])){
         try{
-          $dbCheck = $context->db->prepare("INSERT INTO bgg_game_db SET bgg_id = :bggid");
+          $dbCheck = $context->db->prepare("INSERT IGNORE INTO bgg_game_db SET bgg_id = :bggid");
           $dbCheck->execute(array(':bggid'=>$matched[1]));
           $dbCheck->closeCursor();
         }catch(PDOException $e){
 
         }
+        $done++;
       }
     }
 
     //$games_list = array();
     //if(!is_array($listobj->item)){ $listobj->item = array($listobj->item); }
+    return $done;
   }
 
   static function sort_list_by($gamelist, $sortbykey)

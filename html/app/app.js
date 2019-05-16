@@ -97521,10 +97521,11 @@
 	
 	          if (!!game.image) {
 	            if (game.image.indexOf('original') > -1) {
-	              image = filtered_image_replacer(game.image);
+	              //image = filtered_image_replacer(game.image);
 	            } else {
-	              image = basic_image_replacer(game.image);
-	            }
+	                //image = basic_image_replacer(game.image);
+	              }
+	            image = game.image;
 	          }
 	
 	          return _react2.default.createElement(

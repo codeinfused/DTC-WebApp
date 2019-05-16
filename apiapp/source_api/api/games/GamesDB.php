@@ -22,7 +22,7 @@ abstract class GamesDB
         'title' => $game['title'],
         'desc' => $game['description'],
         'year' => $game['year'],
-        'image' => $game['image'],
+        'image' => CDN['url'].'/'.$game['image_cdn'],
         'players' => array($game['minplayers'], $game['maxplayers']),
         'playtime' => array($game['minplaytime'], $game['maxplaytime']),
         'rating' => $game['rating'],

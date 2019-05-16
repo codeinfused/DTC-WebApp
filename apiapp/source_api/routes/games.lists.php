@@ -9,12 +9,23 @@ $app->get('/import_bgg_process_next', function($req, $resp, $args) use ($app)
 {
   //return;
   Games::bgg_clone__process_next($this);
+  return $resp->withJson(array('state'=>'done'));
 });
 
 $app->get('/import_bgg_sitemap/[{pagenum}]', function($req, $resp, $args) use ($app)
 {
-  //return;
-  Games::bgg_clone__convert_sitemap_page($this, "https://boardgamegeek.com/sitemap_geekitems_boardgame_page_".$args['pagenum']);
+  $num = intval($args['pagenum']);
+  $howmany = 1;
+  while($howmany > 0){
+    $howmany = Games::bgg_clone__convert_sitemap_page($this, "https://boardgamegeek.com/sitemap_geekitems_boardgame_page_".$num);
+    $num++;
+  }
+});
+
+$app->get('/import_bgg_missing_images', function($req, $resp, $args) use ($app)
+{
+  Games::bgg_clone__missing_images($this);
+  return $resp->withJson(array('state'=>'done'));
 });
 
 $app->get('/games/[{bgg_id}]', function($req, $resp, $args) use ($app)
