@@ -23,10 +23,11 @@ $app->post('/library/events/import/', function($req, $resp, $args) use ($app)
 
 $app->post('/library/import/', function($req, $resp, $args) use ($app)
 {
-  $token = Auth::checkAuthorization($this->db, $req);
-  if( is_error($token) ){
-    return $resp->withStatus((int)$token->get_code())->withJson($token->json());
-  }
+  // $token = Auth::checkAuthorization($this->db, $req);
+  // if( is_error($token) ){
+  //   return $resp->withStatus((int)$token->get_code())->withJson($token->json());
+  // }
+  ini_set('memory_limit', '2048M');
 
   $body = $req->getParsedBody();
   $secret = $body['secret'];
@@ -55,7 +56,7 @@ $app->post('/library/update/single/', function($req, $resp, $args) use ($app)
     $pdo = $this->db;
     $bggapi = $this->get('bgg_api');
 
-    $dbCheck = $pdo->prepare("UPDATE library_dtc2018 SET bgg_id=:bgg_id WHERE id=:id");
+    $dbCheck = $pdo->prepare("UPDATE library_dtc2019 SET bgg_id=:bgg_id WHERE id=:id");
     $dbCheck->execute(array( ':bgg_id'=>$bgg_id, ':id'=>$id ));
     $dbCheck->closeCursor();
   }

@@ -131,7 +131,7 @@ abstract class GamesDB
     }
     $exec_params[':term'] = '%'.$opts['term'].'%';
 
-    $library_sql = $opts['db']=='dtc' ? "INNER JOIN library_dtc2018 lib ON lib.bgg_id = db.bgg_id" : "";
+    $library_sql = $opts['db']=='dtc' ? "INNER JOIN library_dtc2019 lib ON lib.bgg_id = db.bgg_id" : "";
     $library_sel = $opts['db']=='dtc' ? "lib.count AS library" : "null AS library";
 
     $sortby_sql = self::parse_sort_by($opts['sort']);
@@ -183,7 +183,7 @@ abstract class GamesDB
         (SELECT count(id) FROM game_tables gt WHERE gt.bgg_id=db.bgg_id AND table_type='now' AND status='ready' AND private=0 AND start_datetime > NOW() - INTERVAL 45 MINUTE) as lfp,
         (SELECT count(id) FROM game_tables gt2 WHERE gt2.bgg_id=db.bgg_id AND table_type='future' AND status='ready' AND private=0 AND start_datetime > NOW()) as scheduled
         FROM bgg_game_db db
-        INNER JOIN library_dtc2018 lib ON lib.bgg_id = db.bgg_id
+        INNER JOIN library_dtc2019 lib ON lib.bgg_id = db.bgg_id
         WHERE db.title != 'EXPANSION' AND db.title IS NOT NULL AND db.title IS NOT NULL $tag_sql $term_sql $sortby_sql
         LIMIT ".($opts['page']*$opts['limit']).",{$opts['limit']}"
     );

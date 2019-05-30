@@ -19,7 +19,7 @@ abstract class Library
     $bggapi = $context->get('bgg_api');
     $pdo = $context->db;
 
-    $dbCheck = $pdo->prepare("SELECT id, title FROM library_dtc2018 WHERE bgg_id IS NULL ORDER BY id LIMIT 1");
+    $dbCheck = $pdo->prepare("SELECT id, title FROM library_dtc2019 WHERE bgg_id IS NULL ORDER BY id LIMIT 1");
     $dbCheck->execute();
     $games = $dbCheck->fetchAll();
     $dbCheck->closeCursor();
@@ -37,7 +37,7 @@ abstract class Library
     $bggapi = $context->get('bgg_api');
     $pdo = $context->db;
 
-    $dbCheck = $pdo->prepare("SELECT id, title FROM library_dtc2018 WHERE bgg_id IS NULL");
+    $dbCheck = $pdo->prepare("SELECT id, title FROM library_dtc2019 WHERE bgg_id IS NULL");
     $dbCheck->execute();
     $games = $dbCheck->fetchAll();
     $dbCheck->closeCursor();
@@ -45,7 +45,7 @@ abstract class Library
     foreach($games as $game){
       $bgg_game = search_games_by_term($context, $game['title'], true);
       if(!empty($bgg_game)){
-        $dbCheck = $pdo->prepare("UPDATE library_dtc2017 SET bgg_id=:bgg WHERE id=:id");
+        $dbCheck = $pdo->prepare("UPDATE library_dtc2018 SET bgg_id=:bgg WHERE id=:id");
         $dbCheck->execute(array(
           ':bgg' => $bgg_game[0],
           ':id' => $game['id']

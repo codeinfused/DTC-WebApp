@@ -425,7 +425,7 @@ abstract class Games
     foreach($games as $game)
     {
       $dbCheck = $pdo->prepare(
-        "INSERT INTO library_dtc2018 SET bgg_id=:bggid, details=:details, count=:count"
+        "INSERT INTO library_dtc2019 SET bgg_id=:bggid, details=:details, count=:count"
       );
       $dbCheck->execute(array(
         ':bggid' => $game['bgg_id'],
