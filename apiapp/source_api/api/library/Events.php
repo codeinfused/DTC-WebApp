@@ -17,8 +17,9 @@ abstract class Events
     *** [4] = room
     *** [5] = Host 1
     *** [6] = Host 2
-    *** [7] = # of seats
-    *** [8] = description/info
+    *** [7] = Event Type [Event, Demo, Tournament, Panel, null]
+    *** [8] = # of seats
+    *** [9] = description/info
     *
     */
 
@@ -42,9 +43,9 @@ abstract class Events
       "convention is over",
       "last library checkouts",
       "library gathering of games",
+      "library packing of games",
       "convention opens",
-      "exhibitor hall opens",
-      "library"
+      "exhibitor hall opens"
     ];
 
     $row = 1;
@@ -59,7 +60,7 @@ abstract class Events
     }
 
     // LOOP EACH ROW
-    while (($data = fgetcsv($handle, 500, ",")) !== FALSE)
+    while (($data = fgetcsv($handle, 2000, ",")) !== FALSE)
     {
       $num = count($data);
       if($row===1){ ++$row; continue; }
@@ -75,6 +76,13 @@ abstract class Events
       if( strpos($Ltitle, 'tournament') !== false ){ $subtype = 'tournament'; }
       if( strpos($Ltitle, 'panel') !== false ){ $subtype = 'panel'; }
       if( strpos($Ltitle, 'demo') !== false ){ $subtype = 'demo'; }
+
+      if(strtolower($data[7]) === 'event'){ $subtype = 'event'; }
+      if(strtolower($data[7]) === 'tournament'){ $subtype = 'tournament'; }
+      if(strtolower($data[7]) === 'demo'){ $subtype = 'demo'; }
+      if(strtolower($data[7]) === 'panel'){ $subtype = 'panel'; }
+
+      /* override official events */
       if( strpos($Ltitle, 'dice tower') !== false ){ $subtype = 'dtc'; }
       if( strpos(strtolower($data[5]), 'tom vasel') !== false ){ $subtype = 'dtc'; }
 
@@ -83,6 +91,7 @@ abstract class Events
       $timeend = (!empty($data[2]) && strtolower($data[2]!=='tbd')) ? date("H:i:00", strtotime($data[2])) : "";
       $datestart = !empty($timestart) ? ($days[$dayindex]." ".$timestart) : "";
       $dateend = !empty($timeend) ? ($days[$dayindex]." ".$timeend) : "";
+      $seats = is_numeric($data[8]) ? $data[8] : 1;
 
       $length = 0;
       if(!empty($dateend) && !empty($datestart)){
@@ -92,9 +101,9 @@ abstract class Events
 
       $events[] = array(
         "title" => $data[3],
-        "desc" => $data[8],
+        "desc" => $data[9],
         "subtype" => $subtype,
-        "seats" => $data[7],
+        "seats" => $seats,
         "room" => $data[4],
         "start" => $datestart,
         "length" => $length,

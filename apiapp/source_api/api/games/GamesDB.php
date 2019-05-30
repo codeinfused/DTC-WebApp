@@ -6,7 +6,7 @@ abstract class GamesDB
 
   protected static $search_defaults = array(
     'page' => 0,
-    'limit' => 10,
+    'limit' => 20,
     'term' => 'firefly',
     'tag' => '',
     'sort' => 'bggrate',
@@ -22,7 +22,7 @@ abstract class GamesDB
         'title' => $game['title'],
         'desc' => $game['description'],
         'year' => $game['year'],
-        'image' => CDN['url'].'/'.$game['image_cdn'],
+        'image' => CDN['url'].'/bggmd/'.$game['image_cdn'],
         'players' => array($game['minplayers'], $game['maxplayers']),
         'playtime' => array($game['minplaytime'], $game['maxplaytime']),
         'rating' => $game['rating'],

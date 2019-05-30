@@ -98797,7 +98797,7 @@
 	
 	    _this.tableTypes = [{ id: 'now', name: 'Play Now!' }, { id: 'later', name: 'Schedule Later' }, { id: 'demo', name: 'Demo' }];
 	
-	    _this.tableLocations = [{ label: 'Grand Sierra Ballroom (Open)', value: 'Grand Sierra Ballroom' }, { label: 'Antigua (Open)', value: 'Antigua' }, { label: 'Hall Foyer (Open)', value: 'Hall Foyer' }, { label: 'Boca (Events, Werewolf)', value: 'Boca' }, { label: 'Curaco (RPGs, War Games, Kids)', value: 'Curaco' }, { label: 'Bonaire (Publisher Demos and Events)', value: 'Bonaire' }, { label: 'Caribbean (Exhibitor Events)', value: 'Caribbean Ballroom' }];
+	    _this.tableLocations = [{ label: 'Grand Sierra Ballroom (Open)', value: 'Grand Sierra Ballroom' }, { label: 'Hall Foyer (Open)', value: 'Hall Foyer' }, { label: 'Curaco (RPGs, War Games, Kids)', value: 'Curaco' }, { label: 'Bonaire (Demos and Events)', value: 'Bonaire' }, { label: 'Caribbean (Exhibitor Events)', value: 'Caribbean Ballroom' }];
 	
 	    _this.playtimeOptions = [{ label: 'Auto', value: '' }, { label: '30 (half hour)', value: '0.5 hour' }, { label: '60 (1 hour)', value: '1 hour' }, { label: '90 (1½ hours)', value: '1.5 hours' }, { label: '120 (2 hours)', value: '2 hours' }, { label: '150 (2½ hours)', value: '2.5 hours' }, { label: '180 (3 hours)', value: '3 hours' }, { label: '240 (4 hours)', value: '4 hours' }, { label: '300 (5+ hours)', value: '5+ hours' }];
 	
@@ -103138,7 +103138,7 @@
 	            //if(isSelected){
 	            return _react2.default.createElement(
 	              'li',
-	              { key: "table-item-" + table.table_id, className: "dtc-event " + table.status + " " + (isMyTable ? "mytable" : table.joined == 1 ? "joined" : "") },
+	              { key: "table-item-" + table.table_id, className: "dtc-event " + table.subtype + " " + table.status + " " + (isMyTable ? "mytable" : table.joined == 1 ? "joined" : "") },
 	              _react2.default.createElement('i', { className: table.status === 'cancelled' ? "fa fa-calendar-times-o cancelled" : "fa " + calIcon }),
 	              table.lft == '1' ? _react2.default.createElement('i', { className: 'fa fa-graduation-cap' }) : '',
 	              _react2.default.createElement(

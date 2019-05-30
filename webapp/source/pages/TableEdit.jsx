@@ -43,11 +43,9 @@ class TableEdit extends React.Component
 
     this.tableLocations = [
       {label: 'Grand Sierra Ballroom (Open)', value: 'Grand Sierra Ballroom'},
-      {label: 'Antigua (Open)', value: 'Antigua'},
       {label: 'Hall Foyer (Open)', value: 'Hall Foyer'},
-      {label: 'Boca (Events, Werewolf)', value: 'Boca'},
       {label: 'Curaco (RPGs, War Games, Kids)', value: 'Curaco'},
-      {label: 'Bonaire (Publisher Demos and Events)', value: 'Bonaire'},
+      {label: 'Bonaire (Demos and Events)', value: 'Bonaire'},
       {label: 'Caribbean (Exhibitor Events)', value: 'Caribbean Ballroom' }
     ];
 

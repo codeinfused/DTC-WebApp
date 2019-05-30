@@ -43,7 +43,7 @@
   font-weight: 100;
   font-size: 2.8rem;
   margin-bottom: 3px;
-  color: #d8d8d8;
+  color: #b1b1b1;
 }
 .calendar-day.active .calendar-day-date{ color: #f0f0f0; }
 .calendar-day-name{
@@ -161,9 +161,10 @@ ul.plans-timeline .cancelled .plans-item{ opacity: 0.6; background: #f1e8e8; }
   text-overflow: ellipsis;
   text-align: left;
 }
-.dtc-event .plans-item .plans-item-head{
-  background: #79648e;
-}
+.dtc-event.dtc .plans-item .plans-item-head{ background: #a76ab1; }
+.dtc-event.tournament .plans-item .plans-item-head{ background: #a26262; }
+.dtc-event.panel .plans-item .plans-item-head{ background: #5376a5; }
+
 .plans-item .plans-item-head a{ color: #fff; text-decoration: underline; }
 .plans-item .plans-item-body{
   padding: 10px 14px 12px;
