@@ -99954,13 +99954,13 @@
 	
 	      function basic_image_replacer(image) {
 	        return image.replace(/(\.[a-zA-Z]+)$/, function (match, p1) {
-	          return "_md" + p1;
+	          return p1;
 	        });
 	      }
 	
 	      function filtered_image_replacer(image) {
 	        return image.replace(/original[\w\_\-\=\/]+(pic\d{3,})(\.[a-zA-Z]{2,4})$/, function (match, p1, p2) {
-	          return "images/" + p1 + "_md" + p2;
+	          return "images/" + p1 + p2;
 	        });
 	      }
 	
