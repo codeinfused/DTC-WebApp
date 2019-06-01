@@ -103307,9 +103307,19 @@
 	              null,
 	              table.allow_signups == 1 ? _react2.default.createElement(
 	                'span',
-	                { className: 'plan-tag' },
-	                'Seats: ',
-	                table.seats
+	                null,
+	                _react2.default.createElement(
+	                  'span',
+	                  { className: 'plan-tag' },
+	                  'Seats: ',
+	                  table.seats
+	                ),
+	                _react2.default.createElement(
+	                  'span',
+	                  { className: 'plan-tag' },
+	                  'Excited: ',
+	                  table.joined
+	                )
 	              ) : '',
 	              table.playtime && table.playtime !== '0' ? _react2.default.createElement(
 	                'span',
