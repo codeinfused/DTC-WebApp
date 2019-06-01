@@ -103318,7 +103318,7 @@
 	                  'span',
 	                  { className: 'plan-tag' },
 	                  'Excited: ',
-	                  table.joined
+	                  table.excited
 	                )
 	              ) : '',
 	              table.playtime && table.playtime !== '0' ? _react2.default.createElement(

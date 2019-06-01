@@ -346,7 +346,7 @@ class OfficialEvents extends React.Component
               <h2>{table.title}</h2>
               <div><span className="table-item-tag">Host: {table.host_name}</span></div>
               <div><span className="table-item-tag">{moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, h:mm a')}</span><span className="table-item-tag">{table.table_location}</span></div>
-              <div>{table.allow_signups==1 ? (<span><span className="plan-tag">Seats: {table.seats}</span><span className="plan-tag">Excited: {table.joined}</span></span>) : ''}{table.playtime && table.playtime!=='0' ? (<span className="plan-tag">Takes {table.playtime}</span>) : ''}</div>
+              <div>{table.allow_signups==1 ? (<span><span className="plan-tag">Seats: {table.seats}</span><span className="plan-tag">Excited: {table.excited}</span></span>) : ''}{table.playtime && table.playtime!=='0' ? (<span className="plan-tag">Takes {table.playtime}</span>) : ''}</div>
               <div style={{marginTop: '10px'}}>{entities.html.decode(entities.xml.decode(table.description))}<p style={{fontStyle:'italic', color:'#aaa'}}><strong>Note:</strong> adding this to your plans does not gaurantee a seat at the event. Sign up at the DTC Headquarters table.</p></div>
             </div>
           : <div />}

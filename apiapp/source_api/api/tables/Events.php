@@ -8,7 +8,8 @@ abstract class Events
     $dbCheck = $pdo->prepare(
       "SELECT tb.id as table_id, tb.host as host_name, tb.player_id, tb.table_type, tb.subtype, tb.bgg_id, tb.seats, tb.table_location,
       tb.start_datetime, tb.playtime, tb.status, tb.allow_signups, tb.title, tb.description,
-      (SELECT count(id) FROM game_signups WHERE table_id=tb.id AND player_id=:uid) as joined
+      (SELECT count(id) FROM game_signups WHERE table_id=tb.id AND player_id=:uid) as joined,
+      (SELECT count(id) FROM game_signups WHERE table_id=tb.id) as excited
       FROM game_tables tb
       WHERE tb.table_type='dtc-event'
       AND tb.start_datetime LIKE :date
