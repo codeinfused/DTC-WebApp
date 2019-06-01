@@ -98826,6 +98826,7 @@
 	      start_time: MomentRound(defaultDate, _moment2.default.duration(15, "minutes"), "round").toDate(),
 	      lfp: true,
 	      lft: false,
+	      only_experienced: false,
 	      joined: true,
 	      reserved: 0,
 	      allow_signups: true,
@@ -98990,6 +98991,7 @@
 	        playtime: comp.state.playtime == '' ? null : comp.state.playtime,
 	        //game_type: comp.state.game_type,
 	        lft: comp.state.lft,
+	        only_experienced: comp.state.only_experienced,
 	        private: comp.state.private,
 	        joined: comp.state.joined,
 	        reserved: comp.state.reserved,
@@ -99070,13 +99072,13 @@
 	                  _react2.default.createElement(
 	                    'label',
 	                    { htmlFor: 'type-now' },
-	                    'Play Now'
+	                    'Play Right Now'
 	                  ),
 	                  _react2.default.createElement('input', { id: 'type-later', name: 'table_type', type: 'radio', value: 'future', checked: comp.state.table_type === 'future', onChange: comp.handleChangeInput.bind(comp, 'table_type', 'future') }),
 	                  _react2.default.createElement(
 	                    'label',
 	                    { htmlFor: 'type-later' },
-	                    'Schedule'
+	                    'Schedule Later'
 	                  ),
 	                  _react2.default.createElement('a', null)
 	                )
@@ -99166,6 +99168,7 @@
 	              'div',
 	              { className: 'table-form-item' },
 	              _react2.default.createElement(_reactToolbox.Switch, { label: 'Looking For Teacher?', checked: comp.state.lft, onChange: comp.handleChangeInput.bind(comp, 'lft') }),
+	              _react2.default.createElement(_reactToolbox.Switch, { label: 'Expert Players?', checked: comp.state.only_experienced, onChange: comp.handleChangeInput.bind(comp, 'only_experienced') }),
 	              comp.state.table_type === 'now' ? '' : _react2.default.createElement(_reactToolbox.Switch, { label: 'Unlisted (Only visible to you)', checked: comp.state.private, onChange: comp.handleChangeInput.bind(comp, 'private') }),
 	              comp.state.table_type === 'now' ? '' : _react2.default.createElement(_reactToolbox.Switch, { label: 'Allow Sign-ups?', checked: comp.state.allow_signups, onChange: comp.handleChangeInput.bind(comp, 'allow_signups') }),
 	              comp.state.table_type === 'now' ? '' : _react2.default.createElement(_reactToolbox.Switch, { label: 'Join Your Own Table?', checked: comp.state.joined, onChange: comp.handleChangeInput.bind(comp, 'joined') }),
@@ -100955,6 +100958,11 @@
 	                    { className: 'plan-tag' },
 	                    'Seats: ',
 	                    table.seats
+	                  ) : '',
+	                  table.only_experienced == 1 ? _react2.default.createElement(
+	                    'span',
+	                    { className: 'plan-tag experts' },
+	                    'Experts'
 	                  ) : ''
 	                ),
 	                _react2.default.createElement(
@@ -102249,6 +102257,11 @@
 	                'span',
 	                { className: 'table-item-tag' },
 	                'Teacher Needed'
+	              ) : '',
+	              table.only_experienced == 1 ? _react2.default.createElement(
+	                'span',
+	                { className: 'plan-tag experts' },
+	                'Experts'
 	              ) : ''
 	            )
 	          );
@@ -102657,6 +102670,11 @@
 	                    'Host: ',
 	                    isMyTable ? "Me" : table.host_name
 	                  ),
+	                  table.only_experienced == 1 ? _react2.default.createElement(
+	                    'span',
+	                    { className: 'plan-tag experts' },
+	                    'Experts'
+	                  ) : '',
 	                  table.allow_signups == 1 ? _react2.default.createElement(
 	                    'span',
 	                    { className: 'plan-tag' },

@@ -127,6 +127,11 @@ label[data-react-toolbox="switch"]{
   margin: 0.7rem 0;
 }
 
+.table-form-item .switch-toggle.switch-candy label{
+  line-height: 3.4em;
+  min-width: 136px;
+}
+
 .table-form-item .submit{
   border: none;
   outline: none;

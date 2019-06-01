@@ -14,7 +14,7 @@ abstract class Tables
   static function table_player_data($pdo, $table_id)
   {
     $req = $pdo->prepare(
-      "SELECT tb.seats, tb.start_datetime, tb.lft, tb.table_location, tb.table_sublocation_alpha, tb.table_sublocation_num, CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as host_name
+      "SELECT tb.seats, tb.start_datetime, tb.lft, tb.only_experienced, tb.table_location, tb.table_sublocation_alpha, tb.table_sublocation_num, CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as host_name
       FROM game_tables tb
       LEFT JOIN users u ON u.id = tb.player_id
       WHERE tb.id = :table_id LIMIT 1");
@@ -38,7 +38,7 @@ abstract class Tables
   {
     $dbCheck = $pdo->prepare(
       "SELECT db.title, tb.id as table_id, tb.player_id, CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as host_name, tb.table_type, tb.bgg_id, tb.seats, tb.table_location,
-      tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft, tb.playtime, ROUND((db.minplaytime+db.maxplaytime)/2) as avgplay,
+      tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft, tb.only_experienced, tb.playtime, ROUND((db.minplaytime+db.maxplaytime)/2) as avgplay,
       COUNT(gs.id) AS signups, tb.allow_signups, tb.status,
       (SELECT count(id) FROM game_signups WHERE table_id=tb.id AND player_id=:uid) as joined
       FROM game_tables tb
@@ -67,7 +67,7 @@ abstract class Tables
   {
     $dbCheck = $pdo->prepare(
       "SELECT db.title, db.minplayers, db.maxplayers, tb.bgg_id, tb.id as table_id, tb.player_id, tb.table_type, tb.seats, tb.table_location, db.minplaytime, db.maxplaytime,
-      tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft, tb.private, tb.allow_signups, tb.status, tb.playtime, ROUND((db.minplaytime+db.maxplaytime)/2) as avgplay,
+      tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft, tb.only_experienced, tb.private, tb.allow_signups, tb.status, tb.playtime, ROUND((db.minplaytime+db.maxplaytime)/2) as avgplay,
       (SELECT count(id) FROM game_signups gs WHERE gs.table_id=tb.id AND gs.player_id=:uid) as joined
       FROM game_tables tb
       JOIN bgg_game_db db ON tb.bgg_id = db.bgg_id
@@ -91,6 +91,7 @@ abstract class Tables
       );
       $table['allow_signups'] = (boolean) $table['allow_signups'];
       $table['lft'] = (boolean) $table['lft'];
+      $table['only_experienced'] = (boolean) $table['only_experienced'];
       $table['joined'] = (boolean) $table['joined'];
       $table['private'] = (boolean) $table['private'];
       $table['reserved'] = $current_reserves['ct'];
@@ -102,7 +103,7 @@ abstract class Tables
   {
     $dbCheck = $pdo->prepare(
       "SELECT db.title, tb.id as table_id, tb.table_type, tb.bgg_id, tb.seats, tb.table_location,
-      tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft, tb.private, tb.allow_signups, tb.status, COUNT(gs.id) AS signups, tb.playtime, ROUND((db.minplaytime+db.maxplaytime)/2) as avgplay,
+      tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft, tb.only_experienced, tb.private, tb.allow_signups, tb.status, COUNT(gs.id) AS signups, tb.playtime, ROUND((db.minplaytime+db.maxplaytime)/2) as avgplay,
       (SELECT count(id) FROM game_signups WHERE table_id=tb.id AND player_id=:uid) as joined
       FROM game_tables tb JOIN bgg_game_db db ON tb.bgg_id = db.bgg_id
       LEFT JOIN game_signups gs ON gs.table_id = tb.id
@@ -119,7 +120,7 @@ abstract class Tables
   {
     $dbCheck = $pdo->prepare(
       "SELECT db.title, tb.title as event_title, tb.id as table_id, tb.player_id, tb.host, tb.table_type, tb.subtype, tb.bgg_id, tb.seats, tb.table_location, tb.description,
-      tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft, tb.private, tb.allow_signups, tb.status, tb.playtime, ROUND((db.minplaytime+db.maxplaytime)/2) as avgplay,
+      tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft, tb.only_experienced, tb.private, tb.allow_signups, tb.status, tb.playtime, ROUND((db.minplaytime+db.maxplaytime)/2) as avgplay,
       CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as host_name,
       (SELECT count(id) FROM game_signups WHERE table_id=tb.id AND player_id=:uid) as joined,
       (SELECT count(*) FROM game_signups WHERE table_id=tb.id) as signups
@@ -140,7 +141,7 @@ abstract class Tables
   static function my_soonest_plans($pdo, $uid)
   {
     $dbCheck = $pdo->prepare(
-      "SELECT db.title, tb.id as table_id, tb.player_id, tb.table_type, tb.seats, tb.table_location, tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft, tb.private, tb.allow_signups, tb.status,
+      "SELECT db.title, tb.id as table_id, tb.player_id, tb.table_type, tb.seats, tb.table_location, tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft, tb.only_experienced, tb.private, tb.allow_signups, tb.status,
       CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as host_name,
       (SELECT count(id) FROM game_signups WHERE table_id=tb.id AND player_id=:uid) as joined,
       (SELECT count(*) FROM game_signups WHERE table_id=tb.id) as signups
@@ -162,7 +163,7 @@ abstract class Tables
   {
     if($table_type==='table'){  // show a specific table
       $dbCheck = $pdo->prepare(
-        "SELECT db.title, tb.id as table_id, tb.player_id, CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as host_name, tb.table_type, tb.bgg_id, tb.seats, tb.table_location, tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft,
+        "SELECT db.title, tb.id as table_id, tb.player_id, CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as host_name, tb.table_type, tb.bgg_id, tb.seats, tb.table_location, tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft, tb.only_experienced,
         COUNT(gs.id) AS signups, tb.allow_signups, tb.status, tb.playtime, ROUND((db.minplaytime+db.maxplaytime)/2) as avgplay,
         (SELECT count(id) FROM game_signups WHERE table_id=tb.id AND player_id=:uid) as joined
         FROM game_tables tb
@@ -178,7 +179,7 @@ abstract class Tables
       $dbCheck->execute(array(':bgg_id' => $bgg_id, ':uid'=>$uid));
     }else{
       $dbCheck = $pdo->prepare(
-        "SELECT db.title, tb.id as table_id, tb.player_id, CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as host_name, tb.table_type, tb.bgg_id, tb.seats, tb.table_location, tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft,
+        "SELECT db.title, tb.id as table_id, tb.player_id, CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as host_name, tb.table_type, tb.bgg_id, tb.seats, tb.table_location, tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft, tb.only_experienced,
         COUNT(gs.id) AS signups, tb.allow_signups, tb.status, tb.playtime, ROUND((db.minplaytime+db.maxplaytime)/2) as avgplay,
         (SELECT count(id) FROM game_signups WHERE table_id=tb.id AND player_id=:uid) as joined
         FROM game_tables tb
@@ -205,7 +206,7 @@ abstract class Tables
   {
     $dbCheck = $pdo->prepare(
       "SELECT db.title, tb.id as table_id, tb.bgg_id, tb.player_id, CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as host_name,
-      tb.table_type, tb.seats, tb.table_location, tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft, tb.allow_signups, tb.status, tb.playtime,
+      tb.table_type, tb.seats, tb.table_location, tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft, tb.only_experienced, tb.allow_signups, tb.status, tb.playtime,
       ROUND((db.minplaytime+db.maxplaytime)/2) as avgplay
       FROM game_tables tb
       JOIN bgg_game_db db ON tb.bgg_id = db.bgg_id
@@ -242,6 +243,7 @@ abstract class Tables
       ':table_location' => $data['table_location'],
       ':start_datetime' => $data['start_datetime'],
       ':lft' => $data['lft'] ? 1 : 0,
+      ':only_experienced' => $data['only_experienced'] ? 1 : 0,
       ':private' => $data['private'] ? 1 : 0,
       ':playtime' => $data['playtime'],
       //':joined' => $data['joined'] ? 1 : 0,
@@ -271,13 +273,13 @@ abstract class Tables
 
       $exec_params[':table_id'] = $data['table_id'];
       $dbCheck = $pdo->prepare(
-        "UPDATE game_tables SET bgg_id=:bid, table_type=:table_type, seats=:seats, table_location=:table_location, start_datetime=:start_datetime, lft=:lft, private=:private, playtime=:playtime, allow_signups=:allow_signups, table_sublocation_alpha=:subloc_alpha, table_sublocation_num=:subloc_num WHERE id=:table_id AND player_id=:uid"
+        "UPDATE game_tables SET bgg_id=:bid, table_type=:table_type, seats=:seats, table_location=:table_location, start_datetime=:start_datetime, lft=:lft, only_experienced=:only_experienced, private=:private, playtime=:playtime, allow_signups=:allow_signups, table_sublocation_alpha=:subloc_alpha, table_sublocation_num=:subloc_num WHERE id=:table_id AND player_id=:uid"
       );
     }else{
       // inserting a new table
       $inserting = true;
       $dbCheck = $pdo->prepare(
-        "INSERT INTO game_tables SET player_id=:uid, bgg_id=:bid, table_type=:table_type, seats=:seats, table_location=:table_location, start_datetime=:start_datetime, lft=:lft, private=:private, playtime=:playtime, allow_signups=:allow_signups, table_sublocation_alpha=:subloc_alpha, table_sublocation_num=:subloc_num"
+        "INSERT INTO game_tables SET player_id=:uid, bgg_id=:bid, table_type=:table_type, seats=:seats, table_location=:table_location, start_datetime=:start_datetime, lft=:lft, only_experienced=:only_experienced, private=:private, playtime=:playtime, allow_signups=:allow_signups, table_sublocation_alpha=:subloc_alpha, table_sublocation_num=:subloc_num"
       );
     }
     $dbCheck->execute($exec_params);

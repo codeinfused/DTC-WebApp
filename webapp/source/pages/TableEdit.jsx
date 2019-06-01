@@ -93,6 +93,7 @@ class TableEdit extends React.Component
       start_time: MomentRound(defaultDate, moment.duration(15, "minutes"), "round").toDate(),
       lfp: true,
       lft: false,
+      only_experienced: false,
       joined: true,
       reserved: 0,
       allow_signups: true,
@@ -258,6 +259,7 @@ class TableEdit extends React.Component
       playtime: (comp.state.playtime == '' ? null : comp.state.playtime),
       //game_type: comp.state.game_type,
       lft: comp.state.lft,
+      only_experienced: comp.state.only_experienced,
       private: comp.state.private,
       joined: comp.state.joined,
       reserved: comp.state.reserved,
@@ -317,9 +319,9 @@ class TableEdit extends React.Component
                   <legend>Type of Table</legend>
                   <div className="switch-toggle switch-candy large-4">
                     <input id='type-now' name="table_type" type="radio" value='now' checked={comp.state.table_type==='now'} onChange={comp.handleChangeInput.bind(comp, 'table_type', 'now')} />
-                    <label htmlFor='type-now'>Play Now</label>
+                    <label htmlFor='type-now'>Play Right Now</label>
                     <input id='type-later' name="table_type" type="radio" value='future' checked={comp.state.table_type==='future'} onChange={comp.handleChangeInput.bind(comp, 'table_type', 'future')} />
-                    <label htmlFor='type-later'>Schedule</label>
+                    <label htmlFor='type-later'>Schedule Later</label>
                     <a></a>
                   </div>
                 </fieldset>
@@ -364,6 +366,7 @@ class TableEdit extends React.Component
               </div>
               <div className="table-form-item">
                 <Switch label="Looking For Teacher?" checked={comp.state.lft} onChange={comp.handleChangeInput.bind(comp, 'lft')} />
+                <Switch label="Expert Players?" checked={comp.state.only_experienced} onChange={comp.handleChangeInput.bind(comp, 'only_experienced')} />
                 {comp.state.table_type==='now' ? '' : (<Switch label="Unlisted (Only visible to you)" checked={comp.state.private} onChange={comp.handleChangeInput.bind(comp, 'private')} /> )}
                 {comp.state.table_type==='now' ? '' : (<Switch label="Allow Sign-ups?" checked={comp.state.allow_signups} onChange={comp.handleChangeInput.bind(comp, 'allow_signups')} /> )}
                 {comp.state.table_type==='now' ? '' : (<Switch label="Join Your Own Table?" checked={comp.state.joined} onChange={comp.handleChangeInput.bind(comp, 'joined')} /> )}

@@ -129,6 +129,7 @@ class PlayersWanted extends React.Component
                   <div></div>
                   <span className="table-item-tag">Host: {table.host_name}</span>
                   {table.lft=='1' ? (<span className="table-item-tag">Teacher Needed</span>) : ''}
+                  {table.only_experienced==1 ? (<span className="plan-tag experts">Experts</span>) : ''}
                 </div>
               </div>
             );

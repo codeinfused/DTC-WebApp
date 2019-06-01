@@ -185,6 +185,10 @@ ul.plans-timeline .cancelled .plans-item{ opacity: 0.6; background: #f1e8e8; }
 .plans-item-body .plan-tag.otherhost{
   background: #846e50;
 }
+.plans-item-body .plan-tag.experts, .plan-tag.experts{
+  background: #da7401;
+  color: #fff;
+}
 
 p.plans-time {
   display: inline-block;
