@@ -98801,7 +98801,7 @@
 	
 	    _this.playtimeOptions = [{ label: 'Auto', value: '' }, { label: '30 (half hour)', value: '0.5 hour' }, { label: '60 (1 hour)', value: '1 hour' }, { label: '90 (1½ hours)', value: '1.5 hours' }, { label: '120 (2 hours)', value: '2 hours' }, { label: '150 (2½ hours)', value: '2.5 hours' }, { label: '180 (3 hours)', value: '3 hours' }, { label: '240 (4 hours)', value: '4 hours' }, { label: '300 (5+ hours)', value: '5+ hours' }];
 	
-	    _this.reservedPlayers = [{ label: 'None', value: '' }, { label: '1 player', value: '1' }, { label: '2 players', value: '2' }, { label: '3 players', value: '3' }, { label: '4 players', value: '4' }, { label: '5 players', value: '5' }];
+	    _this.reservedPlayers = [{ label: 'None', value: '' }, { label: '1 player', value: '1' }, { label: '2 players', value: '2' }, { label: '3 players', value: '3' }, { label: '4 players', value: '4' }, { label: '5 players', value: '5' }, { label: '6 players', value: '6' }, { label: '7 players', value: '7' }, { label: '8 players', value: '8' }];
 	
 	    var mToday = (0, _moment2.default)();
 	    var defaultDate = _moment2.default.max(mToday, (0, _moment2.default)(_this.dateRange[0]));
@@ -99021,7 +99021,7 @@
 	      var joined = comp.state.joined === true ? 1 : 0;
 	
 	      return comp.reservedPlayers.filter(function (obj, i) {
-	        if (i < seats - joined) {
+	        if (i <= seats - joined) {
 	          return obj;
 	        }
 	      });

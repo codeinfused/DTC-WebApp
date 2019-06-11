@@ -68,6 +68,9 @@ class TableEdit extends React.Component
       {label: '3 players', value: '3'},
       {label: '4 players', value: '4'},
       {label: '5 players', value: '5'},
+      {label: '6 players', value: '6'},
+      {label: '7 players', value: '7'},
+      {label: '8 players', value: '8'},
     ];
 
     var mToday = moment();
@@ -289,7 +292,7 @@ class TableEdit extends React.Component
     var joined = comp.state.joined===true ? 1 : 0;
 
     return comp.reservedPlayers.filter(function(obj, i){
-      if( i < seats - joined ){ return obj; }
+      if( i <= seats - joined ){ return obj; }
     });
   }
 
