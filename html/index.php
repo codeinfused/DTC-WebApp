@@ -10,8 +10,11 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <title>Dice Tower Convention App</title>
-  <meta name="description" content="">
-
+  <meta property="og:url"                content="https://dtcapp.com" />
+  <meta property="og:title"              content="Dice Tower Convention Planner" />
+  <meta property="og:description"        content="Schedule and find games to play at Dice Tower Con!" />
+  <meta property="og:image"              content="https://dtcapp.com/images/dtcapp-social-header.jpg" />
+  <meta name="description" content="Schedule and find games to play at Dice Tower Con!">
   <meta name="viewport" content="width=device-width, height=device-height, user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no" />
 
   <!-- Global site tag (gtag.js) - Google Analytics -->
