@@ -48,6 +48,7 @@ class AppLayout extends React.Component
       isTabletWide: false,
       isDesktopWide: false,
       alerts: [],
+      alertCount: 0,
       tableDialogActive: false,
       tableDialogData: {},
       tableDialogLoading: false,
@@ -160,11 +161,11 @@ class AppLayout extends React.Component
         headers: {'Authorization': 'Bearer '+CONFIG.state.auth}
       }).then(function(json){
         if(json.data && json.data.alerts){
-          //comp.setState({alerts: json.data.alerts});
           json.data.alerts.forEach(function(alert, i){
             CONFIG.sendNotification(alert, alert.title, alert.message);
           });
         }
+        comp.setState({"alertCount": json.data.count});
       }).catch(function(){
         //
       });
@@ -255,7 +256,7 @@ class AppLayout extends React.Component
                 onClick={comp.handleAppNav.bind(comp, item)}
                 key={'app-nav-'+i}
                 icon={item.icon}
-              >{item.label}{item.path==='/alerts'?(<span className="alerts-count">{comp.state.alerts.length}</span>):''}</Button>);
+              >{item.label}{item.path==='/alerts'?(<span className="alerts-count">{comp.state.alertCount}</span>):''}</Button>);
             })}
           </AppMenu>
 

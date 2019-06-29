@@ -184,6 +184,7 @@
 	      isTabletWide: false,
 	      isDesktopWide: false,
 	      alerts: [],
+	      alertCount: 0,
 	      tableDialogActive: false,
 	      tableDialogData: {},
 	      tableDialogLoading: false,
@@ -292,11 +293,11 @@
 	          headers: { 'Authorization': 'Bearer ' + _config2.default.state.auth }
 	        }).then(function (json) {
 	          if (json.data && json.data.alerts) {
-	            //comp.setState({alerts: json.data.alerts});
 	            json.data.alerts.forEach(function (alert, i) {
 	              _config2.default.sendNotification(alert, alert.title, alert.message);
 	            });
 	          }
+	          comp.setState({ "alertCount": json.data.count });
 	        }).catch(function () {
 	          //
 	        });
@@ -437,7 +438,7 @@
 	                item.path === '/alerts' ? _react2.default.createElement(
 	                  'span',
 	                  { className: 'alerts-count' },
-	                  comp.state.alerts.length
+	                  comp.state.alertCount
 	                ) : ''
 	              );
 	            })

@@ -24,6 +24,7 @@ abstract class User
     return array('wtp' => $wtps, 'dns' => $dns, 'ignore' => $ignore);
   }
 
+
   static function getNotifications($pdo, $uid)
   {
     $req = $pdo->prepare("DELETE FROM notifications WHERE player_id=:uid AND game_start < NOW() - INTERVAL 20 MINUTE");
@@ -40,11 +41,16 @@ abstract class User
     $wtps = $req->fetchAll();
     $req->closeCursor();
 
+    $req = $pdo->prepare("SELECT COUNT(nt.id) as ct FROM notifications nt WHERE nt.player_id=:uid");
+    $req->execute(array(":uid"=>$uid));
+    $nct = $req->fetch();
+    $req->closeCursor();
+
     $req = $pdo->prepare("UPDATE notifications SET dismissed=1 WHERE player_id=:uid");
     $req->execute(array(":uid"=>$uid));
     $req->closeCursor();
 
-    return array('alerts' => $wtps);
+    return array('alerts'=>$wtps, 'count'=>$nct['ct']);
   }
 
   static function getAllMyNotifications($pdo, $uid)
