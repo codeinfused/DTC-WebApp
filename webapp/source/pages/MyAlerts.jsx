@@ -73,10 +73,12 @@ class MyAlerts extends React.Component
     });
   }
 
-  viewTable(table_id)
+  viewTable(alert)
   {
     var comp = this;
-    browserHistory.push('/list/table/'+table_id);
+    if(alert.reference_type=='table'){
+      browserHistory.push('/list/table/'+alert.reference_id);
+    }
   }
 
 
@@ -95,7 +97,7 @@ class MyAlerts extends React.Component
           {
             return (
               <div className="table-item" key={"alert-item-"+alert.id}>
-                <div className="table-item-header">
+                <div className={"table-item-header "+alert.notify_type}>
                   <span className="table-item-title">{alert.title}</span>
                   <span className={"table-item-when " + alert.notify_type}>
                     {alert.notify_type === 'cancel_table' ? 'Cancelled' : moment(alert.start_datetime, 'YYYY-MM-DD HH:mm:ss').fromNow()}
@@ -107,7 +109,7 @@ class MyAlerts extends React.Component
                 <div className="table-item-actions">
                   <button className='delete' onClick={comp.deleteAlert.bind(comp, alert.id)}><FontIcon value='close' /></button>
                   {alert.alert_type!=='cancel_table' ? (
-                    <button onClick={comp.viewTable.bind(comp, alert.table_id)}>View Table</button>
+                    <button onClick={comp.viewTable.bind(comp, alert)}>View Details</button>
                   ) : ''}
                 </div>
               </div>

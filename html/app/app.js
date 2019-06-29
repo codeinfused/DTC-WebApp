@@ -101935,9 +101935,11 @@
 	    }
 	  }, {
 	    key: 'viewTable',
-	    value: function viewTable(table_id) {
+	    value: function viewTable(alert) {
 	      var comp = this;
-	      _reactRouter.browserHistory.push('/list/table/' + table_id);
+	      if (alert.reference_type == 'table') {
+	        _reactRouter.browserHistory.push('/list/table/' + alert.reference_id);
+	      }
 	    }
 	  }, {
 	    key: 'renderAlertList',
@@ -101960,7 +101962,7 @@
 	              { className: 'table-item', key: "alert-item-" + alert.id },
 	              _react2.default.createElement(
 	                'div',
-	                { className: 'table-item-header' },
+	                { className: "table-item-header " + alert.notify_type },
 	                _react2.default.createElement(
 	                  'span',
 	                  { className: 'table-item-title' },
@@ -101991,8 +101993,8 @@
 	                ),
 	                alert.alert_type !== 'cancel_table' ? _react2.default.createElement(
 	                  'button',
-	                  { onClick: comp.viewTable.bind(comp, alert.table_id) },
-	                  'View Table'
+	                  { onClick: comp.viewTable.bind(comp, alert) },
+	                  'View Details'
 	                ) : ''
 	              )
 	            );

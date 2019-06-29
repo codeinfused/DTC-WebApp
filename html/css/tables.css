@@ -169,12 +169,18 @@ label[data-react-toolbox="switch"]{
   opacity: 0.6;
 }
 .table-item-header{
-    background: rgba(113, 149, 220, 0.45); /* rgba(186, 133, 206, 0.45); #a176b1; */
-    padding: 0px 9px;
-    text-align: right;
-    height: 38px;
-    line-height: 38px;
-    text-align: right;
+  background: rgba(167, 212, 176, 0.45); /* rgba(186, 133, 206, 0.45); #a176b1; */
+  padding: 0px 9px;
+  text-align: right;
+  height: 38px;
+  line-height: 38px;
+  text-align: right;
+}
+.table-item-header.edit_table{
+  background: #3597ca;
+}
+.table-item-header.cancel_table{
+  background: #a95151;
 }
 .table-item-title{
   font-size: 1.3rem;

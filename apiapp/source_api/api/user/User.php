@@ -53,7 +53,7 @@ abstract class User
     $req->execute(array(":uid"=>$uid));
     $req->closeCursor();
 
-    $req = $pdo->prepare("SELECT nt.id, nt.title, db.title as game_title, nt.message, nt.reference_id, nt.created_date, gt.start_datetime, gt.table_type, nt.link, nt.notify_type, nt.dismissed
+    $req = $pdo->prepare("SELECT nt.id, nt.title, db.title as game_title, nt.message, nt.reference_id, nt.reference_type, nt.created_date, gt.start_datetime, gt.table_type, nt.link, nt.notify_type, nt.dismissed
       FROM notifications nt
       LEFT JOIN game_tables gt ON gt.id = nt.reference_id
       LEFT JOIN bgg_game_db db ON db.bgg_id = gt.bgg_id
