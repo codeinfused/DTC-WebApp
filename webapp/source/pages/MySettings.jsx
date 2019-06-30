@@ -371,7 +371,8 @@ class MySettings extends React.Component
             <span className="my-current-account">Currently: <span>{CONFIG.state.user.grant_type}</span></span>
             {/* <div><Switch label='Show My Profile Photo In Tables' check={comp.state.show_photo} onChange={comp.handleChangeInput.bind(comp)}</div> */}
             <Switch label='Allow Phone Notifications' checked={comp.state.allow_notifications} onChange={comp.handleChangeNotifications.bind(comp)} />
-            <span>For iPhones, only works in Chrome</span>
+            <span style={{marginBottom:"1rem",display:"block"}}>Works only in Chrome Browser</span>
+            <Button mini neutral raised className="btn metro" style={{fontSize:"1.1rem"}} onClick={()=>{CONFIG.sendNotification({alert_type:'',reference_id:'',reference_type:'test'}, 'DTC Test Alert', 'Your game alert test has worked!');}}>Send test notification</Button>
             <div className="account-option">
               <button type="button" className="btn-login btn-login-logout metro" onClick={CONFIG.handleLogout}>Log out to switch accounts</button>
             </div>

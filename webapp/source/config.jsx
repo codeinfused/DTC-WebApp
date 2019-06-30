@@ -118,6 +118,11 @@ const CONFIG = {
   },
 
 
+  initNotifications()
+  {
+    navigator.serviceWorker.register('/sw.js');
+  },
+
   handleChangeNotifications(val)
   {
     var comp = this;
@@ -141,6 +146,71 @@ const CONFIG = {
     });
   },
 
+  checkNotificationPermission(enabling)
+  {
+    var comp = this;
+    if ('serviceWorker' in navigator && 'Notification' in window) {
+      if (Notification.permission === 'granted'){
+        if(enabling===true){
+          comp.sendNotification({}, 'Dice Tower Alerts', "Game alerts are enabled!");
+        }
+      }else{
+        // notification not granted yet
+        Notification.requestPermission(function(result) {
+          if (result === 'granted') {
+            comp.checkNotificationPermission(enabling);
+          }
+        });
+      }
+    } else {
+      console.warn('Push messaging is not supported');
+    }
+  },
+
+  sendNotification(obj, title, message)
+  {
+    var comp = this;
+    console.log(arguments, Notification.permission, navigator.serviceWorker);
+    if ('serviceWorker' in navigator && 'Notification' in window && Notification.permission === "granted") {
+    //if ('Notification' in window && Notification.permission === "granted") {
+      navigator.serviceWorker.ready.then(function(registration) {
+        console.log(registration);
+        registration.showNotification(title, {
+          icon: "/apple-touch-icon-192.png",
+          body: message,
+          vibrate: 400,
+          data: {
+            reference_id: obj.reference_id,
+            reference_type: obj.reference_type,
+            notify_type: obj.notify_type
+          }
+        });
+      });
+
+      // var notification = new Notification(title, {
+      //   icon: "/apple-touch-icon-192.png",
+      //   body: message,
+      //   vibrate: 400
+      // });
+      // notification.onclick = function(e){
+      //   if(obj && obj.reference_type==='table'){
+      //     window.location = '/list/table/' + obj.reference_id;
+      //   }
+      //   notification.close();
+      // };
+    }
+
+    /*
+    navigator.serviceWorker.register('sw.js');
+    Notification.requestPermission(function(result) {
+      if (result === 'granted') {
+        navigator.serviceWorker.ready.then(function(registration) {
+          registration.showNotification('Notification with ServiceWorker');
+        });
+      }
+    });
+    */
+  },
 
   // checkNotificationPermission(enabling)
   // {
@@ -175,47 +245,6 @@ const CONFIG = {
   //   }
   // },
   //
-
-  checkNotificationPermission(enabling)
-  {
-    var comp = this;
-    if ('serviceWorker' in navigator && 'Notification' in window) {
-      if (Notification.permission === 'granted'){
-        if(enabling===true){
-          comp.sendNotification({}, 'DTC Notifications', "Notifications are enabled.");
-        }
-      }else{
-        // notification not granted yet
-        Notification.requestPermission(function(result) {
-          if (result === 'granted') {
-            comp.checkNotificationPermission(enabling);
-          }
-        });
-      }
-    } else {
-      console.warn('Push messaging is not supported');
-    }
-  },
-
-
-  sendNotification(obj, title, message)
-  {
-    var comp = this;
-    //if ('serviceWorker' in navigator && 'Notification' in window && Notification.permission === "granted") {
-    if ('Notification' in window && Notification.permission === "granted") {
-      var notification = new Notification(title, {
-        icon: "/apple-touch-icon-192.png",
-        body: message,
-        vibrate: 400
-      });
-      notification.onclick = function(e){
-        if(obj && obj.reference_type==='table'){
-          window.location = '/list/table/' + obj.reference_id;
-        }
-        notification.close();
-      };
-    }
-  },
 
   phraseCapitalize: function(str)
   {

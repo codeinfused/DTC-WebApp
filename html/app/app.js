@@ -208,6 +208,7 @@
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
 	      var comp = this;
+	      _config2.default.initNotifications();
 	      _config2.default.authPromise = new Promise(function (resolve, reject) {
 	        var checkPromise = _config2.default.checkAuth(comp, 'appLoaded');
 	        checkPromise.then(resolve);
@@ -57210,6 +57211,9 @@
 	
 	  checkApiResponse: function checkApiResponse(json) {},
 	
+	  initNotifications: function initNotifications() {
+	    navigator.serviceWorker.register('/sw.js');
+	  },
 	  handleChangeNotifications: function handleChangeNotifications(val) {
 	    var comp = this;
 	    var req = comp.api.changeNotify;
@@ -57231,6 +57235,68 @@
 	    }).catch(function (json) {
 	      _ToastsAPI2.default.toast('error', null, json.response.data.message, { timeOut: 8000 }); // json.response.data.message
 	    });
+	  },
+	  checkNotificationPermission: function checkNotificationPermission(enabling) {
+	    var comp = this;
+	    if ('serviceWorker' in navigator && 'Notification' in window) {
+	      if (Notification.permission === 'granted') {
+	        if (enabling === true) {
+	          comp.sendNotification({}, 'Dice Tower Alerts', "Game alerts are enabled!");
+	        }
+	      } else {
+	        // notification not granted yet
+	        Notification.requestPermission(function (result) {
+	          if (result === 'granted') {
+	            comp.checkNotificationPermission(enabling);
+	          }
+	        });
+	      }
+	    } else {
+	      console.warn('Push messaging is not supported');
+	    }
+	  },
+	  sendNotification: function sendNotification(obj, title, message) {
+	    var comp = this;
+	    console.log(arguments, Notification.permission, navigator.serviceWorker);
+	    if ('serviceWorker' in navigator && 'Notification' in window && Notification.permission === "granted") {
+	      //if ('Notification' in window && Notification.permission === "granted") {
+	      navigator.serviceWorker.ready.then(function (registration) {
+	        console.log(registration);
+	        registration.showNotification(title, {
+	          icon: "/apple-touch-icon-192.png",
+	          body: message,
+	          vibrate: 400,
+	          data: {
+	            reference_id: obj.reference_id,
+	            reference_type: obj.reference_type,
+	            notify_type: obj.notify_type
+	          }
+	        });
+	      });
+	
+	      // var notification = new Notification(title, {
+	      //   icon: "/apple-touch-icon-192.png",
+	      //   body: message,
+	      //   vibrate: 400
+	      // });
+	      // notification.onclick = function(e){
+	      //   if(obj && obj.reference_type==='table'){
+	      //     window.location = '/list/table/' + obj.reference_id;
+	      //   }
+	      //   notification.close();
+	      // };
+	    }
+	
+	    /*
+	    navigator.serviceWorker.register('sw.js');
+	    Notification.requestPermission(function(result) {
+	      if (result === 'granted') {
+	        navigator.serviceWorker.ready.then(function(registration) {
+	          registration.showNotification('Notification with ServiceWorker');
+	        });
+	      }
+	    });
+	    */
 	  },
 	
 	
@@ -57267,44 +57333,6 @@
 	  //   }
 	  // },
 	  //
-	
-	  checkNotificationPermission: function checkNotificationPermission(enabling) {
-	    var comp = this;
-	    if ('serviceWorker' in navigator && 'Notification' in window) {
-	      if (Notification.permission === 'granted') {
-	        if (enabling === true) {
-	          comp.sendNotification({}, 'DTC Notifications', "Notifications are enabled.");
-	        }
-	      } else {
-	        // notification not granted yet
-	        Notification.requestPermission(function (result) {
-	          if (result === 'granted') {
-	            comp.checkNotificationPermission(enabling);
-	          }
-	        });
-	      }
-	    } else {
-	      console.warn('Push messaging is not supported');
-	    }
-	  },
-	  sendNotification: function sendNotification(obj, title, message) {
-	    var comp = this;
-	    //if ('serviceWorker' in navigator && 'Notification' in window && Notification.permission === "granted") {
-	    if ('Notification' in window && Notification.permission === "granted") {
-	      var notification = new Notification(title, {
-	        icon: "/apple-touch-icon-192.png",
-	        body: message,
-	        vibrate: 400
-	      });
-	      notification.onclick = function (e) {
-	        if (obj && obj.reference_type === 'table') {
-	          window.location = '/list/table/' + obj.reference_id;
-	        }
-	        notification.close();
-	      };
-	    }
-	  },
-	
 	
 	  phraseCapitalize: function phraseCapitalize(str) {
 	    return str.toLowerCase().split(' ').map(function (word) {
@@ -101633,8 +101661,15 @@
 	            _react2.default.createElement(_reactToolbox.Switch, { label: 'Allow Phone Notifications', checked: comp.state.allow_notifications, onChange: comp.handleChangeNotifications.bind(comp) }),
 	            _react2.default.createElement(
 	              'span',
-	              null,
-	              'For iPhones, only works in Chrome'
+	              { style: { marginBottom: "1rem", display: "block" } },
+	              'Works only in Chrome Browser'
+	            ),
+	            _react2.default.createElement(
+	              _button.Button,
+	              { mini: true, neutral: true, raised: true, className: 'btn metro', style: { fontSize: "1.1rem" }, onClick: function onClick() {
+	                  _config2.default.sendNotification({ alert_type: '', reference_id: '', reference_type: 'test' }, 'DTC Test Alert', 'Your game alert test has worked!');
+	                } },
+	              'Send test notification'
 	            ),
 	            _react2.default.createElement(
 	              'div',

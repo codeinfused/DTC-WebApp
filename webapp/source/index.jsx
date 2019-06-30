@@ -78,6 +78,7 @@ class AppLayout extends React.Component
   componentDidMount()
   {
     var comp = this;
+    CONFIG.initNotifications();
     CONFIG.authPromise = new Promise((resolve, reject) => {
       var checkPromise = CONFIG.checkAuth(comp, 'appLoaded');
       checkPromise.then(resolve);
