@@ -57212,7 +57212,9 @@
 	  checkApiResponse: function checkApiResponse(json) {},
 	
 	  initNotifications: function initNotifications() {
-	    navigator.serviceWorker.register('/sw.js');
+	    if ('serviceWorker' in navigator) {
+	      navigator.serviceWorker.register('/sw.js');
+	    }
 	  },
 	  handleChangeNotifications: function handleChangeNotifications(val) {
 	    var comp = this;
