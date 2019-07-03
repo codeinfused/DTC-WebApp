@@ -5,7 +5,9 @@ import {browserHistory} from 'react-router';
 import {FontIcon} from 'react-toolbox';
 import {Button, IconButton} from 'react-toolbox/lib/button';
 import {LoadingInline} from '../components/Loaders.jsx';
+import MapPopup from '../components/MapPopup.jsx';
 import moment from 'moment';
+
 
 class Home extends React.Component
 {
@@ -54,21 +56,24 @@ class Home extends React.Component
     });
   }
 
-  openSearchPage()
-  {
+  openSearchPage(){
     CONFIG.state.searchDB = 'bgg';
     browserHistory.push('/games');
   }
 
-  openPlansPage()
-  {
+  openPlansPage(){
     browserHistory.push('/myplans');
   }
 
   renderNoPlans()
   {
+    var comp = this;
     return (
-      <div className="table-search-list-empty"><h3>No plans yet.</h3><p>You can schedule games to play at the convention, and reserve a space at other player's tables! Go get started!</p></div>
+      <div className="table-search-list-empty">
+        <h3>No plans yet.</h3>
+        <p>You can schedule games to play at the convention, and reserve a space at other player's tables! Go get started!</p>
+        <p><Button onClick={comp.openSearchPage} raised style={{width:'100%',display:'block',background:'#3cab51',color:'#fff',marginTop:'2rem'}}><FontIcon value='casino' /> Start a Game!</Button></p>
+      </div>
     );
   }
 
@@ -118,13 +123,13 @@ class Home extends React.Component
 
           <div className="home-plans">
             <div className="home-plans-title">
-              <h2>My Plans <span>Quick Look</span></h2>
+              <h2>My Plans <span>Upcoming 5 Events</span></h2>
             </div>
             {(comp.state.my_plans && comp.state.my_plans.length > 0) ? comp.renderPlansList() : comp.renderNoPlans()}
           </div>
 
-          <div className="clearfix" style={{paddingBottom:'40px'}}>
 
+          <div className="clearfix" style={{paddingBottom:'40px'}}>
             <div className="home-top-list home-top-wtp">
               <h2>Top Wanted Tables</h2>
               <ol>
@@ -151,7 +156,16 @@ class Home extends React.Component
                 })}
               </ol>
             </div>
+          </div>
 
+          <div className="clearfix" style={{marginBottom:"30px"}}>
+            <div className="home-plans">
+              <MapPopup raised fullwidth styles={{width:'100%',display:'block',fontSize:'1.6rem',marginBottom:'1.5rem'}} />
+              <div style={{display:'flex'}}>
+                <Button icon="comment" label='Feedback' target='_blank' href="https://fdier.co/4zOY4x" raised style={{textTransform:'none',fontSize:'1.5rem',marginRight:'0.5rem',flex:'1'}} />
+                <a style={{marginLeft:'0.5rem',flex:'1'}} className="dbox-donation-button" href="https://donorbox.org/dtcapp?amount=5" target="_donate">Support DTCApp</a>
+              </div>
+            </div>
           </div>
 
         </div>

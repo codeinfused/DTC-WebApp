@@ -35,7 +35,7 @@ class MapPopup extends React.Component
   {
     var comp = this;
     return (
-      <div className="map-popup-cm" style={{display:"inline-block"}}>
+      <div className="map-popup-cm" style={comp.props.fullwidth?{}:{display:"inline-block"}}>
         <Button
           label="View DTC Floor Map"
           icon="map"

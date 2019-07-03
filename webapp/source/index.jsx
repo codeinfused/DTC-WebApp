@@ -66,7 +66,7 @@ class AppLayout extends React.Component
       {label:'My Plans',            path:'/myplans', icon:'date_range'},
       {label:'My Tables',           path:'/mytables', icon:'playlist_add_check'},
       {label:'My Settings',         path:'/me', icon:'settings_applications'},
-      {label:'About & Map',         path:'/about', icon:'info'}
+      {label:'About The App',         path:'/about', icon:'info'}
     ];
 
     this.getNewAlerts = this.getNewAlerts.bind(this);

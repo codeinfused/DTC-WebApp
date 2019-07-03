@@ -195,7 +195,7 @@
 	    { label: 'Scheduled Tables', path: '/schedules', icon: 'event_note' }, { label: 'Start/Search Games', path: '/games', icon: 'search', callback: comp.DBLoadBGG }, // library_books
 	    // {label:'Con Library',         path:'/library', icon:'import_contacts', callback: comp.DBLoadLibrary},
 	    { label: 'Official Events', path: '/events', icon: 'local_play' }, // dvr
-	    { label: 'Game Alerts', path: '/alerts', icon: 'notifications' }, { label: 'My Plans', path: '/myplans', icon: 'date_range' }, { label: 'My Tables', path: '/mytables', icon: 'playlist_add_check' }, { label: 'My Settings', path: '/me', icon: 'settings_applications' }, { label: 'About & Map', path: '/about', icon: 'info' }];
+	    { label: 'Game Alerts', path: '/alerts', icon: 'notifications' }, { label: 'My Plans', path: '/myplans', icon: 'date_range' }, { label: 'My Tables', path: '/mytables', icon: 'playlist_add_check' }, { label: 'My Settings', path: '/me', icon: 'settings_applications' }, { label: 'About The App', path: '/about', icon: 'info' }];
 	
 	    _this.getNewAlerts = _this.getNewAlerts.bind(_this);
 	    _this.openTableDialog = _this.openTableDialog.bind(_this);
@@ -80897,6 +80897,10 @@
 	
 	var _Loaders = __webpack_require__(715);
 	
+	var _MapPopup = __webpack_require__(844);
+	
+	var _MapPopup2 = _interopRequireDefault(_MapPopup);
+	
 	var _moment = __webpack_require__(720);
 	
 	var _moment2 = _interopRequireDefault(_moment);
@@ -80974,6 +80978,7 @@
 	  }, {
 	    key: 'renderNoPlans',
 	    value: function renderNoPlans() {
+	      var comp = this;
 	      return _react2.default.createElement(
 	        'div',
 	        { className: 'table-search-list-empty' },
@@ -80986,6 +80991,16 @@
 	          'p',
 	          null,
 	          'You can schedule games to play at the convention, and reserve a space at other player\'s tables! Go get started!'
+	        ),
+	        _react2.default.createElement(
+	          'p',
+	          null,
+	          _react2.default.createElement(
+	            _button.Button,
+	            { onClick: comp.openSearchPage, raised: true, style: { width: '100%', display: 'block', background: '#3cab51', color: '#fff', marginTop: '2rem' } },
+	            _react2.default.createElement(_reactToolbox.FontIcon, { value: 'casino' }),
+	            ' Start a Game!'
+	          )
 	        )
 	      );
 	    }
@@ -81079,7 +81094,7 @@
 	                _react2.default.createElement(
 	                  'span',
 	                  null,
-	                  'Quick Look'
+	                  'Upcoming 5 Events'
 	                )
 	              )
 	            ),
@@ -81134,6 +81149,25 @@
 	                    )
 	                  );
 	                })
+	              )
+	            )
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'clearfix', style: { marginBottom: "30px" } },
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'home-plans' },
+	              _react2.default.createElement(_MapPopup2.default, { raised: true, fullwidth: true, styles: { width: '100%', display: 'block', fontSize: '1.6rem', marginBottom: '1.5rem' } }),
+	              _react2.default.createElement(
+	                'div',
+	                { style: { display: 'flex' } },
+	                _react2.default.createElement(_button.Button, { icon: 'comment', label: 'Feedback', target: '_blank', href: 'https://fdier.co/4zOY4x', raised: true, style: { textTransform: 'none', fontSize: '1.5rem', marginRight: '0.5rem', flex: '1' } }),
+	                _react2.default.createElement(
+	                  'a',
+	                  { style: { marginLeft: '0.5rem', flex: '1' }, className: 'dbox-donation-button', href: 'https://donorbox.org/dtcapp?amount=5', target: '_donate' },
+	                  'Support DTCApp'
+	                )
 	              )
 	            )
 	          )
@@ -98713,7 +98747,7 @@
 	      var comp = this;
 	      return _react2.default.createElement(
 	        'div',
-	        { className: 'map-popup-cm', style: { display: "inline-block" } },
+	        { className: 'map-popup-cm', style: comp.props.fullwidth ? {} : { display: "inline-block" } },
 	        _react2.default.createElement(_button.Button, {
 	          label: 'View DTC Floor Map',
 	          icon: 'map',
