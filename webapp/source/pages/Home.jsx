@@ -162,8 +162,8 @@ class Home extends React.Component
             <div className="home-plans">
               <MapPopup raised fullwidth styles={{width:'100%',display:'block',fontSize:'1.6rem',marginBottom:'1.5rem'}} />
               <div style={{display:'flex'}}>
-                <Button icon="comment" label='Feedback' target='_blank' href="https://fdier.co/4zOY4x" raised style={{textTransform:'none',fontSize:'1.5rem',marginRight:'0.5rem',flex:'1'}} />
-                <a style={{marginLeft:'0.5rem',flex:'1'}} className="dbox-donation-button" href="https://donorbox.org/dtcapp?amount=5" target="_donate">Support DTCApp</a>
+                <Button icon="comment" label='Feedback' target='_blank' href="https://fdier.co/4zOY4x" raised style={{textTransform:'none',fontSize:'1.5rem',marginRight:'0.4rem',flex:'1'}} />
+                <a style={{marginLeft:'0.4rem',flex:'1'}} className="dbox-donation-button" href="https://donorbox.org/dtcapp?amount=5" target="_donate">Fuel Mike</a>
               </div>
             </div>
           </div>
