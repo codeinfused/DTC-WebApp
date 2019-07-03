@@ -98828,7 +98828,7 @@
 	
 	    _this.tableTypes = [{ id: 'now', name: 'Play Now!' }, { id: 'later', name: 'Schedule Later' }, { id: 'demo', name: 'Demo' }];
 	
-	    _this.tableLocations = [{ label: 'Grand Sierra Ballroom (Open)', value: 'Grand Sierra Ballroom' }, { label: 'Hall Foyer (Open)', value: 'Hall Foyer' }, { label: 'Curaco (RPGs, War Games, Kids)', value: 'Curaco' }, { label: 'Bonaire (Demos and Events)', value: 'Bonaire' }, { label: 'Caribbean (Exhibitor Events)', value: 'Caribbean Ballroom' }];
+	    _this.tableLocations = [{ label: 'To Be Determined Later', value: 'TBD' }, { label: 'Grand Sierra Ballroom (Open)', value: 'Grand Sierra Ballroom' }, { label: 'Hall Foyer (Open)', value: 'Hall Foyer' }, { label: 'Curaco (RPGs, War Games, Kids)', value: 'Curaco' }, { label: 'Bonaire (Demos and Events)', value: 'Bonaire' }, { label: 'Caribbean (Exhibitor Events)', value: 'Caribbean Ballroom' }];
 	
 	    _this.playtimeOptions = [{ label: 'Auto', value: '' }, { label: '30 (half hour)', value: '0.5 hour' }, { label: '60 (1 hour)', value: '1 hour' }, { label: '90 (1½ hours)', value: '1.5 hours' }, { label: '120 (2 hours)', value: '2 hours' }, { label: '150 (2½ hours)', value: '2.5 hours' }, { label: '180 (3 hours)', value: '3 hours' }, { label: '240 (4 hours)', value: '4 hours' }, { label: '300 (5+ hours)', value: '5+ hours' }];
 	
@@ -98964,7 +98964,13 @@
 	  }, {
 	    key: 'handleChangeInput',
 	    value: function handleChangeInput(field, value) {
-	      this.setState(_defineProperty({}, field, value));
+	      var obj = _defineProperty({}, field, value);
+	      if (field == 'table_type' && value == 'future') {
+	        obj.table_location = "TBD";
+	      } else if (field == 'table_type' && value == 'now') {
+	        obj.table_location = "Grand Sierra Ballroom";
+	      }
+	      this.setState(obj);
 	    }
 	  }, {
 	    key: 'handleChangeSelect',
@@ -99115,7 +99121,19 @@
 	                )
 	              )
 	            ),
-	            comp.state.table_type === 'now' ? '' : _react2.default.createElement(
+	            comp.state.table_type === 'now' ? _react2.default.createElement(
+	              'div',
+	              null,
+	              _react2.default.createElement(
+	                'div',
+	                { className: 'table-form-item' },
+	                _react2.default.createElement(
+	                  'p',
+	                  null,
+	                  'Grab a "Players Wanted" sign and a table first! Then post your location here for others to find you.'
+	                )
+	              )
+	            ) : _react2.default.createElement(
 	              'div',
 	              null,
 	              _react2.default.createElement(
@@ -99137,29 +99155,33 @@
 	              'div',
 	              { className: 'table-form-item' },
 	              _react2.default.createElement(_reactToolbox.Dropdown, { label: 'Room Location', source: comp.tableLocations, value: comp.state.table_location, onChange: comp.handleChangeInput.bind(comp, 'table_location') }),
-	              _react2.default.createElement(
-	                'select',
-	                { className: 'sublocation_alpha', value: comp.state.table_sublocation_alpha, onChange: comp.handleChangeSelect.bind(comp, 'table_sublocation_alpha') },
-	                this.sublocs_alpha.map(function (alpha) {
-	                  return _react2.default.createElement(
-	                    'option',
-	                    { key: "localpha-" + alpha, value: alpha },
-	                    alpha
-	                  );
-	                })
-	              ),
-	              _react2.default.createElement(
-	                'select',
-	                { className: 'sublocation_num', value: comp.state.table_sublocation_num, onChange: comp.handleChangeSelect.bind(comp, 'table_sublocation_num') },
-	                this.sublocs_num.map(function (num) {
-	                  return _react2.default.createElement(
-	                    'option',
-	                    { key: "locnum" + num, value: num },
-	                    num
-	                  );
-	                })
-	              ),
-	              _react2.default.createElement(_MapPopup2.default, { styles: { fontSize: "1.1rem", height: "2.6rem", lineHeight: "2.6rem", marginLeft: "1rem" }, raised: true })
+	              comp.state.table_location === 'TBD' ? '' : _react2.default.createElement(
+	                'div',
+	                null,
+	                _react2.default.createElement(
+	                  'select',
+	                  { className: 'sublocation_alpha', value: comp.state.table_sublocation_alpha, onChange: comp.handleChangeSelect.bind(comp, 'table_sublocation_alpha') },
+	                  this.sublocs_alpha.map(function (alpha) {
+	                    return _react2.default.createElement(
+	                      'option',
+	                      { key: "localpha-" + alpha, value: alpha },
+	                      alpha
+	                    );
+	                  })
+	                ),
+	                _react2.default.createElement(
+	                  'select',
+	                  { className: 'sublocation_num', value: comp.state.table_sublocation_num, onChange: comp.handleChangeSelect.bind(comp, 'table_sublocation_num') },
+	                  this.sublocs_num.map(function (num) {
+	                    return _react2.default.createElement(
+	                      'option',
+	                      { key: "locnum" + num, value: num },
+	                      num
+	                    );
+	                  })
+	                ),
+	                _react2.default.createElement(_MapPopup2.default, { styles: { fontSize: "1.1rem", height: "2.6rem", lineHeight: "2.6rem", marginLeft: "1rem" }, raised: true })
+	              )
 	            ),
 	            _react2.default.createElement(
 	              'div',
@@ -102702,7 +102724,7 @@
 	                  _react2.default.createElement(
 	                    'span',
 	                    { className: 'plan-tag' },
-	                    table.table_location + ' ' + (table.table_sublocation_alpha || '') + '-' + (table.table_sublocation_num || '')
+	                    table.table_location + ' ' + (table.table_location == 'TBD' ? '' : (table.table_sublocation_alpha || '') + '-' + (table.table_sublocation_num || ''))
 	                  ),
 	                  _react2.default.createElement(
 	                    'span',

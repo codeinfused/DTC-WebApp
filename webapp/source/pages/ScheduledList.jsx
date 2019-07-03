@@ -242,7 +242,7 @@ class ScheduledList extends React.Component
                       {/* <span className="plan-tag">{moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, MMM Do YYYY, h:mm a')}</span> */}
                       <span className="plan-tag">{moment(table.start_datetime, 'YYYY-MM-DD HH:mm:ss').format('ddd, h:mm a')}</span>
                       <span className="plan-tag">Takes {table.playtime ? table.playtime : Math.round((Math.round(table.avgplay/6)/10)*2)/2 + ' hours'}</span>
-                      <span className="plan-tag">{table.table_location +' '+ (table.table_sublocation_alpha||'') + '-' + (table.table_sublocation_num||'')}</span>
+                      <span className="plan-tag">{table.table_location +' '+ ( table.table_location=='TBD'?'': (table.table_sublocation_alpha||'') + '-' + (table.table_sublocation_num||'') ) }</span>
                       <span className={"plan-tag" + (isMyTable ? " hosting" : " otherhost")}>Host: {(isMyTable ? "Me" : table.host_name)}</span>
                       {table.only_experienced==1 ? (<span className="plan-tag experts">Experts</span>) : ''}
                       {table.allow_signups==1 ? (<span className="plan-tag">{table.signups} of {table.seats} seats taken</span>) : ''}

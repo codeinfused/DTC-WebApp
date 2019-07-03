@@ -42,6 +42,7 @@ class TableEdit extends React.Component
     ];
 
     this.tableLocations = [
+      {label: 'To Be Determined Later', value: 'TBD'},
       {label: 'Grand Sierra Ballroom (Open)', value: 'Grand Sierra Ballroom'},
       {label: 'Hall Foyer (Open)', value: 'Hall Foyer'},
       {label: 'Curaco (RPGs, War Games, Kids)', value: 'Curaco'},
@@ -203,7 +204,15 @@ class TableEdit extends React.Component
 
   handleChangeInput(field, value)
   {
-    this.setState({[field]: value});
+    let obj = {
+      [field]: value
+    };
+    if(field=='table_type' && value=='future'){
+      obj.table_location = "TBD";
+    }else if(field=='table_type' && value=='now'){
+      obj.table_location = "Grand Sierra Ballroom";
+    }
+    this.setState(obj);
   }
 
   handleChangeSelect(field, value)
@@ -329,7 +338,13 @@ class TableEdit extends React.Component
                   </div>
                 </fieldset>
               </div>
-              {comp.state.table_type==='now' ? '' : (
+              {comp.state.table_type==='now' ? (
+                <div>
+                  <div className="table-form-item">
+                    <p>Grab a "Players Wanted" sign and a table first! Then post your location here for others to find you.</p>
+                  </div>
+                </div>
+              ) : (
                 <div>
                   <div className="table-form-item">
                     <DatePicker label='Day' autoOk sundayFirstDayOfWeek minDate={moment(comp.dateRange[0], 'YYYY-MM-DD').toDate()} maxDate={moment(comp.dateRange[1], 'YYYY-MM-DD').toDate()}
@@ -345,17 +360,21 @@ class TableEdit extends React.Component
               )}
               <div className="table-form-item">
                 <Dropdown label='Room Location' source={comp.tableLocations} value={comp.state.table_location} onChange={comp.handleChangeInput.bind(comp, 'table_location')} />
-                <select className="sublocation_alpha" value={comp.state.table_sublocation_alpha} onChange={comp.handleChangeSelect.bind(comp, 'table_sublocation_alpha')}>
-                  {this.sublocs_alpha.map(function(alpha){
-                    return (<option key={"localpha-"+alpha} value={alpha}>{alpha}</option>);
-                  })}
-                </select>
-                <select className="sublocation_num" value={comp.state.table_sublocation_num} onChange={comp.handleChangeSelect.bind(comp, 'table_sublocation_num')}>
-                  {this.sublocs_num.map(function(num){
-                    return (<option key={"locnum"+num} value={num}>{num}</option>);
-                  })}
-                </select>
-                <MapPopup styles={{fontSize:"1.1rem", height:"2.6rem", lineHeight:"2.6rem", marginLeft:"1rem"}} raised />
+                {comp.state.table_location==='TBD' ? '' : (
+                  <div>
+                    <select className="sublocation_alpha" value={comp.state.table_sublocation_alpha} onChange={comp.handleChangeSelect.bind(comp, 'table_sublocation_alpha')}>
+                      {this.sublocs_alpha.map(function(alpha){
+                        return (<option key={"localpha-"+alpha} value={alpha}>{alpha}</option>);
+                      })}
+                    </select>
+                    <select className="sublocation_num" value={comp.state.table_sublocation_num} onChange={comp.handleChangeSelect.bind(comp, 'table_sublocation_num')}>
+                      {this.sublocs_num.map(function(num){
+                        return (<option key={"locnum"+num} value={num}>{num}</option>);
+                      })}
+                    </select>
+                    <MapPopup styles={{fontSize:"1.1rem", height:"2.6rem", lineHeight:"2.6rem", marginLeft:"1rem"}} raised />
+                  </div>
+                )}
               </div>
               <div className="table-form-item">
                 <div className="table-form-playtime">
