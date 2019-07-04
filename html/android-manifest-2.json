@@ -2,7 +2,7 @@
   "name": "Dice Tower Convention App",
   "short_name": "Dice Tower Con",
   "lang": "en-US",
-  "version": "4.3.5",
+  "version": "4.3.6",
   "start_url": "/home",
   "scope": "/",
   "display": "standalone",

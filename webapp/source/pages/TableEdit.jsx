@@ -45,7 +45,8 @@ class TableEdit extends React.Component
       {label: 'To Be Determined Later', value: 'TBD'},
       {label: 'Grand Sierra Ballroom (Open)', value: 'Grand Sierra Ballroom'},
       {label: 'Hall Foyer (Open)', value: 'Hall Foyer'},
-      {label: 'Curaco (RPGs, War Games, Kids)', value: 'Curaco'},
+      {label: 'Curaco I-II (War Games)', value: 'Curaco I-II'},
+      {label: 'Curaco III-IV (RPGs)', value: 'Curaco III-IV'},
       {label: 'Bonaire (Demos and Events)', value: 'Bonaire'},
       {label: 'Caribbean (Exhibitor Events)', value: 'Caribbean Ballroom' }
     ];

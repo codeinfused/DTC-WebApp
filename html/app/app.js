@@ -98862,7 +98862,7 @@
 	
 	    _this.tableTypes = [{ id: 'now', name: 'Play Now!' }, { id: 'later', name: 'Schedule Later' }, { id: 'demo', name: 'Demo' }];
 	
-	    _this.tableLocations = [{ label: 'To Be Determined Later', value: 'TBD' }, { label: 'Grand Sierra Ballroom (Open)', value: 'Grand Sierra Ballroom' }, { label: 'Hall Foyer (Open)', value: 'Hall Foyer' }, { label: 'Curaco (RPGs, War Games, Kids)', value: 'Curaco' }, { label: 'Bonaire (Demos and Events)', value: 'Bonaire' }, { label: 'Caribbean (Exhibitor Events)', value: 'Caribbean Ballroom' }];
+	    _this.tableLocations = [{ label: 'To Be Determined Later', value: 'TBD' }, { label: 'Grand Sierra Ballroom (Open)', value: 'Grand Sierra Ballroom' }, { label: 'Hall Foyer (Open)', value: 'Hall Foyer' }, { label: 'Curaco I-II (War Games)', value: 'Curaco I-II' }, { label: 'Curaco III-IV (RPGs)', value: 'Curaco III-IV' }, { label: 'Bonaire (Demos and Events)', value: 'Bonaire' }, { label: 'Caribbean (Exhibitor Events)', value: 'Caribbean Ballroom' }];
 	
 	    _this.playtimeOptions = [{ label: 'Auto', value: '' }, { label: '30 (half hour)', value: '0.5 hour' }, { label: '60 (1 hour)', value: '1 hour' }, { label: '90 (1½ hours)', value: '1.5 hours' }, { label: '120 (2 hours)', value: '2 hours' }, { label: '150 (2½ hours)', value: '2.5 hours' }, { label: '180 (3 hours)', value: '3 hours' }, { label: '240 (4 hours)', value: '4 hours' }, { label: '300 (5+ hours)', value: '5+ hours' }];
 	
