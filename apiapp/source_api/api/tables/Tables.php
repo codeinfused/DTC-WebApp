@@ -217,6 +217,7 @@ abstract class Tables
       LEFT JOIN game_signups gs ON gs.table_id = tb.id
       WHERE (tb.table_type='now' OR tb.table_type='future')
       AND tb.start_datetime > NOW() - INTERVAL 20 MINUTE
+      AND tb.start_datetime < NOW() + INTERVAL 30 MINUTE
       AND tb.status='ready'
       AND tb.private='0'
       AND gi.id IS NULL
