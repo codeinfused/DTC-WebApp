@@ -207,19 +207,22 @@ abstract class Tables
     $dbCheck = $pdo->prepare(
       "SELECT db.title, tb.id as table_id, tb.bgg_id, tb.player_id, CONCAT(u.firstname, ' ', SUBSTRING(u.lastname, 1, 1)) as host_name,
       tb.table_type, tb.seats, tb.table_location, tb.table_sublocation_alpha, tb.table_sublocation_num, tb.start_datetime, tb.lft, tb.only_experienced, tb.allow_signups, tb.status, tb.playtime,
+      COUNT(gs.id) AS signups,
       ROUND((db.minplaytime+db.maxplaytime)/2) as avgplay
       FROM game_tables tb
       JOIN bgg_game_db db ON tb.bgg_id = db.bgg_id
       LEFT JOIN users u ON u.id = tb.player_id
       LEFT JOIN game_ignore gi ON gi.bgg_id = tb.bgg_id
       LEFT JOIN game_ignore gi2 ON gi2.bad_player_id = tb.player_id
-      WHERE tb.table_type=:table_type
+      LEFT JOIN game_signups gs ON gs.table_id = tb.id
+      WHERE (tb.table_type='now' OR tb.table_type='future')
       AND tb.start_datetime > NOW() - INTERVAL 20 MINUTE
       AND tb.status='ready'
       AND tb.private='0'
       AND gi.id IS NULL
       AND gi2.id IS NULL
       GROUP BY tb.id
+      HAVING signups < tb.seats
       ORDER BY tb.start_datetime ASC"
     );
     $dbCheck->execute(array(':table_type' => 'now'));
